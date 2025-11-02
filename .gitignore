@@ -26,7 +26,3 @@ Thumbs.db
 /node_modules
 .env
 meilisearch.exe
-/vendor
-/node_modules
-.env
-meilisearch.exe
