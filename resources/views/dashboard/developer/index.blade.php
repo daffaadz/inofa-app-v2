@@ -1,10 +1,5 @@
-@extends('layouts.app')
-
-{{--  title  --}}
-@section('title', 'Developer Dashboard – Inofa')
-
-{{--  main content  --}}
-@section('content')
+<x-app-layout>
+    <x-slot:title>{{__('Dashboard Anda - Inofa')}}</x-slot:title>
     <section class="min-h-screen flex">
 
         <!-- ===== SIDEBAR ===== -->
@@ -152,7 +147,7 @@
 
                                 {{-- right --}}
                                 <span
-                                    class="px-4 py-4 bg-blue-100 text-blue-600 text-b-3 font-medium rounded-full">New</span>
+                                    class="px-4 py-2 bg-blue-100 text-blue-600 text-b-3 font-medium rounded-xl">{{__('New')}}</span>
                             </div>
                             <p class="text-b-1 text-neutral-600 mb-1">Pending Inquiries</p>
                             <p class="text-h-3 font-bold text-neutral-900 mb-4">
@@ -352,4 +347,4 @@
         </div>
 
     </section>
-@endsection
+</x-app-layout>

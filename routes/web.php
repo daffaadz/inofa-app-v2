@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Auth\RegistrationFlowController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\RedirectAfterLoginController;
+use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
+use App\Http\Controllers\Developer\SearchController as SearchProjects;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -60,6 +62,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/developer/information', [RegistrationFlowController::class, 'storeDeveloperInformation'])->name('developer.information.store');
 });
 
+// Search for Developers (public access - as guest or authenticated)
+Route::get('/search/developers', [SearchDevelopers::class, 'index'])
+    ->name('search.developers');
+Route::get('/search/developers/{id}', [SearchDevelopers::class, 'show'])
+    ->name('search.developers.show');
+
+// Search for Projects (public access - for developers)
+Route::get('/search/projects', [SearchProjects::class, 'index'])
+    ->name('search.projects');
+Route::get('/search/projects/{id}', [SearchProjects::class, 'show'])
+    ->name('search.projects.show');
+
 require __DIR__.'/auth.php';
 
 
@@ -95,6 +109,15 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
          ->name('earnings.index');
 
     /* ---------- Search (API) ---------- */
-    Route::get('/search', [DevSearch::class, 'search'])
+    Route::get('/search', [DevSearch::class, 'index'])
          ->name('search');
+});
+
+
+// CUSTOMER ROUTING
+
+Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function(){
+     Route::get('project/create', function(){
+          return "BIKIN PROJECT AHHH";
+     })->name('project.create');
 });

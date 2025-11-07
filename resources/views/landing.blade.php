@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Inofa – Bring Your Digital Projects to Life')
-
-@section('content')
+<x-app-layout>
     {{-- Hero Section --}}
     <section class="relative pt-24 z-10">
         <div class="max-w-8xl mx-4 md:mx-16 py-12 md:py-24 overflow-hidden bg-cover bg-center rounded-xl"
@@ -38,10 +34,11 @@
                             <span class="whitespace-nowrap text-neutral-0">or</span>
                             <div class="flex-1 border-t border-neutral-10"></div>
                         </div>
-                        <button
+                        <a
+                            href="{{ route('consumer.project.create') }}"
                             class="px-6 py-3 bg-transparent w-full border-[1px] border-white rounded-lg hover:bg-white hover:text-neutral-1000 transition font-medium">
                             Create a new project request
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -146,117 +143,7 @@
                 @endphp
 
                 @forelse($developers as $developer)
-                    <div
-                        class="bg-white rounded-xl p-6 shadow-xl hover:shadow-2xl hover:scale-105 border-[0.2px] border-neutral-800 transition-all">
-                        <div class="flex items-start gap-4 mb-4">
-                            {{-- Profile Image --}}
-                            @if ($developer->avatar)
-                                @php
-                                    $src = $developer->avatar
-                                        ? (Str::startsWith($developer->avatar, 'http')
-                                            ? $developer->avatar
-                                            : asset('storage/' . $developer->avatar))
-                                        : 'https://ui-avatars.com/api/?name=' .
-                                            urlencode($developer->name) .
-                                            '&size=56';
-                                @endphp
-
-                                <img src="{{ $src }}" alt="{{ $developer->name }}"
-                                    class="w-14 h-14 rounded-full object-cover">
-                            @else
-                                <div
-                                    class="w-14 h-14 rounded-full bg-primary-200 flex items-center justify-center text-primary-700 font-semibold text-b-1">
-                                    {{ substr($developer->name, 0, 2) }}
-                                </div>
-                            @endif
-                            <div>
-                                <h3 class="text-b-1 font-semibold text-neutral-1000">{{ $developer->name }}</h3>
-                                @if ($developer->location)
-                                    <div class="flex items-center gap-1 text-b-3 text-neutral-500">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <span>{{ $developer->location }}</span>
-                                    </div>
-                                @endif
-                                @if ($developer->developerProfile)
-                                    <div class="flex items-center gap-1 mt-1">
-                                        @for ($j = 0; $j < 5; $j++)
-                                            <svg class="w-4 h-4 {{ $j < floor($developer->developerProfile->rating_average) ? 'text-secondary-500' : 'text-neutral-300' }}"
-                                                fill="currentColor" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        @endfor
-                                        <span class="text-b-3 text-neutral-500 ml-1">
-                                            {{ number_format($developer->developerProfile->rating_average, 1) }}
-                                            ({{ $developer->developerProfile->rating_count }})
-                                        </span>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        @if ($developer->developerProfile && $developer->developerProfile->headline)
-                            <p class="text-b-2 text-neutral-600 mb-4 line-clamp-3">
-                                {{ $developer->developerProfile->headline }}
-                            </p>
-                        @elseif($developer->bio)
-                            <p class="text-b-2 text-neutral-600 mb-4 line-clamp-3">
-                                {{ $developer->bio }}
-                            </p>
-                        @else
-                            <p class="text-b-2 text-neutral-600 mb-4 line-clamp-3">
-                                Professional developer with {{ $developer->developerProfile->experience_years ?? 0 }}+
-                                years of experience.
-                            </p>
-                        @endif
-
-                        <div class="mb-4">
-                            @if ($developer->developerProfile && $developer->developerProfile->skills->isNotEmpty())
-                                <h4 class="text-b-3 font-semibold text-neutral-1000 mb-2">Top Skills</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach ($developer->skills->take(3) as $skill)
-                                        <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-b-3">
-                                            {{ $skill->name }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            @elseif($developer->developerProfile && $developer->developerProfile->projects_completed > 0)
-                                <div class="flex items-center gap-2 text-b-3 text-neutral-600">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                        <path fill-rule="evenodd"
-                                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    <span>{{ $developer->developerProfile->projects_completed }} projects completed</span>
-                                </div>
-                            @endif
-
-                            @if ($developer->developerProfile && $developer->developerProfile->rate_min_byproject)
-                                <div class="flex items-center gap-2 text-b-3 text-neutral-600 mt-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path
-                                            d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                                        <path fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    <span>Rp{{ number_format($developer->developerProfile->rate_min_byproject, 0, ',', '.') }}
-                                        -
-                                        Rp{{ number_format($developer->developerProfile->rate_max_byproject, 0, ',', '.') }}/project</span>
-                                </div>
-                            @endif
-                        </div>
-
-                        <a href="{{ route('landing', $developer->id) }}"
-                            class="block w-full py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium text-b-1 text-center">
-                            View Full Profile
-                        </a>
-                    </div>
+                    <x-profile-card :developer="$developer" />
                 @empty
                     {{-- Fallback if no developers --}}
                     <div class="col-span-full text-center py-12">
@@ -277,7 +164,8 @@
                 <div class="flex flex-col rounded-l-xl p-8 justify-center border-l border-y border-neutral-200">
                     <div class="space-y-4">
                         <h3 class="text-b-2 text-neutral-500 font-medium">Search</h3>
-                        <h4 class="text-h-6 text-neutral-1000 leading-tight">Find the Right Developer for Your Needs</h4>
+                        <h4 class="text-h-6 text-neutral-1000 leading-tight">Find the Right Developer for Your Needs
+                        </h4>
                         <p class="text-b-2 text-neutral-600">
                             Search by type of software, skills, location, and experience
                         </p>
@@ -286,7 +174,8 @@
                             Explore
                             <svg class="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
                             </svg>
                         </a>
                     </div>
@@ -313,16 +202,16 @@
                             <a href="#"
                                 class="inline-flex items-center text-primary-500 font-medium text-b-2 hover:text-primary-600 group">
                                 Explore
-                                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 5l7 7-7 7" />
                                 </svg>
                             </a>
                         </div>
                         <div class="rounded-b-xl overflow-hidden">
-                            <img src="{{ asset('assets/images/placeholder_management.jpg') }}" alt="Project Management"
-                                class="w-full h-40 object-cover">
+                            <img src="{{ asset('assets/images/placeholder_management.jpg') }}"
+                                alt="Project Management" class="w-full h-40 object-cover">
                         </div>
                     </div>
 
@@ -337,8 +226,8 @@
                             <a href="#"
                                 class="inline-flex items-center text-primary-500 font-medium text-b-2 hover:text-primary-600 group">
                                 Explore
-                                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 5l7 7-7 7" />
                                 </svg>
@@ -395,7 +284,8 @@
                     </div>
                     <h3 class="text-h-7 text-neutral-1000 mb-3">Hire top talent fast</h3>
                     <p class="text-b-2 text-neutral-600">
-                        Connect, interview, and hire in no time. We give you talented freelancers that best fit your needs.
+                        Connect, interview, and hire in no time. We give you talented freelancers that best fit your
+                        needs.
                     </p>
                 </div>
 
@@ -416,7 +306,8 @@
                 <div class="text-center">
                     <div class="w-24 h-24 mx-auto mb-6">
                         {{-- Illustration: Payment --}}
-                        <img src="{{ asset('assets/images/how-it-works/4.png') }}" alt="Payment" class="w-full h-full">
+                        <img src="{{ asset('assets/images/how-it-works/4.png') }}" alt="Payment"
+                            class="w-full h-full">
                     </div>
                     <h3 class="text-h-7 text-neutral-1000 mb-3">Payment simplified</h3>
                     <p class="text-b-2 text-neutral-600">
@@ -471,7 +362,8 @@
                             <div>
                                 <p class="text-b-2 font-semibold text-neutral-1000">Work done by:
                                     {{ $review->developer->name ?? 'Developer' }}</p>
-                                <p class="text-b-3 text-neutral-600">For: {{ $review->consumer->name ?? 'Client' }}</p>
+                                <p class="text-b-3 text-neutral-600">For: {{ $review->consumer->name ?? 'Client' }}
+                                </p>
                                 <p class="text-b-3 text-neutral-500">{{ $review->created_at->format('M d, Y') }}</p>
                             </div>
                             @if ($review->consumer && $review->consumer->avatar)
@@ -528,10 +420,16 @@
         <div
             class="mx-4 md:mx-16 max-w-8xl bg-gradient-to-br from-primary-400 to-primary-500 rounded-2xl px-6 py-16 sm:py-20 text-center">
             <h2 class="text-h-2 text-white mb-8">Ready to Build Something Amazing?</h2>
-            <button
-                class="px-8 py-4 bg-white text-primary-500 rounded-lg hover:bg-neutral-100 transition font-semibold text-b-1 shadow-lg">
-                Hire Talent
-            </button>
+            <div class="flex flex-row gap-4 justify-center items-center">
+                <a href="{{ route('search.developers') }}"
+                    class="px-8 py-4 bg-white text-primary-500 rounded-lg hover:bg-neutral-100 transition font-semibold text-b-1 shadow-lg">
+                    Hire Talent
+                </a>
+                <a href="{{ route('search.projects') }}"
+                    class="px-8 py-4 bg-white text-primary-500 rounded-lg hover:bg-neutral-100 transition font-semibold text-b-1 shadow-lg">
+                    Find Project
+                </a>
+            </div>
         </div>
     </section>
-@endsection
+</x-app-layout>

@@ -4,7 +4,7 @@
 
         {{-- LEFT PANEL : ILLUSTRATION --}}
         <div
-            class="hidden md:flex relative items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 p-6">
+            class="hidden md:flex sticky top-0 items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 max-h-screen p-6">
 
             {{-- Logo --}}
             <div class="absolute left-24 top-12 mb-10">
@@ -124,7 +124,7 @@
                     <div>
                         <x-input-label for="name" value="Full name" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="name" type="text" name="name" :value="old('name')"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border-neutral-300
+                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
                                      font-sans text-b-1 placeholder-neutral-400
                                      focus:ring-2 focus:ring-primary-500" />
                         <x-input-error :messages="$errors->get('name')" class="mt-1" />
@@ -134,56 +134,67 @@
                     <div>
                         <x-input-label for="email" value="Email" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="email" type="email" name="email" :value="old('email')"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border-neutral-300
+                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
                                      font-sans text-b-1 placeholder-neutral-400
                                      focus:ring-2 focus:ring-primary-500" />
                         <x-input-error :messages="$errors->get('email')" class="mt-1" />
                     </div>
 
                     {{-- Password + hints --}}
-                    <div>
-                        <x-input-label for="password" value="Password" class="font-sans text-b-3 text-neutral-700" />
-                        <x-text-input id="password" type="password" name="password"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border-neutral-300
-                                     font-sans text-b-1 placeholder-neutral-400
-                                     focus:ring-2 focus:ring-primary-500" />
-                        {{-- Confirm Password --}}
-                        <x-input-label for="password_confirmation" value="Confirm Password" class="font-sans text-b-3 text-neutral-700" />
-                        <x-text-input id="password_confirmation" type="password" name="password_confirmation"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border-neutral-300
-                                     font-sans text-b-1 placeholder-neutral-400
-                                     focus:ring-2 focus:ring-primary-500" />
+                    <div x-data="{ pwd: '', pwdC: '' }">
+                        {{-- Password --}}
+                        <div>
+                            <x-input-label for="password" value="Password"
+                                class="font-sans text-b-3 text-neutral-700" />
+                            <x-text-input id="password" type="password" name="password" x-model="pwd"
+                                class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
+                             font-sans text-b-1 placeholder-neutral-400
+                             focus:ring-2 focus:ring-primary-500" />
+                        </div>
 
-                        {{-- hint list --}}
-                        <ul class="mt-2 space-y-1 font-sans text-b-2 text-neutral-600">
+                        {{-- Confirm Password --}}
+                        <div class="mt-3">
+                            <x-input-label for="password_confirmation" value="Confirm Password"
+                                class="font-sans text-b-3 text-neutral-700" />
+                            <x-text-input id="password_confirmation" type="password" name="password_confirmation"
+                                x-model="pwdC"
+                                class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
+                             font-sans text-b-1 placeholder-neutral-400
+                             focus:ring-2 focus:ring-primary-500" />
+                        </div>
+
+                        {{-- Hint list (muncul hanya jika ada input tapi belum valid) --}}
+                        <ul x-show="pwd && !(/[A-Z]/.test(pwd) && /\d/.test(pwd) && pwd.length >= 8)" x-transition
+                            class="mt-2 space-y-1 font-sans text-b-2 text-neutral-600">
                             <li class="flex items-center gap-2">
-                                <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
+                                <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none">
                                     <path
                                         d="M7.5 12L10.5 15L16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" />
-                                </svg> At least 1 uppercase
+                                </svg>
+                                At least 1 uppercase
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
+                                <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none">
                                     <path
                                         d="M7.5 12L10.5 15L16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" />
-                                </svg> At least 1 number
+                                </svg>
+                                At least 1 number
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
+                                <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none">
                                     <path
                                         d="M7.5 12L10.5 15L16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" />
-                                </svg> At least 8 characters
+                                </svg>
+                                At least 8 characters
                             </li>
                         </ul>
+
                         <x-input-error :messages="$errors->get('password')" class="mt-1" />
                     </div>
 
@@ -191,7 +202,7 @@
                     <div class="space-y-3">
                         <label class="flex items-start gap-4 cursor-pointer border border-neutral-400 rounded-lg p-4">
                             <input type="radio" name="role" value="consumer" required
-                                class="mt-1 w-4 h-4 text-primary-500 border-neutral-300 focus:ring-primary-500">
+                                class="mt-1 w-4 h-4 text-primary-500 border border-neutral-300 focus:ring-primary-500">
                             <div>
                                 <div class="font-sans text-b-2 text-neutral-800">I want to find developers for projects
                                     (as a Client)
@@ -201,7 +212,7 @@
 
                         <label class="flex items-start gap-6 cursor-pointer border border-neutral-400 rounded-lg p-4">
                             <input type="radio" name="role" value="developer" required
-                                class="mt-1 w-4 h-4 text-primary-500 border-neutral-300 focus:ring-primary-500">
+                                class="mt-1 w-4 h-4 text-primary-500 border border-neutral-300 focus:ring-primary-500">
                             <div>
                                 <div class="font-sans text-b-2 text-neutral-800">I want to offer services as a
                                     developer (as a Developer) </div>

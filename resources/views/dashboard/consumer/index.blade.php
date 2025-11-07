@@ -1,10 +1,5 @@
-@extends('layouts.app')
-
-{{--  title  --}}
-@section('title', 'My Projects – Inofa')
-
-{{--  main content  --}}
-@section('content')
+<x-app-layout>
+    <x-slot:title>{{__('Dashboard Anda - Inofa')}}</x-slot:title>
     <section class="min-h-screen flex">
 
         <!-- ===== SIDEBAR ===== -->
@@ -269,4 +264,5 @@
         </div>
 
     </section>
-@endsection
+
+</x-app-layout>

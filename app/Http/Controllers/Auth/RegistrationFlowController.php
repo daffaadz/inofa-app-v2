@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RegistrationFlowController extends Controller
 {
@@ -61,7 +62,7 @@ class RegistrationFlowController extends Controller
 
     public function showDeveloperInformation()
     {
-        $skills = Skill::all();
+        $skills = Skill::where('is_active', true)->orderBy('name')->get();
         return view('auth.developer-information', compact('skills'));
     }
 
@@ -71,7 +72,7 @@ class RegistrationFlowController extends Controller
             'headline' => 'nullable|string|max:255',
             'experience' => 'nullable|string',
             'rate_min_byproject' => 'nullable|numeric|min:0',
-            'rate_max_byproject' => 'nullable|numeric|min:0',
+            'rate_max_byproject' => 'nullable|numeric|min:0|gte:rate_min_byproject',
             'availability' => 'nullable|in:available,busy,unavailable',
             'experience_years' => 'nullable|integer|min:0',
             'education' => 'nullable|string|max:255',
@@ -79,10 +80,13 @@ class RegistrationFlowController extends Controller
             'portfolio_links' => 'nullable|string',
             'skills' => 'nullable|array',
             'skills.*' => 'exists:skills,id',
+            'custom_skills' => 'nullable|array',
+            'custom_skills.*' => 'string|max:100',
         ]);
 
         $user = auth()->user();
 
+        // Create developer profile
         $profile = $user->developerProfile()->create([
             'headline' => $request->headline,
             'experience' => $request->experience,
@@ -95,8 +99,41 @@ class RegistrationFlowController extends Controller
             'portfolio_links' => $request->portfolio_links,
         ]);
 
-        if ($request->has('skills')) {
+        // Attach existing skills
+        if ($request->has('skills') && is_array($request->skills)) {
             $user->skills()->attach($request->skills);
+        }
+
+        // Create and attach custom skills
+        if ($request->has('custom_skills') && is_array($request->custom_skills)) {
+            foreach ($request->custom_skills as $customSkillName) {
+                $skillName = trim($customSkillName);
+
+                if (empty($skillName)) {
+                    continue;
+                }
+
+                // Check if skill already exists (case-insensitive)
+                $existingSkill = Skill::whereRaw('LOWER(name) = ?', [strtolower($skillName)])->first();
+
+                if ($existingSkill) {
+                    // If skill exists, just attach it
+                    if (!$user->skills->contains($existingSkill->id)) {
+                        $user->skills()->attach($existingSkill->id);
+                    }
+                } else {
+                    // Create new skill
+                    $newSkill = Skill::create([
+                        'name' => $skillName,
+                        'slug' => Str::slug($skillName),
+                        'category' => 'Other', // Default category
+                        'is_active' => true,
+                    ]);
+
+                    // Attach to user
+                    $user->skills()->attach($newSkill->id);
+                }
+            }
         }
 
         return redirect()->route('redirect-after-login');

@@ -90,9 +90,9 @@
                     <div>
                         <x-input-label for="email" value="Email" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="email" type="email" name="email" :value="old('email')"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border-neutral-300
+                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
                                      font-sans text-b-1 placeholder-neutral-400
-                                     focus:ring-2 focus:ring-primary-500" />
+                                     focus:ring-1 focus:ring-primary-500" />
                         @error('email')
                             <p class="mt-1 font-sans text-b-2 text-red-500">Please enter a valid email.</p>
                         @enderror
@@ -102,9 +102,9 @@
                     <div>
                         <x-input-label for="password" value="Password" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="password" type="password" name="password"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border-neutral-300
+                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
                                      font-sans text-b-1 placeholder-neutral-400
-                                     focus:ring-2 focus:ring-primary-500" />
+                                     focus:ring-1 focus:ring-primary-500" />
                         <x-input-error :messages="$errors->get('password')" class="mt-1" />
                     </div>
 

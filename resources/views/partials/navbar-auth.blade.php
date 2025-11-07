@@ -33,7 +33,8 @@
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M16 8V5L19 2L20 4L22 5L19 8H16ZM16 8L12 11.9999M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7"
-                                        stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                             </div>
 
@@ -44,13 +45,15 @@
                                 </p>
                             </div>
                         </a>
-                        <a href="#" class="flex flex-row justify-center items-start gap-4 px-4 py-3 w-full text-neutral-800 hover:bg-neutral-10 text-h-7">
+                        <a href="#"
+                            class="flex flex-row justify-center items-start gap-4 px-4 py-3 w-full text-neutral-800 hover:bg-neutral-10 text-h-7">
                             <div>
                                 <svg class="w-8 h-auto pt-2" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M13 2L4.09346 12.6879C3.74465 13.1064 3.57024 13.3157 3.56758 13.4925C3.56526 13.6461 3.63373 13.7923 3.75326 13.8889C3.89075 14 4.16318 14 4.70803 14H12L11 22L19.9065 11.3121C20.2554 10.8936 20.4298 10.6843 20.4324 10.5075C20.4347 10.3539 20.3663 10.2077 20.2467 10.1111C20.1093 10 19.8368 10 19.292 10H12L13 2Z"
-                                        stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                             </div>
 
@@ -68,7 +71,8 @@
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M12 15L9 12M12 15C13.3968 14.4687 14.7369 13.7987 16 13M12 15V20C12 20 15.03 19.45 16 18C17.08 16.38 16 13 16 13M9 12C9.53214 10.6194 10.2022 9.29607 11 8.05C12.1652 6.18699 13.7876 4.65305 15.713 3.5941C17.6384 2.53514 19.8027 1.98637 22 2C22 4.72 21.22 9.5 16 13M9 12H4C4 12 4.55 8.97 6 8C7.62 6.92 11 8 11 8M4.5 16.5C3 17.76 2.5 21.5 2.5 21.5C2.5 21.5 6.24 21 7.5 19.5C8.21 18.66 8.2 17.37 7.41 16.59C7.02131 16.219 6.50929 16.0046 5.97223 15.988C5.43516 15.9714 4.91088 16.1537 4.5 16.5Z"
-                                        stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                             </div>
 
@@ -103,7 +107,8 @@
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M14 2.26953V6.40007C14 6.96012 14 7.24015 14.109 7.45406C14.2049 7.64222 14.3578 7.7952 14.546 7.89108C14.7599 8.00007 15.0399 8.00007 15.6 8.00007H19.7305M16 13H8M16 17H8M10 9H8M14 2H8.8C7.11984 2 6.27976 2 5.63803 2.32698C5.07354 2.6146 4.6146 3.07354 4.32698 3.63803C4 4.27976 4 5.11984 4 6.8V17.2C4 18.8802 4 19.7202 4.32698 20.362C4.6146 20.9265 5.07354 21.3854 5.63803 21.673C6.27976 22 7.11984 22 8.8 22H15.2C16.8802 22 17.7202 22 18.362 21.673C18.9265 21.3854 19.3854 20.9265 19.673 20.362C20 19.7202 20 18.8802 20 17.2V8L14 2Z"
-                                        stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                             </div>
 
@@ -114,13 +119,15 @@
                                 </p>
                             </div>
                         </a>
-                        <a href="#" class="flex flex-row justify-center items-start gap-4 px-4 py-3 w-full text-neutral-800 hover:bg-neutral-10 text-h-7">
+                        <a href="#"
+                            class="flex flex-row justify-center items-start gap-4 px-4 py-3 w-full text-neutral-800 hover:bg-neutral-10 text-h-7">
                             <div>
                                 <svg class="w-8 h-auto pt-2" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M2.49954 9H21.4995M9.99954 3L7.99954 9L11.9995 20.5L15.9995 9L13.9995 3M12.6141 20.2625L21.5727 9.51215C21.7246 9.32995 21.8005 9.23885 21.8295 9.13717C21.8551 9.04751 21.8551 8.95249 21.8295 8.86283C21.8005 8.76114 21.7246 8.67005 21.5727 8.48785L17.2394 3.28785C17.1512 3.18204 17.1072 3.12914 17.0531 3.09111C17.0052 3.05741 16.9518 3.03238 16.8953 3.01717C16.8314 3 16.7626 3 16.6248 3H7.37424C7.2365 3 7.16764 3 7.10382 3.01717C7.04728 3.03238 6.99385 3.05741 6.94596 3.09111C6.89192 3.12914 6.84783 3.18204 6.75966 3.28785L2.42633 8.48785C2.2745 8.67004 2.19858 8.76114 2.16957 8.86283C2.144 8.95249 2.144 9.04751 2.16957 9.13716C2.19858 9.23885 2.2745 9.32995 2.42633 9.51215L11.385 20.2625C11.596 20.5158 11.7015 20.6424 11.8279 20.6886C11.9387 20.7291 12.0603 20.7291 12.1712 20.6886C12.2975 20.6424 12.4031 20.5158 12.6141 20.2625Z"
-                                        stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="black" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
                             </div>
 
@@ -157,8 +164,8 @@
                     </div>
                 </div>
 
-                <a href="{{ url('#why-inofa') }}"
-                    class="hover:text-primary-500  font-sans text-b-1 transition">Why Inofa</a>
+                <a href="{{ url('#why-inofa') }}" class="hover:text-primary-500  font-sans text-b-1 transition">Why
+                    Inofa</a>
             </div>
         </div>
 
@@ -196,10 +203,14 @@
 
                 {{-- User dropdown --}}
                 <div class="relative" x-data="{ open: false }" @click.away="open=false">
+                    @php
+                        $src = Str::startsWith(Auth::user()->avatar, 'http')
+                            ? Auth::user()->avatar
+                            : asset('storage/' . $developer->avatar);
+                    @endphp
                     <button @click="open=!open"
                         class="flex items-center gap-2 hover:bg-neutral-100 px-3 py-2 rounded-lg transition">
-                        <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
-                            alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                        <img src="{{ $src }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
                         <svg class="w-4 h-4 text-neutral-600 mt-0.5" :class="open ? 'rotate-180' : ''" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

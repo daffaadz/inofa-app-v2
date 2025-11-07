@@ -8,35 +8,18 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
 
-
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable, Searchable, HasFactory;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-        'avatar',
-        'bio',
-        'location',
-        'dark_mode',
-        'messenger_color',
-        'active_status',
-        'provider',
-        'provider_id',
-    ];
+    protected $fillable = ['name', 'email', 'password', 'role', 'avatar', 'bio', 'location', 'dark_mode', 'messenger_color', 'active_status', 'provider', 'provider_id'];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'dark_mode'         => 'boolean',
-        'active_status'     => 'boolean',
+        'dark_mode' => 'boolean',
+        'active_status' => 'boolean',
     ];
 
     /* ---------------- Relationships ---------------- */
@@ -58,18 +41,17 @@ class User extends Authenticatable
 
     public function skills()
     {
-        return $this->belongsToMany(Skill::class, 'skill_user')
-            ->withPivot('proficiency_level')
-            ->withTimestamps();
+        return $this->belongsToMany(Skill::class, 'skill_user')->withPivot('proficiency_level')->withTimestamps();
     }
 
     public function portfolios()
     {
-        return $this->hasMany(Portfolio::class);
+        return $this->hasMany(Portofolio::class);
     }
 
-    public function postedProjects()        // consumer side
+    public function postedProjects()
     {
+        // consumer side
         return $this->hasMany(Project::class, 'consumer_id');
     }
 
@@ -111,6 +93,11 @@ class User extends Authenticatable
     public function messages()
     {
         return $this->hasMany(Message::class);
+    }
+
+    public function completedProjects()
+    {
+        return $this->hasMany(ProjectAgreement::class, 'developer_id')->where('status', 'completed');
     }
 
     public function conversations()
