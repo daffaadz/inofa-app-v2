@@ -12,8 +12,7 @@ use App\Models\ProjectAgreement;
 class SearchController extends Controller
 {
     /**
-     * 🔍 Advanced Search untuk Customer
-     * Menggabungkan MeiliSearch + Eloquent Filter
+     *  Advanced Search untuk Customer
      */
     public function search(Request $request)
     {
@@ -26,7 +25,7 @@ class SearchController extends Controller
         $perPage    = $request->get('per_page', 10);
 
         /** ----------------------------------------
-         * 1️⃣ MeiliSearch Query (Full-text)
+         *  MeiliSearch Query (Full-text)
          * ---------------------------------------- */
         $projectIds = $keyword
             ? Project::search($keyword)->get()->pluck('id')
@@ -41,7 +40,7 @@ class SearchController extends Controller
             : ProjectAgreement::pluck('id');
 
         /** ----------------------------------------
-         * 2️⃣ Eloquent Filter (Structured Query)
+         *  Eloquent Filter (Structured Query)
          * ---------------------------------------- */
         $projects = Project::where('customer_id', Auth::id())
             ->whereIn('id', $projectIds)
@@ -76,7 +75,7 @@ class SearchController extends Controller
             ->paginate($perPage);
 
         /** ----------------------------------------
-         * 3️⃣ Response JSON
+         *  Response JSON
          * ---------------------------------------- */
         return response()->json([
             'status'  => true,
