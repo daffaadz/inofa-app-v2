@@ -5,7 +5,12 @@ namespace App\Providers;
 use App\Models\Offer;
 use App\Policies\OfferPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
+use App\Models\User;
+use App\Models\Conversation;
+
+
 
 class AppServiceProvider extends ServiceProvider
 {

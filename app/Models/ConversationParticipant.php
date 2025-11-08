@@ -13,4 +13,15 @@ class ConversationParticipant extends Pivot
         'last_read_at'=> 'datetime',
         'is_active'   => 'boolean',
     ];
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

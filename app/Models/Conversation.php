@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class Conversation extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'title',
         'type',
@@ -37,4 +41,15 @@ class Conversation extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function latestMessage()
+    { 
+        return $this->hasOne(Message::class)->latestOfMany('sent_at'); 
+    }
+
+    public function participantLinks()
+    {
+        return $this->hasMany(ConversationParticipant::class);
+    }
+
 }

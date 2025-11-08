@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Scout\Searchable;
 
 class Offer extends Model
 {
+    use HasFactory, Searchable;
+    
     protected $fillable = [
         'project_id',
         'user_id',

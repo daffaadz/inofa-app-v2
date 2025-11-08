@@ -3,9 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
+use App\Models\SkillUser;
+use App\Models\Skill;
+use Laravel\Scout\Searchable;
 
 class DeveloperProfile extends Model
 {
+    use HasFactory, Searchable;
+    
     protected $table = 'developer_profiles';
 
     protected $fillable = [

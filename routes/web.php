@@ -68,6 +68,7 @@ use App\Http\Controllers\Developer\AgreementController as DevAgreement;
 use App\Http\Controllers\Developer\OfferController as DevOffer;
 use App\Http\Controllers\Developer\ProjectController as DevProject;
 use App\Http\Controllers\Developer\EarningsController as DevEarnings;
+use App\Http\Controllers\Developer\SearchController as DevSearch;
 
 Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('developer.')->group(function () {
 
@@ -92,4 +93,8 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
     /* ---------- Earnings & Payment History ---------- */
     Route::get('/earnings', [DevEarnings::class, 'index'])
          ->name('earnings.index');
+
+    /* ---------- Search (API) ---------- */
+    Route::get('/search', [DevSearch::class, 'search'])
+         ->name('search');
 });
