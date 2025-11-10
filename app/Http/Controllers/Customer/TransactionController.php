@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Models\Payment as Transaction;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
