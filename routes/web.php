@@ -114,3 +114,15 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
     Route::get('/search', [DevSearch::class, 'search'])
          ->name('search');
 });
+
+// ADMIN ESCROW ROUTING
+use App\Http\Controllers\Admin\EscrowController;
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(function () {
+    Route::get('/escrow', [EscrowController::class, 'index'])->name('escrow.index');
+    Route::post('/escrow/{id}/confirm', [EscrowController::class, 'confirm'])->name('escrow.confirm');
+    Route::post('/escrow/{id}/transfer', [EscrowController::class, 'transfer'])->name('escrow.transfer');
+    Route::post('/escrow/{id}/refund', [EscrowController::class, 'refund'])->name('escrow.refund');
+});
+
+
