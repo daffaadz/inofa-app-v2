@@ -53,7 +53,7 @@ class ConversationController extends Controller
 
     /**
      * POST /chat/conversations
-     * Buat percakapan private manual (opsional).
+     * Buat percakapan private manual.
      */
     public function store(Request $request)
     {
@@ -65,7 +65,7 @@ class ConversationController extends Controller
 
         $authId = Auth::id();
 
-        // Cek kalau sudah ada percakapan 1-on-1
+        // Cek percakapan 1-on-1
         $existing = Conversation::where('type', 'private')
             ->whereHas('participants', fn ($q) => $q->where('user_id', $authId))
             ->whereHas('participants', fn ($q) => $q->where('user_id', $data['user_id']))

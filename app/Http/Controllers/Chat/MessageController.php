@@ -81,9 +81,27 @@ class MessageController extends Controller
         if ($recipientIds->isNotEmpty()) {
             $recipients = User::whereIn('id', $recipientIds)->get();
             Notification::send($recipients, new NewMessageNotification($message));
+
+                // Update unread count untuk penerima
+                foreach ($recipientIds as $recipientId) {
+                    $participant = $conversation->participantLinks()
+                        ->where('user_id', $recipientId)
+                        ->first();
+
+                    $unread = $conversation->messages()
+                        ->where('sent_at', '>', $participant?->last_read_at ?? now()->subCentury())
+                        ->count();
+
+                    broadcast(new \App\Events\ConversationUnreadUpdated(
+                        $conversation->id,
+                        $recipientId,
+                        $unread
+                    ))->toOthers();
+                }
+
         }
 
-        // Broadcast ke channel conversation.{id} (FE subscribe via Echo)
+        // Broadcast ke channel conversation.{id} 
         broadcast(new MessageSent($message))->toOthers();
 
         return response()->json(['message' => $message], 201);
@@ -96,9 +114,18 @@ class MessageController extends Controller
     {
         Gate::authorize('talk-in-conversation', $conversation);
 
+        $userId = auth()->id();
+
         $conversation->participantLinks()
-            ->where('user_id', auth()->id())
+            ->where('user_id', $userId)
             ->update(['last_read_at' => now()]);
+
+        // broadcast update unread count = 0
+        broadcast(new \App\Events\ConversationUnreadUpdated(
+            $conversation->id,
+            $userId,
+            0
+        ))->toOthers();
 
         return response()->noContent();
     }

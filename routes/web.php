@@ -62,6 +62,19 @@ Route::middleware(['auth'])->group(function () {
 
 require __DIR__.'/auth.php';
 
+// CHAT ROUTING
+use App\Http\Controllers\Chat\ConversationController;
+use App\Http\Controllers\Chat\MessageController;
+
+Route::middleware('auth')->prefix('chat')->group(function () {
+    Route::get('conversations', [ConversationController::class, 'index']);
+    Route::post('conversations', [ConversationController::class, 'store']);
+    Route::get('conversations/{conversation}', [ConversationController::class, 'show']);
+    Route::get('conversations/{conversation}/messages', [MessageController::class, 'index']);
+    Route::post('conversations/{conversation}/messages', [MessageController::class, 'send']);
+    Route::post('conversations/{conversation}/read', [MessageController::class, 'markRead']);
+});
+
 
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;
