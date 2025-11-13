@@ -148,12 +148,12 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
     /* ---------- custom CREATE (view) ---------- */
     Route::get('project/create/skills',      [CustProject::class, 'createSkills'])->name('project.createSkills');
     Route::get('project/create/budget',      [CustProject::class, 'createBudget'])->name('project.createBudget');
-    Route::get('project/create/attachment',  [CustProject::class, 'createAttachment'])->name('project.createAttachment');
+    Route::get('project/create/requirements',  [CustProject::class, 'createRequirements'])->name('project.createRequirements');
 
     // Additional custom routes (must be registered manually)
     Route::post('project/store-details',     [CustProject::class, 'storeDetails'])->name('project.storeDetails');
     Route::post('project/store-skills',      [CustProject::class, 'storeSkills'])->name('project.storeSkills');
     Route::post('project/store-budget',      [CustProject::class, 'storeBudget'])->name('project.storeBudget');
-    Route::post('project/store-attachment',  [CustProject::class, 'storeAttachment'])->name('project.storeAttachment');
+    Route::post('project/store-requirements',  [CustProject::class, 'storeRequirements'])->name('project.storeRequirements');
     Route::post('project/reset-session',     [CustProject::class, 'resetSession'])->name('project.resetSession');
 });

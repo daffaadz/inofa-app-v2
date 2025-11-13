@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -30,18 +31,32 @@ class ProjectController extends Controller
     public function createSkills()
     {
         // Ambil semua skills untuk ditampilkan di form
-        $skills = Skill::where('is_active', 1)->get();
+        $skills = Skill::where('is_active', 1)->orderBy('name')->get();
         return view('projects.create-skills', compact('skills'));
     }
 
     public function createBudget()
     {
+        // Validasi apakah sudah mengisi details dan skills
+        if (!session()->has('project.details') || !session()->has('project.skills')) {
+            return redirect()->route('consumer.project.create')
+                ->with('error', 'Please complete previous steps first.');
+        }
         return view('projects.create-budget');
     }
 
-    public function createAttachment()
+    public function createRequirements()
     {
-        return view('projects.create-attachment');
+        // Validasi apakah sudah mengisi semua step sebelumnya
+        if (
+            !session()->has('project.details') ||
+            !session()->has('project.skills') ||
+            !session()->has('project.budget')
+        ) {
+            return redirect()->route('consumer.project.create')
+                ->with('error', 'Please complete previous steps first.');
+        }
+        return view('projects.create-requirements');
     }
 
     // ➕ Menyimpan data sementara sebelum submit
@@ -54,7 +69,6 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'requirements' => 'nullable|string',
         ]);
 
         // Simpan ke session
@@ -74,17 +88,48 @@ class ProjectController extends Controller
     {
         $validated = $request->validate([
             'skills' => 'required|array|min:1',
-            'skills.*.skill_id' => 'required|exists:skills,id',
-            'skills.*.required_level' => 'required|integer|min:1|max:4', // 1=Beginner, 2=Intermediate, 3=Advanced, 4=Expert
+            'skills.*.skill_id' => 'required|integer',
+            'skills.*.skill_name' => 'required|string',
+            'skills.*.required_level' => 'required|integer|min:1|max:4',
         ]);
 
+        $processedSkills = [];
+
+        foreach ($validated['skills'] as $skillData) {
+            // Cek apakah skill sudah ada di database
+            $skill = Skill::find($skillData['skill_id']);
+
+            // Jika skill_id = 0, berarti skill baru yang perlu ditambahkan
+            if (!$skill || $skillData['skill_id'] == 0) {
+                // Cek apakah skill dengan nama yang sama sudah ada
+                $existingSkill = Skill::where('name', $skillData['skill_name'])->first();
+
+                if ($existingSkill) {
+                    $skill = $existingSkill;
+                } else {
+                    // Buat skill baru
+                    $skill = Skill::create([
+                        'name' => $skillData['skill_name'],
+                        'slug' => Str::slug($skillData['skill_name']),
+                        'is_active' => true,
+                    ]);
+                }
+            }
+
+            $processedSkills[] = [
+                'skill_id' => $skill->id,
+                'skill_name' => $skill->name,
+                'required_level' => $skillData['required_level'],
+            ];
+        }
+
         // Simpan ke session
-        session()->put('project.skills', $validated['skills']);
+        session()->put('project.skills', $processedSkills);
 
         return response()->json([
             'status' => true,
             'message' => 'Skills saved to session',
-            'data' => $validated['skills'],
+            'data' => $processedSkills,
         ]);
     }
 
@@ -109,37 +154,24 @@ class ProjectController extends Controller
     }
 
     /**
-     * 📎 Menyimpan attachment ke session (opsional)
+     * 📋 Menyimpan requirements ke session (JSON format)
      */
-    public function storeAttachment(Request $request)
+    public function storeRequirements(Request $request)
     {
         $validated = $request->validate([
-            'attachments' => 'nullable|array',
-            'attachments.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120', // max 5MB
+            'requirements' => 'nullable|array',
+            'requirements.*.type' => 'required|string|in:feature,technical,deliverable,other',
+            'requirements.*.description' => 'required|string|max:500',
+            'requirements.*.priority' => 'required|string|in:must_have,should_have,nice_to_have',
         ]);
 
-        $attachmentPaths = [];
-
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                // Simpan file sementara
-                $path = $file->store('temp/attachments', 'public');
-                $attachmentPaths[] = [
-                    'original_name' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                ];
-            }
-        }
-
         // Simpan ke session
-        session()->put('project.attachments', $attachmentPaths);
+        session()->put('project.requirements', $validated['requirements'] ?? []);
 
         return response()->json([
             'status' => true,
-            'message' => 'Attachments saved to session',
-            'data' => $attachmentPaths,
+            'message' => 'Requirements saved to session',
+            'data' => $validated['requirements'] ?? [],
         ]);
     }
 
@@ -150,27 +182,32 @@ class ProjectController extends Controller
     {
         // Ambil semua data dari session
         $details = session()->get('project.details');
-        $skills = session()->get('project.skills ');
+        $skills = session()->get('project.skills'); // FIXED: hapus spasi
         $budget = session()->get('project.budget');
-        $attachments = session()->get('project.attachments', []);
+        $requirements = session()->get('project.requirements', []);
 
         // Validasi apakah semua data tersedia
         if (!$details || !$skills || !$budget) {
-            return response()->json(
-                [
-                    'status' => false,
-                    'message' => 'Incomplete project data. Please complete all steps.',
+            return response()->json([
+                'status' => false,
+                'message' => 'Incomplete project data. Please complete all steps.',
+                'debug' => [
+                    'has_details' => !empty($details),
+                    'has_skills' => !empty($skills),
+                    'has_budget' => !empty($budget),
                 ],
-                422,
-            );
+            ], 422);
         }
 
         // Gabungkan data untuk create project
         $projectData = array_merge($details, $budget);
         $projectData['consumer_id'] = Auth::id();
-        $projectData['status'] = 'open'; // atau status default lainnya
+        $projectData['status'] = 'open';
         $projectData['views_count'] = 0;
         $projectData['is_featured'] = false;
+
+        // Simpan requirements sebagai JSON
+        $projectData['requirements'] = !empty($requirements) ? json_encode($requirements) : null;
 
         // Buat project
         $project = Project::create($projectData);
@@ -184,24 +221,10 @@ class ProjectController extends Controller
             ]);
         }
 
-        // Pindahkan attachments dari temp ke permanent (jika ada)
-        if (!empty($attachments)) {
-            foreach ($attachments as $attachment) {
-                // Logic untuk memindahkan file dari temp ke folder permanent
-                // Dan simpan ke database jika ada tabel attachments
-                // Contoh:
-                // Storage::move($attachment['path'], 'projects/'.$project->id.'/'.$attachment['original_name']);
-            }
-        }
-
         // Hapus data dari session setelah berhasil disimpan
-        session()->forget(['project.details', 'project.skills', 'project.budget', 'project.attachments']);
+        session()->forget(['project.details', 'project.skills', 'project.budget', 'project.requirements']);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Project created successfully',
-            'data' => $project->load('skills'),
-        ]);
+        return redirect()->route('dashboard')->with('success', 'Project created successfully!');
     }
 
     /**
@@ -221,12 +244,18 @@ class ProjectController extends Controller
     {
         $project = Project::where('consumer_id', Auth::id())->findOrFail($id);
 
-        $data = $request->only(['title', 'description', 'budget', 'deadline', 'requirements']);
+        $data = $request->only(['title', 'description', 'budget', 'deadline']);
+
+        // Update requirements jika ada
+        if ($request->has('requirements')) {
+            $data['requirements'] = json_encode($request->requirements);
+        }
+
         $project->update($data);
 
         // Update skills jika ada
         if ($request->has('skills')) {
-            $project->skills()->detach(); // Hapus relasi lama
+            $project->skills()->detach();
 
             foreach ($request->skills as $skill) {
                 $project->skills()->attach($skill['skill_id'], [
@@ -264,7 +293,7 @@ class ProjectController extends Controller
      */
     public function resetSession()
     {
-        session()->forget(['project.details', 'project.skills', 'project.budget', 'project.attachments']);
+        session()->forget(['project.details', 'project.skills', 'project.budget', 'project.requirements']);
 
         return response()->json([
             'status' => true,

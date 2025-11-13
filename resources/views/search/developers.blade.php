@@ -79,13 +79,55 @@
                                 <!-- Filter: Skills -->
                                 <div class="mb-6">
                                     <h3 class="text-b-1 font-semibold text-neutral-900 mb-3">Skills</h3>
+
+                                    <!-- Search Input -->
+                                    <div class="mb-3 relative">
+                                        <input type="text" id="skillSearch" placeholder="Cari skill..."
+                                            class="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                            autocomplete="off">
+                                        <!-- Suggestion Dropdown -->
+                                        <div id="skillSuggestions"
+                                            class="absolute z-10 w-full mt-1 bg-white border border-neutral-300 rounded-lg shadow-lg hidden max-h-48 overflow-y-auto">
+                                            <!-- Suggestions will be populated here -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Selected Skills (Chips) -->
+                                    <div id="selectedSkillsContainer" class="mb-3 flex flex-wrap gap-2">
+                                        @foreach ($skills ?? [] as $selectedSkill)
+                                            <div
+                                                class="inline-flex items-center bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
+                                                <span>{{ $selectedSkill }}</span>
+                                                <button type="button" onclick="removeSkill('{{ $selectedSkill }}')"
+                                                    class="ml-2 text-primary-700 hover:text-primary-900">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <!-- Hidden Inputs for Selected Skills -->
+                                    <div id="hiddenSkillsContainer">
+                                        @foreach ($skills ?? [] as $selectedSkill)
+                                            <input type="hidden" name="skills[]" value="{{ $selectedSkill }}"
+                                                data-skill="{{ $selectedSkill }}">
+                                        @endforeach
+                                    </div>
+
+                                    <!-- All Skills List (Checkboxes) -->
                                     <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-                                        @foreach ($allSkills->take(12) as $skill)
+                                        @foreach ($allSkills->take(6) as $skill)
                                             <label
-                                                class="flex items-center text-b-2 text-neutral-700 cursor-pointer group">
-                                                <input type="checkbox" name="skills[]" value="{{ $skill->name }}"
-                                                    onchange="submitSearchForm()" @checked(in_array($skill->name, $skills ?? []))
-                                                    class="h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500 cursor-pointer">
+                                                class="flex items-center text-b-2 text-neutral-700 cursor-pointer group skill-item"
+                                                data-skill-name="{{ strtolower($skill->name) }}">
+                                                <input type="checkbox" value="{{ $skill->name }}"
+                                                    onchange="toggleSkill('{{ $skill->name }}')"
+                                                    @checked(in_array($skill->name, $skills ?? []))
+                                                    class="h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500 cursor-pointer skill-checkbox">
                                                 <span
                                                     class="ml-3 group-hover:text-neutral-900">{{ $skill->name }}</span>
                                             </label>
@@ -162,8 +204,13 @@
 
                                             <!-- Avatar -->
                                             <div class="flex-shrink-0">
+                                                @php
+                                                    $src = Str::startsWith($developer->avatar, 'http')
+                                                        ? $developer->avatar
+                                                        : asset('storage/' . $developer->avatar);
+                                                @endphp
                                                 <img class="h-20 w-20 rounded-lg object-cover"
-                                                    src="{{ $developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) . '&size=80&background=108a00&color=fff' }}"
+                                                    src="{{ $developer->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) }}"
                                                     alt="{{ $developer->name }}">
                                             </div>
 
@@ -319,4 +366,140 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // All available skills data
+        const allSkills = @json($allSkills->pluck('name')->toArray());
+        let selectedSkills = @json($skills ?? []);
+
+        const searchInput = document.getElementById('skillSearch');
+        const suggestionsBox = document.getElementById('skillSuggestions');
+        const selectedContainer = document.getElementById('selectedSkillsContainer');
+        const hiddenContainer = document.getElementById('hiddenSkillsContainer');
+
+        // Search and show suggestions
+        searchInput.addEventListener('input', function() {
+            const keyword = this.value.trim().toLowerCase();
+
+            if (keyword.length === 0) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            // Filter skills by keyword (starts with)
+            const matches = allSkills.filter(skill =>
+                skill.toLowerCase().startsWith(keyword) && !selectedSkills.includes(skill)
+            );
+
+            if (matches.length === 0) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            // Show suggestions
+            suggestionsBox.innerHTML = matches.map(skill =>
+                `<div class="px-3 py-2 hover:bg-primary-50 cursor-pointer text-sm suggestion-item" data-skill="${skill}">
+            ${skill}
+        </div>`
+            ).join('');
+
+            suggestionsBox.classList.remove('hidden');
+
+            // Add click handlers to suggestions
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    addSkill(this.dataset.skill);
+                    searchInput.value = '';
+                    suggestionsBox.classList.add('hidden');
+                });
+            });
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.classList.add('hidden');
+            }
+        });
+
+        // Toggle skill from checkbox
+        function toggleSkill(skillName) {
+            if (selectedSkills.includes(skillName)) {
+                removeSkill(skillName);
+            } else {
+                addSkill(skillName);
+            }
+        }
+
+        // Add skill
+        function addSkill(skillName) {
+            if (selectedSkills.includes(skillName)) return;
+
+            selectedSkills.push(skillName);
+
+            // Add chip
+            const chip = document.createElement('div');
+            chip.className = 'inline-flex items-center bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm';
+            chip.innerHTML = `
+        <span>${skillName}</span>
+        <button type="button" onclick="removeSkill('${skillName}')" class="ml-2 text-primary-700 hover:text-primary-900">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    `;
+            selectedContainer.appendChild(chip);
+
+            // Add hidden input
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'skills[]';
+            hiddenInput.value = skillName;
+            hiddenInput.dataset.skill = skillName;
+            hiddenContainer.appendChild(hiddenInput);
+
+            // Check the checkbox
+            updateCheckboxes();
+
+            // Submit form
+            submitSearchForm();
+        }
+
+        // Remove skill
+        function removeSkill(skillName) {
+            selectedSkills = selectedSkills.filter(s => s !== skillName);
+
+            // Remove chip
+            const chips = selectedContainer.querySelectorAll('div');
+            chips.forEach(chip => {
+                if (chip.textContent.includes(skillName)) {
+                    chip.remove();
+                }
+            });
+
+            // Remove hidden input
+            const hiddenInput = hiddenContainer.querySelector(`input[data-skill="${skillName}"]`);
+            if (hiddenInput) {
+                hiddenInput.remove();
+            }
+
+            // Uncheck the checkbox
+            updateCheckboxes();
+
+            // Submit form
+            submitSearchForm();
+        }
+
+        // Update checkboxes based on selected skills
+        function updateCheckboxes() {
+            document.querySelectorAll('.skill-checkbox').forEach(checkbox => {
+                checkbox.checked = selectedSkills.includes(checkbox.value);
+            });
+        }
+
+        // Submit search form (your existing function)
+        function submitSearchForm() {
+            document.getElementById('searchForm').submit();
+        }
+    </script>
 </x-app-layout>

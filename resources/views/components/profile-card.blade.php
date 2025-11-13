@@ -13,8 +13,8 @@
                         : asset('storage/' . $developer->avatar);
                 @endphp
                 <div class="relative flex-shrink-0">
-                    <img src="{{ $src }}" alt="{{ $developer->name }}"
-                        class="w-24 h-auto rounded-2xl object-cover">
+                    <img src="{{ $developer->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) }}" alt="{{ $developer->name }}"
+                        class="w-24 h-24 rounded-2xl object-cover">
                     {{-- Rating Badge on Image --}}
                     @if ($developer->developerProfile && $developer->developerProfile->rating_count > 0)
                         <div
@@ -123,7 +123,7 @@
         @if ($developer->skills && $developer->skills->isNotEmpty())
             <div class="flex flex-wrap gap-2.5">
                 @foreach ($developer->skills->take(5) as $skill)
-                    <span class="px-4 py-2 bg-primary-100 text-primary-700 rounded-lg text-b-2 font-medium">
+                    <span class="px-4 py-2 bg-primary-100 text-primary-500 border border-primary-500 rounded-2xl text-b-2 font-medium">
                         {{ $skill->name }}
                     </span>
                 @endforeach
@@ -135,7 +135,7 @@
             </div>
         @else
             <div class="flex flex-wrap gap-2.5">
-                <span class="px-4 py-2 bg-neutral-100 text-neutral-500 rounded-lg text-b-2 font-medium">
+                <span class="px-4 py-2 bg-neutral-100 text-neutral-500 border border-neutral-500 rounded-2xl text-b-2 font-medium">
                     No skills added yet
                 </span>
             </div>
@@ -143,7 +143,7 @@
     </div>
 
     {{-- View Full Profile Button --}}
-    <a href="{{ route('landing', $developer->id) }}"
+    <a href="{{ route('search.developers.show', $developer->id) }}"
         class="block w-full py-4 bg-gradient-to-r from-secondary-500 via-primary-400 to-secondary-600 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium text-b-2 text-center shadow-sm hover:shadow-md">
         View Full Profile
         <span class="ml-1">›</span>

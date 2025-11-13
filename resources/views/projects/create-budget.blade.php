@@ -52,7 +52,7 @@
                         <span class="text-b-2 font-medium text-primary-500 mt-6">Budget</span>
                     </div>
 
-                    <div class="flex-1 h-1 bg-neutral-200 mx-4"></div>
+                    <div class="flex-1 h-1 bg-neutral-200 mx-4 mt-6"></div>
 
                     <!-- Step 4 -->
                     <div class="flex flex-col items-center">
@@ -60,7 +60,7 @@
                             class="w-12 h-12 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-b-1 font-semibold mb-2">
                             4
                         </div>
-                        <span class="text-b-2 text-neutral-500 mt-6">Attachments</span>
+                        <span class="text-b-2 text-neutral-500 mt-6">Requirements</span>
                     </div>
                 </div>
             </div>
@@ -68,45 +68,60 @@
             <!-- Form Card -->
             <div class="bg-white rounded-lg shadow-sm p-8 mb-6">
                 <h2 class="text-h-5 text-neutral-1000 mb-2">Budget & Timeline</h2>
-                <p class="text-b-2 text-neutral-500 mb-8">Set your budget range and expected delivery date</p>
+                <p class="text-b-2 text-neutral-500 mb-8">Set your budget and expected delivery date</p>
 
                 <form id="projectBudgetForm" action="{{ route('consumer.project.storeBudget') }}" method="POST">
                     @csrf
 
-                    <!-- Budget Range -->
+                    <!-- Budget Input -->
+                    <div class="mb-8">
+                        <label for="budget" class="block text-b-1 font-medium text-neutral-800 mb-2">
+                            Project Budget (Rp) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-b-1 text-neutral-500 font-medium">Rp</span>
+                            <input type="number" id="budget" name="budget" min="50000" step="10000"
+                                placeholder="1.000.000"
+                                class="w-full pl-12 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-b-1 text-neutral-800"
+                                required>
+                        </div>
+                        <p class="text-b-3 text-neutral-500 mt-1">Minimum budget: Rp 50.000</p>
+                    </div>
+
+                    <!-- Budget Range Suggestions -->
                     <div class="mb-8">
                         <label class="block text-b-1 font-medium text-neutral-800 mb-4">
-                            Budget Range <span class="text-red-500">*</span>
+                            Or choose a budget range
                         </label>
 
                         <div class="grid grid-cols-2 gap-4">
                             <button type="button"
-                                class="budget-option p-4 border-2 border-primary-500 bg-primary-500 text-white rounded-lg text-b-1 font-medium hover:bg-primary-600 transition-colors text-left"
-                                onclick="selectBudget(this, 1000)">
-                                $500 - $1,000
+                                class="budget-range p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+                                onclick="setBudget(500000, this)">
+                                Rp 500.000 - Rp 1.000.000
                             </button>
                             <button type="button"
-                                class="budget-option p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
-                                onclick="selectBudget(this, 2000)">
-                                $1,000 - $2,000
+                                class="budget-range p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+                                onclick="setBudget(2000000, this)">
+                                Rp 1.000.000 - Rp 2.000.000
                             </button>
                             <button type="button"
-                                class="budget-option p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
-                                onclick="selectBudget(this, 5000)">
-                                $2,000 - $5,000
+                                class="budget-range p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+                                onclick="setBudget(5000000, this)">
+                                Rp 2.000.000 - Rp 5.000.000
                             </button>
                             <button type="button"
-                                class="budget-option p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
-                                onclick="selectBudget(this, 10000)">
-                                $5,000 - $10,000
+                                class="budget-range p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+                                onclick="setBudget(10000000, this)">
+                                Rp 5.000.000 - Rp 10.000.000
                             </button>
                             <button type="button"
-                                class="budget-option col-span-2 p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
-                                onclick="selectBudget(this, 10001)">
-                                $10,000+
+                                class="budget-range col-span-2 p-4 border-2 border-neutral-300 bg-white text-neutral-700 rounded-lg text-b-1 font-medium hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+                                onclick="setBudget(15000000, this)">
+                                Rp 10.000.000+
                             </button>
                         </div>
-                        <input type="hidden" name="budget" id="budgetInput" value="500-1000">
                     </div>
 
                     <!-- Expected Delivery Date -->
@@ -115,7 +130,7 @@
                             Expected Delivery Date <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <input type="date" id="deadline" name="deadline" value="2025-11-01"
+                            <input type="date" id="deadline" name="deadline"
                                 class="w-full px-4 py-3 pl-12 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-b-1 text-neutral-800"
                                 required>
                             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 pointer-events-none"
@@ -124,6 +139,7 @@
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                         </div>
+                        <p class="text-b-3 text-neutral-500 mt-1">Deadline must be at least tomorrow</p>
                     </div>
 
                     <!-- Project Summary -->
@@ -132,16 +148,12 @@
 
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-b-2 text-neutral-700">Budget Range:</span>
-                                <span class="text-b-1 font-semibold text-primary-500">$500 - $1,000</span>
+                                <span class="text-b-2 text-neutral-700">Budget:</span>
+                                <span class="text-b-1 font-semibold text-primary-500" id="summaryBudget">-</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-b-2 text-neutral-700">Delivery Date:</span>
-                                <span class="text-b-1 font-semibold text-neutral-800">November 1st, 2025</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-b-2 text-neutral-700">Skills Required:</span>
-                                <span class="text-b-1 font-semibold text-neutral-800">3 skills</span>
+                                <span class="text-b-1 font-semibold text-neutral-800" id="summaryDeadline">-</span>
                             </div>
                         </div>
                     </div>
@@ -177,9 +189,15 @@
     </div>
 
     <script>
-        function selectBudget(button, value) {
+        // Set minimum date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        document.getElementById('deadline').min = minDate;
+
+        function setBudget(amount, button) {
             // Remove active state from all buttons
-            document.querySelectorAll('.budget-option').forEach(btn => {
+            document.querySelectorAll('.budget-range').forEach(btn => {
                 btn.classList.remove('border-primary-500', 'bg-primary-500', 'text-white');
                 btn.classList.add('border-neutral-300', 'bg-white', 'text-neutral-700');
             });
@@ -188,32 +206,74 @@
             button.classList.remove('border-neutral-300', 'bg-white', 'text-neutral-700');
             button.classList.add('border-primary-500', 'bg-primary-500', 'text-white');
 
-            // Update hidden input
-            document.getElementById('budgetInput').value = value;
+            // Set budget input
+            document.getElementById('budget').value = amount;
 
             // Update summary
-            const summaryBudget = document.querySelector('.bg-green-100 .space-y-3 > div:first-child span:last-child');
-            summaryBudget.textContent = button.textContent.trim();
+            updateSummary();
         }
 
-        // Update delivery date in summary
-        document.getElementById('deadline').addEventListener('change', function() {
-            const date = new Date(this.value);
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            };
-            const formattedDate = date.toLocaleDateString('en-US', options);
+        // Update budget summary when typing
+        document.getElementById('budget').addEventListener('input', function() {
+            // Clear range button selections
+            document.querySelectorAll('.budget-range').forEach(btn => {
+                btn.classList.remove('border-primary-500', 'bg-primary-500', 'text-white');
+                btn.classList.add('border-neutral-300', 'bg-white', 'text-neutral-700');
+            });
 
-            const summaryDate = document.querySelector(
-                '.bg-green-100 .space-y-3 > div:nth-child(2) span:last-child');
-            summaryDate.textContent = formattedDate;
+            updateSummary();
         });
+
+        // Update deadline summary
+        document.getElementById('deadline').addEventListener('change', function() {
+            updateSummary();
+        });
+
+        function updateSummary() {
+            const budget = document.getElementById('budget').value;
+            const deadline = document.getElementById('deadline').value;
+
+            if (budget) {
+                const formattedBudget = new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(budget);
+                document.getElementById('summaryBudget').textContent = formattedBudget;
+            } else {
+                document.getElementById('summaryBudget').textContent = '-';
+            }
+
+            if (deadline) {
+                const date = new Date(deadline);
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                const formattedDate = date.toLocaleDateString('en-US', options);
+                document.getElementById('summaryDeadline').textContent = formattedDate;
+            } else {
+                document.getElementById('summaryDeadline').textContent = '-';
+            }
+        }
 
         // Form submission
         document.getElementById('projectBudgetForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            const budget = document.getElementById('budget').value;
+            const deadline = document.getElementById('deadline').value;
+
+            if (!budget || !deadline) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (parseInt(budget) < 50000) {
+                alert('Minimum budget is Rp 50.000');
+                return;
+            }
 
             const formData = new FormData(this);
 
@@ -230,10 +290,13 @@
                 const data = await response.json();
 
                 if (data.status) {
-                    window.location.href = "{{ route('consumer.project.createAttachment') }}";
+                    window.location.href = "{{ route('consumer.project.createRequirements') }}";
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to save budget'));
                 }
             } catch (error) {
                 console.error('Error:', error);
+                alert('An error occurred. Please try again.');
             }
         });
     </script>

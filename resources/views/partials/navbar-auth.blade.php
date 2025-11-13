@@ -203,14 +203,15 @@
 
                 {{-- User dropdown --}}
                 <div class="relative" x-data="{ open: false }" @click.away="open=false">
-                    @php
-                        $src = Str::startsWith(Auth::user()->avatar, 'http')
-                            ? Auth::user()->avatar
-                            : asset('storage/' . $developer->avatar);
-                    @endphp
                     <button @click="open=!open"
                         class="flex items-center gap-2 hover:bg-neutral-100 px-3 py-2 rounded-lg transition">
-                        <img src="{{ $src }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                        @php
+                            $src = Str::startsWith(Auth::user()->avatar, 'http')
+                                ? Auth::user()->avatar
+                                : asset('storage/' . Auth::user()->avatar);
+                        @endphp
+                        <img src="{{ Auth::user()->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                            alt="Avatar" class="w-8 h-8 rounded-full object-cover">
                         <svg class="w-4 h-4 text-neutral-600 mt-0.5" :class="open ? 'rotate-180' : ''" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -87,7 +87,8 @@ class DashboardController extends Controller
             'totalProjects',
             'inProgressCount',
             'completedCount',
-            'totalSpent'
+            'totalSpent',
+            'user'
         ));
     }
 
@@ -142,7 +143,8 @@ class DashboardController extends Controller
             'activeAgreements',
             'earnings',
             'pendingOffers',
-            'profileViews'
+            'profileViews',
+            'user'
         ));
     }
 
@@ -152,6 +154,8 @@ class DashboardController extends Controller
      */
     private function adminDashboard()
     {
+        $user = Auth::user();
+        
         // Total users
         $totalUsers = User::count();
         $totalDevelopers = User::where('role', 'developer')->count();
@@ -197,7 +201,8 @@ class DashboardController extends Controller
             'pendingPayments',
             'paymentsToTransfer',
             'totalRevenue',
-            'recentProjects'
+            'recentProjects',
+            'user'
         ));
     }
 }

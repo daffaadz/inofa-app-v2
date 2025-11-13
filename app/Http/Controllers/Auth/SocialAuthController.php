@@ -64,7 +64,7 @@ class SocialAuthController extends Controller
     private function redirectBasedOnRegistration(User $user)
     {
         // Jika belum punya role → wajib pilih role
-        if (!$user->role || $user->role === 'consumer') {
+        if (!$user->role) {
             return redirect()->route('select-role');
         }
 

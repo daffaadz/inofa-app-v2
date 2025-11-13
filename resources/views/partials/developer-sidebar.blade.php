@@ -4,7 +4,12 @@
     <div
         class="p-4 mx-4 my-8 bg-gradient-to-br from-primary-500/5 to-secondary-500/10 rounded-2xl border border-primary-200">
         <div class="flex items-center gap-3 mb-2">
-            <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+            @php
+                $src = Str::startsWith(Auth::user()->avatar, 'http')
+                    ? Auth::user()->avatar
+                    : asset('storage/' . Auth::user()->avatar);
+            @endphp
+            <img src="{{ Auth::user()->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
                 alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
             <div class="flex-1 min-w-0">
                 <p class="text-b-2 font-semibold text-neutral-900 truncate">{{ Auth::user()->name }}</p>
@@ -27,7 +32,8 @@
         </x-sidebar-link>
 
         {{-- Notifikasi --}}
-        <x-sidebar-link :href="route('landing')" :active="request()->routeIs('notifications.index')" icon="notifikasi" :badge="$activeAgreements->count() ?: null" description="All notifications">
+        <x-sidebar-link :href="route('landing')" :active="request()->routeIs('notifications.index')" icon="notifikasi" :badge="$activeAgreements->count() ?: null"
+            description="All notifications">
             Notifikasi
         </x-sidebar-link>
 

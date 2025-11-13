@@ -108,22 +108,22 @@
                                         
                                         <button type="button" onclick="document.querySelector('[name=min_budget]').value='1000000'; document.querySelector('[name=max_budget]').value='2000000'; submitProjectSearchForm();"
                                             class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '1000000' && request('max_budget') == '2000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            $1,000 - $2,000
+                                            Rp1,000 - Rp2,000
                                         </button>
                                         
                                         <button type="button" onclick="document.querySelector('[name=min_budget]').value='2000000'; document.querySelector('[name=max_budget]').value='3000000'; submitProjectSearchForm();"
                                             class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '2000000' && request('max_budget') == '3000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            $2,000 - $3,000
+                                            Rp2,000 - Rp3,000
                                         </button>
                                         
                                         <button type="button" onclick="document.querySelector('[name=min_budget]').value='3000000'; document.querySelector('[name=max_budget]').value='5000000'; submitProjectSearchForm();"
                                             class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '3000000' && request('max_budget') == '5000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            $3,000 - $5,000
+                                            Rp3,000 - Rp5,000
                                         </button>
                                         
                                         <button type="button" onclick="document.querySelector('[name=min_budget]').value='5000000'; document.querySelector('[name=max_budget]').value=''; submitProjectSearchForm();"
                                             class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '5000000' && empty(request('max_budget')) ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            $5,000+
+                                            Rp5,000+
                                         </button>
                                         
                                         <input type="hidden" name="min_budget" value="{{ request('min_budget', '') }}">

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot:title>{{__('Dashboard Anda - Inofa')}}</x-slot:title>
+    <x-slot:title>{{ __('Dashboard Anda - Inofa') }}</x-slot:title>
     <section class="min-h-screen flex">
 
         <!-- ===== SIDEBAR ===== -->
@@ -16,12 +16,13 @@
                     class="p-8 pb-16 flex flex-row items-center justify-between border-b-[0.5px] border-neutral-100 bg-neutral-0">
                     <div>
                         <h1 class="text-h-3 font-bold text-neutral-900">Developer Dashboard</h1>
-                        <p class="mt-1 text-b-1 text-neutral-600">Welcome back! Here's what's happening with your projects
+                        <p class="mt-1 text-b-1 text-neutral-600">Welcome back! Here's what's happening with your
+                            projects
                         </p>
                     </div>
 
                     <div>
-                        <a href=""
+                        <a href="{{ route('search.developers.show', auth()->user()->id) }}" target="_blank"
                             class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary-500 text-neutral-0
                                 hover:bg-primary-600 hover:scale-[1.02] active:scale-[0.98]
                                 [box-shadow:inset_0_2px_4px_0_rgba(0,0,0,0.06),0_4px_12px_rgba(16,138,0,0.25)]
@@ -57,10 +58,12 @@
                                         fill="url(#paint0_linear_782_4044)" />
                                     <path
                                         d="M28 32V16C28 15.4696 27.7893 14.9609 27.4142 14.5858C27.0391 14.2107 26.5304 14 26 14H22C21.4696 14 20.9609 14.2107 20.5858 14.5858C20.2107 14.9609 20 15.4696 20 16V32"
-                                        stroke="#108A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="#108A00" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                     <path
                                         d="M32 18H16C14.8954 18 14 18.8954 14 20V30C14 31.1046 14.8954 32 16 32H32C33.1046 32 34 31.1046 34 30V20C34 18.8954 33.1046 18 32 18Z"
-                                        stroke="#108A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="#108A00" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                     <defs>
                                         <linearGradient id="paint0_linear_782_4044" x1="0" y1="0"
                                             x2="48" y2="48" gradientUnits="userSpaceOnUse">
@@ -90,18 +93,14 @@
                         <div
                             class="bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl border-[3px] border-primary-400 p-6 relative overflow-hidden hover:shadow-lg transition">
                             <div class="flex items-center justify-between mb-2">
-                                {{-- left --}}
-                                <svg class="w-14 h-auto" viewBox="0 0 48 48" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M0 14C0 6.26801 6.26801 0 14 0H34C41.732 0 48 6.26801 48 14V34C48 41.732 41.732 48 34 48H14C6.26801 48 0 41.732 0 34V14Z"
-                                        fill="#108A00" />
-                                    <path d="M24 14V34" stroke="white" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <path
-                                        d="M29 17H21.5C20.5717 17 19.6815 17.3687 19.0251 18.0251C18.3687 18.6815 18 19.5717 18 20.5C18 21.4283 18.3687 22.3185 19.0251 22.9749C19.6815 23.6313 20.5717 24 21.5 24H26.5C27.4283 24 28.3185 24.3687 28.9749 25.0251C29.6313 25.6815 30 26.5717 30 27.5C30 28.4283 29.6313 29.3185 28.9749 29.9749C28.3185 30.6313 27.4283 31 26.5 31H18"
-                                        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+                                <div class="w-14 h-14 rounded-2xl bg-primary-500 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-auto text-white"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M128,88a40,40,0,1,0,40,40A40,40,0,0,0,128,88Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,152ZM240,56H16a8,8,0,0,0-8,8V192a8,8,0,0,0,8,8H240a8,8,0,0,0,8-8V64A8,8,0,0,0,240,56ZM193.65,184H62.35A56.78,56.78,0,0,0,24,145.65v-35.3A56.78,56.78,0,0,0,62.35,72h131.3A56.78,56.78,0,0,0,232,110.35v35.3A56.78,56.78,0,0,0,193.65,184ZM232,93.37A40.81,40.81,0,0,1,210.63,72H232ZM45.37,72A40.81,40.81,0,0,1,24,93.37V72ZM24,162.63A40.81,40.81,0,0,1,45.37,184H24ZM210.63,184A40.81,40.81,0,0,1,232,162.63V184Z">
+                                        </path>
+                                    </svg>
+                                </div>
 
                                 {{-- right --}}
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -147,7 +146,7 @@
 
                                 {{-- right --}}
                                 <span
-                                    class="px-4 py-2 bg-blue-100 text-blue-600 text-b-3 font-medium rounded-xl">{{__('New')}}</span>
+                                    class="px-4 py-2 bg-blue-100 text-blue-600 text-b-3 font-medium rounded-xl">{{ __('New') }}</span>
                             </div>
                             <p class="text-b-1 text-neutral-600 mb-1">Pending Inquiries</p>
                             <p class="text-h-3 font-bold text-neutral-900 mb-4">
@@ -212,7 +211,8 @@
                             class="text-primary-500 text-b-1 font-medium hover:underline flex items-center gap-1">
                             View All
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
                             </svg>
                         </a>
                     </div>
@@ -272,7 +272,8 @@
                                             <p class="text-h-5 font-bold text-neutral-900">
                                                 ${{ number_format($agreement->final_price, 0) }}</p>
                                             <p class="text-b-3 text-neutral-600">Payment</p>
-                                            <p class="text-b-3 text-neutral-600 flex items-center justify-end gap-1 mt-2">
+                                            <p
+                                                class="text-b-3 text-neutral-600 flex items-center justify-end gap-1 mt-2">
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                     <circle cx="12" cy="12" r="8" />
                                                 </svg>
@@ -317,26 +318,23 @@
 
                     <!-- View All Projects Button -->
                     <div class="mt-6">
-                        <a href="{{ route('developer.agreements.index') }}"
+                        <a href="{{ route('search.projects') }}"
                             class="w-full flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary-500 text-primary-500 text-b-1 font-medium rounded-xl hover:bg-primary-50 transition">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-auto text-primary-500"
+                                fill="currentColor" viewBox="0 0 256 256">
                                 <path
-                                    d="M9.99984 18.3337C14.6022 18.3337 18.3332 14.6027 18.3332 10.0003C18.3332 5.39795 14.6022 1.66699 9.99984 1.66699C5.39746 1.66699 1.6665 5.39795 1.6665 10.0003C1.6665 14.6027 5.39746 18.3337 9.99984 18.3337Z"
-                                    stroke="#108A00" stroke-width="1.66667" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M7.5 9.99967L9.16667 11.6663L12.5 8.33301" stroke="#108A00"
-                                    stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
+                                    d="M237.2,151.87v0a47.1,47.1,0,0,0-2.35-5.45L193.26,51.8a7.82,7.82,0,0,0-1.66-2.44,32,32,0,0,0-45.26,0A8,8,0,0,0,144,55V80H112V55a8,8,0,0,0-2.34-5.66,32,32,0,0,0-45.26,0,7.82,7.82,0,0,0-1.66,2.44L21.15,146.4a47.1,47.1,0,0,0-2.35,5.45v0A48,48,0,1,0,112,168V96h32v72a48,48,0,1,0,93.2-16.13ZM76.71,59.75a16,16,0,0,1,19.29-1v73.51a47.9,47.9,0,0,0-46.79-9.92ZM64,200a32,32,0,1,1,32-32A32,32,0,0,1,64,200ZM160,58.74a16,16,0,0,1,19.29,1l27.5,62.58A47.9,47.9,0,0,0,160,132.25ZM192,200a32,32,0,1,1,32-32A32,32,0,0,1,192,200Z">
+                                </path>
                             </svg>
 
-                            View All Projects
+                            Search For Projects
 
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M4.1665 10H15.8332" stroke="#108A00" stroke-width="1.66667"
                                     stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M10 4.16699L15.8333 10.0003L10 15.8337" stroke="#108A00" stroke-width="1.66667"
-                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M10 4.16699L15.8333 10.0003L10 15.8337" stroke="#108A00"
+                                    stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                         </a>

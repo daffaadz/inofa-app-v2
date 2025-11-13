@@ -52,7 +52,7 @@
                             class="w-12 h-12 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-b-1 font-semibold mb-2">
                             4
                         </div>
-                        <span class="text-b-2 text-neutral-500">Attachments</span>
+                        <span class="text-b-2 text-neutral-500">Requirements</span>
                     </div>
                 </div>
             </div>

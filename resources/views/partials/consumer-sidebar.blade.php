@@ -7,10 +7,10 @@
             @php
                 $src = Str::startsWith(Auth::user()->avatar, 'http')
                     ? Auth::user()->avatar
-                    : asset('storage/' . $developer->avatar);
+                    : asset('storage/' . Auth::user()->avatar);
             @endphp
-            <img src="{{ $src }}" alt="Avatar"
-                class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
+            <img src="{{ Auth::user()->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+                alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
             <div class="flex-1 min-w-0">
                 <p class="text-b-2 font-semibold text-neutral-900 truncate">{{ Auth::user()->name }}</p>
                 <p class="text-b-3 text-neutral-600 truncate">{{ Auth::user()->email }}</p>

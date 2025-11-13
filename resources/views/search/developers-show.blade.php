@@ -8,8 +8,14 @@
                 <div class="flex flex-row gap-6 mt-16">
                     <!-- Avatar -->
                     <div class="flex-shrink-0">
-                        <img src="{{ $developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) . '&size=120' }}"
-                            alt="{{ $developer->name }}" class="w-40 h-auto rounded-lg object-cover border-4 border-primary-400">
+                        @php
+                            $src = Str::startsWith($developer->avatar, 'http')
+                                ? $developer->avatar
+                                : asset('storage/' . $developer->avatar);
+                        @endphp
+                        <img src="{{ $developer->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) . '&size=120' }}"
+                            alt="{{ $developer->name }}"
+                            class="w-40 h-40 rounded-lg object-cover border-4 border-primary-400">
                     </div>
 
                     <!-- Developer Info -->
@@ -237,7 +243,8 @@
                                 </path>
                             </svg>
                         </div>
-                        <div class="text-h-4 text-neutral-900 font-bold mb-1">{{ number_format($totalReviews) }}+</div>
+                        <div class="text-h-4 text-neutral-900 font-bold mb-1">{{ number_format($totalReviews) }}+
+                        </div>
                         <p class="text-b-1 text-neutral-600">Total Client Reviews</p>
                     </div>
 
@@ -250,7 +257,8 @@
                                     d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                         </div>
-                        <div class="text-h-4 text-neutral-900 font-bold mb-1">{{ number_format($stats['success_rate']) }}%</div>
+                        <div class="text-h-4 text-neutral-900 font-bold mb-1">
+                            {{ number_format($stats['success_rate']) }}%</div>
                         <p class="text-b-1 text-neutral-600">Project Complete over Total Projects</p>
                     </div>
                 </div>
@@ -318,7 +326,7 @@
 
                 <div class="space-y-6">
                     @forelse($reviews as $review)
-                        <div class="bg-white border-l-8 border-primary-500 rounded-xl last:border-0 pb-6 last:pb-0">
+                        <div class="bg-white border-l-4 border-primary-500 rounded-xl p-6 shadow-sm">
                             <div class="flex items-start gap-4">
                                 <!-- Avatar -->
                                 <img src="{{ $review->consumer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($review->consumer->name) . '&size=48' }}"

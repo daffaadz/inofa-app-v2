@@ -18,24 +18,6 @@
                         <h1 class="text-h-3 font-bold text-neutral-900">My Projects</h1>
                         <p class="mt-1 text-b-1 text-neutral-600">Manage and track all your project collaborations</p>
                     </div>
-
-                    <div>
-                        <a href="{{ route('landing') }}"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary-500 text-neutral-0
-                                hover:bg-primary-600 hover:scale-[1.02] active:scale-[0.98]
-                                [box-shadow:inset_0_2px_4px_0_rgba(0,0,0,0.06),0_4px_12px_rgba(16,138,0,0.25)]
-                                transition-all duration-200 group">
-
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 20 20">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
-                                    d="M1.72 10.29c-.07-.19-.07-.4 0-.59C2.4 8.07 3.54 6.67 5.02 5.68c1.47-.99 3.2-1.51 4.98-1.51s3.51.52 4.98 1.51c1.48.99 2.62 2.39 3.3 4.02.07.19.07.4 0 .59-.68 1.63-1.82 3.03-3.3 4.02-1.47.99-3.2 1.51-4.98 1.51s-3.51-.52-4.98-1.51C3.54 13.32 2.4 11.92 1.72 10.29z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
-                                    d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                            </svg>
-
-                            <span class="text-b-1 font-light">View Public Profile</span>
-                        </a>
-                    </div>
                 </div>
 
                 <!-- ===== KEY STATS GRID ===== -->
