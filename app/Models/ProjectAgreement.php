@@ -18,6 +18,7 @@ class ProjectAgreement extends Model
         'consumer_id',
         'developer_id',
         'offer_id',
+        'conversation_id',
         'final_price',
         'start_date',
         'end_date',
@@ -58,5 +59,10 @@ class ProjectAgreement extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
     }
 }

@@ -10,7 +10,7 @@ use Chatify\Http\Controllers\MessagesController as BaseController;
 class ChatController extends BaseController
 {
     /**
-     * Contoh override: fetch messages dari tabel custom
+     * fetch messages dari tabel 
      * GET /chatify/fetch?conversation_id=...
      */
     public function fetch(Request $request)

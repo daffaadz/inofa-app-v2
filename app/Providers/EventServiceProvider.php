@@ -10,10 +10,18 @@ class EventServiceProvider extends ServiceProvider
      * Event → Listener mapping.
      */
     protected $listen = [
-        // 🧾 Saat offer dibuat, otomatis buat percakapan
+        // otomatis buat percakapan
         \App\Events\OfferCreated::class => [
             \App\Listeners\CreateConversationForOffer::class,
         ],
+        //  buat escrow payment
+        \App\Events\AgreementAccepted::class => [
+            \App\Listeners\CreateEscrowPayment::class,
+        ],
+        // broadcast update status payment
+        \App\Events\PaymentStatusUpdated::class => [
+        \App\Listeners\BroadcastPaymentStatusUpdate::class,
+    ],
     ];
 
     /**

@@ -27,8 +27,67 @@ class Payment extends Model
         'admin_transferred_at'=> 'datetime',
     ];
 
+    /* ---------------- Relations ---------------- */
+
     public function agreement()
     {
         return $this->belongsTo(ProjectAgreement::class, 'project_agreement_id');
+    }
+
+    public function consumer()
+    {
+        return $this->hasOneThrough(
+            User::class,
+            ProjectAgreement::class,
+            'id', 'id',
+            'project_agreement_id', 'consumer_id'
+        );
+    }
+
+    public function developer()
+    {
+        return $this->hasOneThrough(
+            User::class,
+            ProjectAgreement::class,
+            'id', 'id',
+            'project_agreement_id', 'developer_id'
+        );
+    }
+
+    /* ---------------- Scopes ---------------- */
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeConfirmed($query)
+    {
+        return $query->where('status', 'confirmed');
+    }
+
+    public function scopeTransferred($query)
+    {
+        return $query->where('status', 'transferred');
+    }
+
+    /* ---------------- Helpers ---------------- */
+
+    public function markAsConfirmed(): void
+    {
+        $this->update([
+            'status' => 'confirmed',
+            'admin_confirmed' => true,
+            'admin_confirmed_at' => now(),
+        ]);
+    }
+
+    public function markAsTransferred(): void
+    {
+        $this->update([
+            'status' => 'transferred',
+            'admin_transferred' => true,
+            'admin_transferred_at' => now(),
+        ]);
     }
 }
