@@ -45,10 +45,10 @@ Route::middleware('auth')->group(function () {
 
 // socialite authentication
 Route::get('/auth/{driver}', [SocialAuthController::class, 'redirect'])
-     ->name('social.redirect');
+    ->name('social.redirect');
 
 Route::get('/auth/{driver}/callback', [SocialAuthController::class, 'callback'])
-     ->name('social.callback');
+    ->name('social.callback');
 
 // Registration flow routes
 Route::middleware(['auth'])->group(function () {
@@ -74,8 +74,23 @@ Route::get('/search/projects', [SearchProjects::class, 'index'])
 Route::get('/search/projects/{id}', [SearchProjects::class, 'show'])
     ->name('search.projects.show');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
+// CHAT ROUTING
+use App\Http\Controllers\Chat\ConversationController;
+use App\Http\Controllers\Chat\MessageController;
+use App\Http\Controllers\Chat\AgreementController;
+
+Route::middleware('auth')->prefix('chat')->group(function () {
+    Route::get('conversations', [ConversationController::class, 'index']);
+    Route::post('conversations', [ConversationController::class, 'store']);
+    Route::get('conversations/{conversation}', [ConversationController::class, 'show']);
+    Route::get('conversations/{conversation}/messages', [MessageController::class, 'index']);
+    Route::post('conversations/{conversation}/messages', [MessageController::class, 'send']);
+    Route::post('conversations/{conversation}/read', [MessageController::class, 'markRead']);
+    Route::post('conversations/{conversation}/agreements', [AgreementController::class, 'send']);
+    Route::patch('agreements/{agreement}', [AgreementController::class, 'updateStatus']);
+});
 
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;
@@ -88,36 +103,57 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
 
     /* ---------- Agreements (active / completed) ---------- */
     Route::get('/agreements', [DevAgreement::class, 'index'])
-         ->name('agreements.index');
+        ->name('agreements.index');
     Route::get('/agreements/{agreement}', [DevAgreement::class, 'show'])
-         ->name('agreements.show');
+        ->name('agreements.show');
 
     /* ---------- My Offers (penawaran saya) ---------- */
     Route::get('/offers', [DevOffer::class, 'index'])
-         ->name('offers.index');
+        ->name('offers.index');
     Route::delete('/offers/{offer}', [DevOffer::class, 'destroy'])
-         ->name('offers.destroy');   // withdraw
+        ->name('offers.destroy');   // withdraw
 
     /* ---------- Browse Open Projects ---------- */
     Route::get('/projects', [DevProject::class, 'index'])
-         ->name('projects.index');
+        ->name('projects.index');
     Route::get('/projects/{project}', [DevProject::class, 'show'])
-         ->name('projects.show');
+        ->name('projects.show');
 
     /* ---------- Earnings & Payment History ---------- */
     Route::get('/earnings', [DevEarnings::class, 'index'])
-         ->name('earnings.index');
+        ->name('earnings.index');
 
     /* ---------- Search (API) ---------- */
     Route::get('/search', [DevSearch::class, 'index'])
-         ->name('search');
+        ->name('search');
+});
+
+// ADMIN ESCROW ROUTING
+use App\Http\Controllers\Admin\EscrowController;
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(function () {
+    Route::get('/escrow', [EscrowController::class, 'index'])->name('escrow.index');
+    Route::post('/escrow/{id}/confirm', [EscrowController::class, 'confirm'])->name('escrow.confirm');
+    Route::post('/escrow/{id}/transfer', [EscrowController::class, 'transfer'])->name('escrow.transfer');
+    Route::post('/escrow/{id}/refund', [EscrowController::class, 'refund'])->name('escrow.refund');
 });
 
 
 // CUSTOMER ROUTING
+use App\Http\Controllers\Customer\ProjectController as CustProject;
 
-Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function(){
-     Route::get('project/create', function(){
-          return "BIKIN PROJECT AHHH";
-     })->name('project.create');
+Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function () {
+    Route::resource('project', CustProject::class);
+
+    /* ---------- custom CREATE (view) ---------- */
+    Route::get('project/create/skills',      [CustProject::class, 'createSkills'])->name('project.createSkills');
+    Route::get('project/create/budget',      [CustProject::class, 'createBudget'])->name('project.createBudget');
+    Route::get('project/create/attachment',  [CustProject::class, 'createAttachment'])->name('project.createAttachment');
+
+    // Additional custom routes (must be registered manually)
+    Route::post('project/store-details',     [CustProject::class, 'storeDetails'])->name('project.storeDetails');
+    Route::post('project/store-skills',      [CustProject::class, 'storeSkills'])->name('project.storeSkills');
+    Route::post('project/store-budget',      [CustProject::class, 'storeBudget'])->name('project.storeBudget');
+    Route::post('project/store-attachment',  [CustProject::class, 'storeAttachment'])->name('project.storeAttachment');
+    Route::post('project/reset-session',     [CustProject::class, 'resetSession'])->name('project.resetSession');
 });

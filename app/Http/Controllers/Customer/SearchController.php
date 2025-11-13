@@ -151,30 +151,52 @@ class SearchController extends Controller
      */
     public function show($id)
     {
-        $developer = User::where('role', 'developer')
-            ->with([
-                'developerProfile',
-                'skills' => function ($q) {
-                    $q->orderBy('proficiency_level', 'desc');
-                },
-                'portfolios' => function ($q) {
-                    $q->orderBy('is_featured', 'desc')->orderBy('sort_order', 'asc');
-                },
-            ])
-            ->withCount(['completedProjects as total_projects', 'reviewsReceived as total_reviews'])
-            ->findOrFail($id);
+        // Fetch developer with all related data
+        $developer = User::with([
+            'developerProfile',
+            'skills' => function ($query) {
+                $query->orderBy('proficiency_level', 'desc');
+            },
+            'portfolios' => function ($query) {
+                $query->orderBy('is_featured', 'desc')->orderBy('sort_order', 'asc');
+            },
+        ])->findOrFail($id);
+
+        // Check if user is actually a developer
+        if ($developer->role !== 'developer') {
+            abort(404);
+        }
 
         // Get reviews for this developer
-        $reviews = Review::where('developer_id', $id)
-            ->where('is_public', true)
-            ->with(['consumer:id,name,avatar', 'project:id,title'])
-            ->latest()
-            ->paginate(10);
+        $reviews = Review::with('consumer')->where('developer_id', $id)->where('is_public', true)->orderBy('created_at', 'desc')->get();
 
-        // Calculate review statistics
+        // Calculate statistics
+        $totalReviews = $reviews->count();
+        $averageRating = $reviews->avg('rating');
+        $projectsCompleted = $developer->developerProfile->projects_completed ?? 0;
+
+        // Group skills by category
+        $skills = $developer->skills;
+
+        // Get certifications
+        $certifications = [];
+        if ($developer->developerProfile && $developer->developerProfile->certifications) {
+            $certifications = is_array($developer->developerProfile->certifications) ? $developer->developerProfile->certifications : json_decode($developer->developerProfile->certifications, true);
+
+            // Ensure it's always an array
+            if (!is_array($certifications)) {
+                $certifications = [];
+            }
+        }
+
+        $educations = $developer->developerProfile->education ?? 'Not specified';
+        $rateMin = $developer->developerProfile->rate_min_byproject ?? 'N/A';
+        $rateMax = $developer->developerProfile->rate_max_byproject ?? 'N/A';
+
+        // Calculate review statistics for distribution
         $reviewStats = [
-            'total' => $reviews->total(),
-            'average' => $developer->developerProfile->rating_average ?? 0,
+            'total' => $totalReviews,
+            'average' => $averageRating ?? 0,
             'distribution' => [
                 5 => Review::where('developer_id', $id)->where('rating', 5)->count(),
                 4 => Review::where('developer_id', $id)->where('rating', 4)->count(),
@@ -184,17 +206,14 @@ class SearchController extends Controller
             ],
         ];
 
-        // Group skills by category
-        $skillsByCategory = $developer->skills->groupBy('category');
-
         // Developer statistics
         $stats = [
-            'projects_completed' => $developer->developerProfile->projects_completed ?? 0,
+            'projects_completed' => $projectsCompleted,
             'success_rate' => $this->calculateSuccessRate($developer),
             'avg_delivery_time' => $this->calculateAvgDeliveryTime($developer),
         ];
 
-        return view('search.developers-show', compact('developer', 'reviews', 'reviewStats', 'skillsByCategory', 'stats'));
+        return view('search.developers-show', compact('developer', 'reviews', 'totalReviews', 'averageRating', 'projectsCompleted', 'certifications', 'reviewStats', 'skills', 'stats', 'educations', 'rateMin', 'rateMax'));
     }
 
     /**
@@ -203,7 +222,10 @@ class SearchController extends Controller
      */
     private function calculateSuccessRate($developer)
     {
-        $totalProjects = $developer->total_projects ?? 0;
+        $totalProjects = \App\Models\ProjectAgreement::where('developer_id', $developer->id)
+            ->whereIn('status', ['completed', 'active', 'terminated'])
+            ->count();
+
         $completed = $developer->developerProfile->projects_completed ?? 0;
 
         if ($totalProjects == 0) {

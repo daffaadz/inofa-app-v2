@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -22,7 +23,6 @@ return new class extends Migration
             $table->integer('experience_years')->default(0);
             $table->string('education')->nullable();
             $table->text('certifications')->nullable();
-            $table->json('portfolio_links')->nullable();
             $table->decimal('rating_average', 3, 2)->default(0);
             $table->integer('rating_count')->default(0);
             $table->integer('projects_completed')->default(0);
