@@ -21,14 +21,14 @@ Route::prefix('developer')->group(function () {
     
 });
 
-// 🔍 Advanced Search untuk Developer
+// Search untuk Developer
 use App\Http\Controllers\Developer\SearchController as DeveloperSearchController;
 
 Route::prefix('developer')->middleware('auth:sanctum')->group(function () {
     Route::get('search', [DeveloperSearchController::class, 'search']);
 });
 
-// 🔍 Advanced Search untuk Customer
+// Search untuk Customer
 
 use App\Http\Controllers\Customer\SearchController as CustomerSearchController;
 Route::prefix('customer')->middleware('auth:sanctum')->group(function () {

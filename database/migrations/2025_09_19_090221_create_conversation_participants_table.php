@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('conversation_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('role',['admin','participant'])->default('participant');
             $table->timestamp('joined_at')->useCurrent();
             $table->timestamp('last_read_at')->nullable();
             $table->boolean('is_active')->default(true);
