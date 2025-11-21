@@ -23,7 +23,7 @@
 
         {{-- Akun Saya --}}
         <x-sidebar-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" icon="akun-saya" description="Profile and settings">
-            Akun Saya
+            My Account
         </x-sidebar-link>
 
         {{-- My Projects --}}

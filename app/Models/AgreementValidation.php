@@ -6,8 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class AgreementValidation extends Model
 {
-    protected $fillable = ['project_agreement_id','admin_id','status','notes','validated_at'];
+    // Fillable fields
+    protected $fillable = [
+        'project_agreement_id',
+        'admin_id',
+        'status',
+        'notes',
+        'validated_at'
+    ];
 
+    // Relationships
     public function agreement() {
         return $this->belongsTo(ProjectAgreement::class);
     }

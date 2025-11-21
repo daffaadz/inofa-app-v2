@@ -92,6 +92,10 @@ Route::middleware('auth')->prefix('chat')->group(function () {
     Route::patch('agreements/{agreement}', [AgreementController::class, 'updateStatus']);
 });
 
+// COSTUMER SERVICE ROUTING
+Route::get('/chat/admin', function () {return redirect('/chat?user=admin');})->name('chat.admin');
+
+
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;
 use App\Http\Controllers\Developer\OfferController as DevOffer;
@@ -141,6 +145,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
 
 // CUSTOMER ROUTING
 use App\Http\Controllers\Customer\ProjectController as CustProject;
+    // Agreement Detail Controller & Payment Controller
+    use App\Http\Controllers\Customer\AgreementDetailController As AgreementDetail;
+    use App\Http\Controllers\Customer\CheckoutController as PaymentCheckout;
 
 Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function () {
     Route::resource('project', CustProject::class);
@@ -149,6 +156,17 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
     Route::get('project/create/skills',      [CustProject::class, 'createSkills'])->name('project.createSkills');
     Route::get('project/create/budget',      [CustProject::class, 'createBudget'])->name('project.createBudget');
     Route::get('project/create/requirements',  [CustProject::class, 'createRequirements'])->name('project.createRequirements');
+
+    /* ---------- Agreement Detail & Payment Detail ---------- */
+    Route::get('/agreements/{agreement}', [AgreementDetail::class, 'show'])
+        ->name('payments.offer-detail');
+
+    // payment flow
+    Route::get('/payments/create/{agreement}', [PaymentCheckout::class, 'create'])->name('payments.create');
+    Route::get('/payments/checkout/{payment}', [PaymentCheckout::class, 'checkout'])->name('payments.checkout');
+
+    Route::post('/payments/checkout/{payment}', [PaymentCheckout::class, 'checkout'])->name('payments.checkout');
+    Route::post('/payments/confirm/{payment}', [PaymentCheckout::class, 'confirm'])->name('payments.confirm');
 
     // Additional custom routes (must be registered manually)
     Route::post('project/store-details',     [CustProject::class, 'storeDetails'])->name('project.storeDetails');

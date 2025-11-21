@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AgreementController extends Controller
 {
-    /**
-     * 📄 Lihat semua agreement yang terhubung dengan project milik customer
-     */
+    // Lihat semua agreement milik customer
     public function index()
     {
         $agreements = Agreement::whereHas('project', function ($q) {
@@ -20,9 +18,7 @@ class AgreementController extends Controller
         return response()->json(['status' => true, 'data' => $agreements]);
     }
 
-    /**
-     * 👁️ Lihat detail agreement
-     */
+    // Lihat detail agreement tertentu
     public function show($id)
     {
         $agreement = Agreement::whereHas('project', function ($q) {
@@ -32,9 +28,7 @@ class AgreementController extends Controller
         return response()->json(['status' => true, 'data' => $agreement]);
     }
 
-    /**
-     * ✍️ Customer menandatangani agreement
-     */
+    // Tanda tangani agreement
     public function sign($id)
     {
         $agreement = Agreement::whereHas('project', function ($q) {

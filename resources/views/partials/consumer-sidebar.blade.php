@@ -22,7 +22,7 @@
     <nav class="flex-1 px-4 py-6 overflow-y-auto border-t border-neutral-100">
         {{-- Akun Saya --}}
         <x-sidebar-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" icon="akun-saya" description="Profile and settings">
-            Akun Saya
+            My Account
         </x-sidebar-link>
 
         {{-- My Projects --}}
