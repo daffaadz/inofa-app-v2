@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Http\Controllers\Chat\MessageController as ChatMessageController;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
-use Chatify\Http\Controllers\MessagesController as BaseController;
 
-class ChatController extends BaseController
+class ChatController extends ChatMessageController
 {
     /**
      * fetch messages dari tabel 

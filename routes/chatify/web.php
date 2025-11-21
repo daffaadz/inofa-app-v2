@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * -----------------------------------------------------------------
  * NOTE : There is two routes has a name (user & group),
@@ -116,5 +116,3 @@ Route::get('/group/{id}', 'MessagesController@index')->name('group');
 // Route::get('/route', function(){ return 'Munaf'; }); // works as a route
 Route::get('/{id}', 'MessagesController@index')->name('user');
 // Route::get('/route', function(){ return 'Munaf'; }); // works as a user id
-
-

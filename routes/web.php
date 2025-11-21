@@ -77,20 +77,25 @@ Route::get('/search/projects/{id}', [SearchProjects::class, 'show'])
 require __DIR__ . '/auth.php';
 
 // CHAT ROUTING
-use App\Http\Controllers\Chat\ConversationController;
-use App\Http\Controllers\Chat\MessageController;
-use App\Http\Controllers\Chat\AgreementController;
+// use App\Http\Controllers\Chat\ConversationController;
+// use App\Http\Controllers\Chat\MessageController;
+// use App\Http\Controllers\Chat\AgreementController;
 
-Route::middleware('auth')->prefix('chat')->group(function () {
-    Route::get('conversations', [ConversationController::class, 'index']);
-    Route::post('conversations', [ConversationController::class, 'store']);
-    Route::get('conversations/{conversation}', [ConversationController::class, 'show']);
-    Route::get('conversations/{conversation}/messages', [MessageController::class, 'index']);
-    Route::post('conversations/{conversation}/messages', [MessageController::class, 'send']);
-    Route::post('conversations/{conversation}/read', [MessageController::class, 'markRead']);
-    Route::post('conversations/{conversation}/agreements', [AgreementController::class, 'send']);
-    Route::patch('agreements/{agreement}', [AgreementController::class, 'updateStatus']);
-});
+// Route::middleware('auth')->prefix('chat')->group(function () {
+//     Route::get('conversations', [ConversationController::class, 'index'])->name('chat.conversations');
+//     Route::get('conversations/{conversation}', [ConversationController::class, 'show'])->name('chat.conversations.show');
+//     Route::get('conversations/{conversation}/messages', [MessageController::class, 'index'])->name('chat.conversations.messages');
+//     Route::post('conversations', [ConversationController::class, 'store'])
+//         ->name('chat.conversations.store');
+//     Route::post('conversations/{conversation}/messages', [MessageController::class, 'send'])
+//         ->name('chat.messages.send');
+//     Route::post('conversations/{conversation}/read', [MessageController::class, 'markRead'])
+//         ->name('chat.conversations.read');
+//     Route::post('conversations/{conversation}/agreements', [AgreementController::class, 'send'])
+//         ->name('chat.agreements.send');
+//     Route::patch('agreements/{agreement}', [AgreementController::class, 'updateStatus'])
+//         ->name('chat.agreements.update');
+// });
 
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;

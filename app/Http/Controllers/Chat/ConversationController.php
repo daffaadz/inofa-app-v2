@@ -21,10 +21,10 @@ class ConversationController extends Controller
         $userId = Auth::id();
 
         $conversations = Conversation::query()
-            ->whereHas('participants', fn ($q) => $q->where('user_id', $userId))
+            ->whereHas('participants', fn($q) => $q->where('user_id', $userId))
             ->with([
-                'participants' => fn ($q) => $q->select('users.id', 'users.name'),
-                'messages'     => fn ($q) => $q->latest('sent_at')->limit(1)->with('sender:id,name'),
+                'participants' => fn($q) => $q->select('users.id', 'users.name'),
+                'messages'     => fn($q) => $q->latest('sent_at')->limit(1)->with('sender:id,name'),
             ])
             ->orderByDesc('last_message_at')
             ->get()
@@ -37,7 +37,7 @@ class ConversationController extends Controller
                     'is_active'       => $c->is_active,
                     'last_message'    => $c->messages->first()?->body,
                     'last_message_at' => $c->last_message_at?->toIso8601String(),
-                    'participants'    => $c->participants->map(fn ($p) => [
+                    'participants'    => $c->participants->map(fn($p) => [
                         'id'   => $p->id,
                         'name' => $p->name,
                     ]),
@@ -67,8 +67,8 @@ class ConversationController extends Controller
 
         // Cek percakapan 1-on-1
         $existing = Conversation::where('type', 'private')
-            ->whereHas('participants', fn ($q) => $q->where('user_id', $authId))
-            ->whereHas('participants', fn ($q) => $q->where('user_id', $data['user_id']))
+            ->whereHas('participants', fn($q) => $q->where('user_id', $authId))
+            ->whereHas('participants', fn($q) => $q->where('user_id', $data['user_id']))
             ->first();
 
         if ($existing) {
@@ -84,7 +84,7 @@ class ConversationController extends Controller
         DB::transaction(function () use (&$conversation, $authId, $data) {
             $conversation = Conversation::create([
                 'type'            => 'private',
-                'title'           => $data['title'] ?? 'Chat with user '.$data['user_id'],
+                'title'           => $data['title'] ?? 'Chat with user ' . $data['user_id'],
                 'project_id'      => $data['project_id'] ?? null,
                 'last_message_at' => now(),
                 'is_active'       => true,
@@ -112,7 +112,7 @@ class ConversationController extends Controller
 
         $conversation->load([
             'participants:id,name',
-            'messages' => fn ($q) => $q->with('sender:id,name')->latest('sent_at')->limit(50),
+            'messages' => fn($q) => $q->with('sender:id,name')->latest('sent_at')->limit(50),
         ]);
 
         return response()->json([

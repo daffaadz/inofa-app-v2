@@ -20,13 +20,14 @@
 
     <!-- Navigation Menu -->
     <nav class="flex-1 px-4 py-6 overflow-y-auto border-t border-neutral-100">
+
         {{-- Akun Saya --}}
         <x-sidebar-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" icon="akun-saya" description="Profile and settings">
             Akun Saya
         </x-sidebar-link>
 
         {{-- My Projects --}}
-        <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="my-projects-active" description="Manage projects">
+        <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="my-projects" description="Manage projects">
             My Projects
         </x-sidebar-link>
 
@@ -36,9 +37,10 @@
         </x-sidebar-link>
 
         {{-- Chat --}}
-        <x-sidebar-link :href="route('landing')" :active="request()->routeIs('chat.index')" icon="chat" description="Messages">
+        <x-sidebar-link :href="route('chat.conversations')" :active="request()->routeIs('chat.conversations')" icon="chat" description="Messages">
             Chat
         </x-sidebar-link>
+        
     </nav>
 
     <!-- Exit Dashboard -->

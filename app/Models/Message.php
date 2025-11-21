@@ -24,7 +24,7 @@ class Message extends Model
     ];
 
     protected $dispatchesEvents = [
-    'created' => \App\Events\MessageCreated::class,
+    'created' => \App\Events\MessageSent::class,
     ];
 
     public function conversation(){ 

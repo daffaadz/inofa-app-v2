@@ -27,7 +27,7 @@
         </x-sidebar-link>
 
         {{-- My Projects --}}
-        <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="my-projects-active" description="Manage projects">
+        <x-sidebar-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="my-projects" description="Manage projects">
             My Projects
         </x-sidebar-link>
 
@@ -38,7 +38,7 @@
         </x-sidebar-link>
 
         {{-- Chat --}}
-        <x-sidebar-link :href="route('landing')" :active="request()->routeIs('chat.index')" icon="chat" description="Messages">
+        <x-sidebar-link :href="route('chat.conversations')" :active="request()->routeIs('chat.conversations')" icon="chat" description="Messages">
             Chat
         </x-sidebar-link>
 

@@ -3,7 +3,7 @@
     <section class="min-h-screen flex">
 
         <!-- ===== SIDEBAR ===== -->
-        @include('partials.consumer-sidebar')
+        @include('partials.global-sidebar')
 
         <!-- ===== MAIN CONTENT ===== -->
         <div class="flex-1 ml-[18rem]">
