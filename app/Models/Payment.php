@@ -34,6 +34,10 @@ class Payment extends Model
         return $this->belongsTo(ProjectAgreement::class, 'project_agreement_id');
     }
 
+    public function payer()
+    {
+        return $this->agreement->consumer();
+    }
     public function consumer()
     {
         return $this->hasOneThrough(
@@ -44,6 +48,10 @@ class Payment extends Model
         );
     }
 
+    public function receiver()
+    {
+        return $this->agreement->developer();
+    }
     public function developer()
     {
         return $this->hasOneThrough(
@@ -69,6 +77,11 @@ class Payment extends Model
     public function scopeTransferred($query)
     {
         return $query->where('status', 'transferred');
+    }
+
+    public function scopeFailed($query)
+    {
+        return $query->where('status', 'failed');
     }
 
     /* ---------------- Helpers ---------------- */

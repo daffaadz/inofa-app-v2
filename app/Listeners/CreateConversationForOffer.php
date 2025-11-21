@@ -39,8 +39,16 @@ class CreateConversationForOffer implements ShouldQueue
 
             // Attach 2 peserta (tanpa menduplikasi)
             $conv->participants()->syncWithoutDetaching([
-                $offer->client_id    => ['role' => 'admin',       'joined_at' => now(), 'is_active' => true],
-                $offer->developer_id => ['role' => 'participant', 'joined_at' => now(), 'is_active' => true],
+                $offer->developer_id => [
+                    'role' => 'developer',
+                    'joined_at' => now(),
+                    'is_active' => true,
+                ],
+                $offer->client_id => [
+                    'role' => 'consumer',
+                    'joined_at' => now(),
+                    'is_active' => true,
+                ],
             ]);
 
             // Simpan referensi ke offer
