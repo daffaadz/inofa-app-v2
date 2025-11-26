@@ -1,6 +1,6 @@
 <x-app-layout>
-    <x-slot:title>{{ __('Dashboard Anda - Inofa') }}</x-slot:title>
-    <section class="min-h-screen flex">
+    <x-slot:title>{{ __('My Dashboard - Inofa') }}</x-slot:title>
+    <section class="min-h-screen flex bg-neutral-10">
 
         <!-- ===== SIDEBAR ===== -->
         @include('partials.global-sidebar')
@@ -12,63 +12,47 @@
             <div class="mt-16">
 
                 <!-- HEADER SECTION -->
-                <div
-                    class="p-8 pb-16 flex flex-row items-center justify-between border-b-[0.5px] border-neutral-100 bg-neutral-0">
+                <div class="px-8 py-8 flex flex-row items-center justify-between bg-white border-b border-neutral-100">
                     <div>
                         <h1 class="text-h-3 font-bold text-neutral-900">My Projects</h1>
                         <p class="mt-1 text-b-1 text-neutral-600">Manage and track all your project collaborations</p>
                     </div>
+                    <a href="{{ route('consumer.project.create') }}"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white text-b-2 font-medium rounded-xl hover:bg-primary-600 transition shadow-sm hover:shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Post New Project
+                    </a>
                 </div>
 
                 <!-- ===== KEY STATS GRID ===== -->
-                <div class="p-8 bg-neutral-10/50">
+                <div class="p-8">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
                         <!-- Total Projects -->
-                        <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
+                        <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-md transition">
                             <div class="flex items-start justify-between mb-2">
-                                <svg class="w-12 h-auto" viewBox="0 0 48 48" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M0 14C0 6.26801 6.26801 0 14 0H34C41.732 0 48 6.26801 48 14V34C48 41.732 41.732 48 34 48H14C6.26801 48 0 41.732 0 34V14Z"
-                                        fill="url(#paint0_linear_total)" />
-                                    <path
-                                        d="M28 32V16C28 15.4696 27.7893 14.9609 27.4142 14.5858C27.0391 14.2107 26.5304 14 26 14H22C21.4696 14 20.9609 14.2107 20.5858 14.5858C20.2107 14.9609 20 15.4696 20 16V32"
-                                        stroke="#108A00" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <path
-                                        d="M32 18H16C14.8954 18 14 18.8954 14 20V30C14 31.1046 14.8954 32 16 32H32C33.1046 32 34 31.1046 34 30V20C34 18.8954 33.1046 18 32 18Z"
-                                        stroke="#108A00" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                    <defs>
-                                        <linearGradient id="paint0_linear_total" x1="0" y1="0"
-                                            x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                                            <stop stop-color="#108A00" stop-opacity="0.1" />
-                                            <stop offset="1" stop-color="#D2FF00" stop-opacity="0.2" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M9 11H15M12 8V14M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                                        stroke="#108A00" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                </svg>
+                                <div class="p-3 bg-primary-50 rounded-xl">
+                                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                </div>
                             </div>
-                            <p class="text-b-3 text-neutral-500 mb-1">Total Projects</p>
+                            <p class="text-b-3 text-neutral-500 mb-1">Total Project</p>
                             <p class="text-h-4 font-bold text-neutral-900">{{ $totalProjects }}</p>
                         </div>
 
                         <!-- In Progress -->
-                        <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
+                        <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-md transition">
                             <div class="flex items-center justify-between mb-2">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-auto text-blue-600"
-                                        fill="currentColor" viewBox="0 0 256 256">
-                                        <path
-                                            d="M184,24H72A16,16,0,0,0,56,40V76a16.07,16.07,0,0,0,6.4,12.8L114.67,128,62.4,167.2A16.07,16.07,0,0,0,56,180v36a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V180.36a16.09,16.09,0,0,0-6.35-12.77L141.27,128l52.38-39.6A16.05,16.05,0,0,0,200,75.64V40A16,16,0,0,0,184,24Zm0,16V56H72V40Zm0,176H72V180l56-42,56,42.35Zm-56-98L72,76V72H184v3.64Z">
-                                        </path>
+                                <div class="p-3 bg-blue-50 rounded-xl">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
                             </div>
@@ -77,14 +61,13 @@
                         </div>
 
                         <!-- Completed -->
-                        <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
+                        <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-md transition">
                             <div class="flex items-center justify-between mb-2">
-                                <div class="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-auto text-green-600"
-                                        fill="currentColor" viewBox="0 0 256 256">
-                                        <path
-                                            d="M254.3,107.91,228.78,56.85a16,16,0,0,0-21.47-7.15L182.44,62.13,130.05,48.27a8.14,8.14,0,0,0-4.1,0L73.56,62.13,48.69,49.7a16,16,0,0,0-21.47,7.15L1.7,107.9a16,16,0,0,0,7.15,21.47l27,13.51,55.49,39.63a8.06,8.06,0,0,0,2.71,1.25l64,16a8,8,0,0,0,7.6-2.1l55.07-55.08,26.42-13.21a16,16,0,0,0,7.15-21.46Zm-54.89,33.37L165,113.72a8,8,0,0,0-10.68.61C136.51,132.27,116.66,130,104,122L147.24,80h31.81l27.21,54.41ZM41.53,64,62,74.22,36.43,125.27,16,115.06Zm116,119.13L99.42,168.61l-49.2-35.14,28-56L128,64.28l9.8,2.59-45,43.68-.08.09a16,16,0,0,0,2.72,24.81c20.56,13.13,45.37,11,64.91-5L188,152.66Zm62-57.87-25.52-51L214.47,64,240,115.06Zm-87.75,92.67a8,8,0,0,1-7.75,6.06,8.13,8.13,0,0,1-1.95-.24L80.41,213.33a7.89,7.89,0,0,1-2.71-1.25L51.35,193.26a8,8,0,0,1,9.3-13l25.11,17.94L126,208.24A8,8,0,0,1,131.82,217.94Z">
-                                        </path>
+                                <div class="p-3 bg-green-50 rounded-xl">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
                             </div>
@@ -112,205 +95,190 @@
 
                     </div>
 
-                    <!-- FILTERS & SEARCH -->
-                    <div class="mb-6 flex items-center gap-4">
-                        <div class="flex-1 relative">
-                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <input type="text" placeholder="Search projects..."
-                                class="w-full pl-12 pr-4 py-3 bg-white border border-neutral-200 rounded-xl font-sans text-b-2 text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <!-- FILTERS -->
+                    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+                        <h3 class="text-h-6 font-bold text-neutral-900">Active Works & Postings</h3>
+                        <div class="flex gap-3">
+                            <select
+                                class="px-4 py-2.5 bg-white border border-neutral-200 rounded-xl font-sans text-b-2 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option>All Status</option>
+                                <option>Active Contract</option>
+                                <option>Bidding Phase</option>
+                                <option>Completed</option>
+                            </select>
                         </div>
-                        <select
-                            class="px-6 py-3 bg-white border border-neutral-200 rounded-xl font-sans text-b-2 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <option>All Status</option>
-                            <option>Draft</option>
-                            <option>Open</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-                            <option>Cancelled</option>
-                        </select>
-                        <select
-                            class="px-6 py-3 bg-white border border-neutral-200 rounded-xl font-sans text-b-2 text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                            <option>Newest First</option>
-                            <option>Oldest First</option>
-                            <option>Budget: High to Low</option>
-                            <option>Budget: Low to High</option>
-                        </select>
                     </div>
 
-                    <!-- PROJECT LIST -->
-                    <div class="space-y-4">
-                        @forelse($projects as $project)
-                            <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
-                                <div class="flex items-start justify-between gap-6">
+                    <div class="grid grid-cols-1 gap-6">
 
-                                    <!-- Left Content -->
-                                    <div class="flex-1">
-                                        <div class="mb-4">
-                                            <h3 class="text-b-1 font-semibold text-neutral-900 mb-2">
-                                                {{ $project->title }}</h3>
-                                            <p class="text-b-2 text-neutral-600 line-clamp-2">
-                                                {{ $project->description }}</p>
-                                        </div>
-
-                                        <!-- Tech Stack Tags -->
-                                        @if ($project->skills->count() > 0)
-                                            <div class="flex flex-wrap gap-2 mb-4">
-                                                @foreach ($project->skills->take(3) as $skill)
-                                                    <span
-                                                        class="px-3 py-1 bg-neutral-100 text-neutral-700 text-b-4 rounded-lg">{{ $skill->name }}</span>
-                                                @endforeach
-                                                @if ($project->skills->count() > 3)
-                                                    <span
-                                                        class="px-3 py-1 bg-neutral-100 text-neutral-700 text-b-4 rounded-lg">+{{ $project->skills->count() - 3 }}
-                                                        more</span>
-                                                @endif
-                                            </div>
-                                        @endif
-
-                                        <!-- Meta Info -->
-                                        <div class="flex items-center gap-4 text-b-3 text-neutral-600">
-                                            @if ($project->agreement)
-                                                <span class="flex items-center gap-1">
-                                                    <img src="{{ $project->agreement->developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($project->agreement->developer->name) }}"
-                                                        alt="{{ $project->agreement->developer->name }}"
-                                                        class="w-5 h-5 rounded-full object-cover">
-                                                    {{ $project->agreement->developer->name }}
-                                                </span>
-                                            @endif
-
-                                            @if ($project->offers_count > 0)
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                        <circle cx="12" cy="12" r="8" />
-                                                    </svg>
-                                                    {{ $project->offers_count }} offers
-                                                </span>
-                                            @endif
-
-                                            <span class="flex items-center gap-1">
-                                                Started: {{ $project->created_at->format('M d, Y') }}
-                                            </span>
-                                            <span class="flex items-center gap-1">
-                                                Deadline:
-                                                {{ \Carbon\Carbon::parse($project->deadline)->format('M d, Y') }}
-                                            </span>
-                                        </div>
-
-                                        <!-- Progress Bar (if in progress) -->
-                                        @if ($project->agreement && $project->status === 'in_progress')
-                                            <div class="mt-4">
-                                                <div class="flex items-center justify-between mb-1">
-                                                    <span class="text-b-3 text-neutral-600">Progress:
-                                                        {{ $project->progress ?? 0 }}%</span>
-                                                </div>
-                                                <div class="w-full bg-neutral-200 rounded-full h-2">
-                                                    <div class="bg-primary-500 h-2 rounded-full transition-all"
-                                                        style="width: {{ $project->progress ?? 0 }}%"></div>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    <!-- Right Content -->
-                                    <div class="flex flex-col items-end gap-3">
-                                        <!-- Status Badge -->
-                                        @php
-                                            $statusConfig = [
-                                                'draft' => [
-                                                    'bg' => 'bg-neutral-100',
-                                                    'text' => 'text-neutral-600',
-                                                    'label' => 'Draft',
-                                                ],
-                                                'open' => [
-                                                    'bg' => 'bg-blue-100',
-                                                    'text' => 'text-blue-600',
-                                                    'label' => 'Open',
-                                                ],
-                                                'in_progress' => [
-                                                    'bg' => 'bg-blue-100',
-                                                    'text' => 'text-blue-600',
-                                                    'label' => 'In Progress',
-                                                ],
-                                                'completed' => [
-                                                    'bg' => 'bg-green-100',
-                                                    'text' => 'text-green-600',
-                                                    'label' => 'Completed',
-                                                ],
-                                                'cancelled' => [
-                                                    'bg' => 'bg-red-100',
-                                                    'text' => 'text-red-600',
-                                                    'label' => 'Cancelled',
-                                                ],
-                                            ];
-                                            $status = $statusConfig[$project->status] ?? $statusConfig['draft'];
-                                        @endphp
-                                        <span
-                                            class="px-4 py-2 {{ $status['bg'] }} {{ $status['text'] }} text-b-3 font-medium rounded-full">
-                                            {{ $status['label'] }}
-                                        </span>
-
-                                        <!-- Budget -->
-                                        <div class="text-right">
-                                            <p class="text-h-6 font-bold text-neutral-900">
-                                                Rp{{ number_format($project->budget, 0, ',', '.') }}</p>
-                                            <p class="text-b-3 text-neutral-600">Total budget</p>
-                                        </div>
-
-                                        <!-- Actions -->
-                                        <div class="flex gap-2 mt-2">
-                                            @if ($project->status === 'draft' || $project->status === 'open')
-                                                <button class="p-2 hover:bg-neutral-100 rounded-lg transition">
-                                                    <svg class="w-5 h-5 text-neutral-600" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                </button>
-                                            @endif
-                                            <button class="p-2 hover:bg-neutral-100 rounded-lg transition">
-                                                <svg class="w-5 h-5 text-neutral-600" fill="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="6" r="2" />
-                                                    <circle cx="12" cy="12" r="2" />
-                                                    <circle cx="12" cy="18" r="2" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        @empty
-                            <div class="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
+                        {{-- 1. LOOP AGREEMENTS (CONTRACTS) --}}
+                        @foreach ($agreements as $agreement)
+                            <div
+                                class="group bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg hover:border-primary-200 transition relative overflow-hidden">
+                                {{-- Indicator Line --}}
                                 <div
-                                    class="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-neutral-400" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10" />
-                                    </svg>
+                                    class="absolute left-0 top-0 bottom-0 w-1 
+                                    {{ $agreement->status === 'active' ? 'bg-green-500' : ($agreement->status === 'completed' ? 'bg-blue-500' : 'bg-yellow-500') }}">
                                 </div>
-                                <p class="text-b-1 text-neutral-600 mb-2">No projects yet</p>
-                                <p class="text-b-3 text-neutral-500 mb-4">Create your first project to get started</p>
-                                <a href="{{ route('consumer.project.create') }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white text-b-2 font-medium rounded-xl hover:bg-primary-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Create Project
-                                </a>
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
 
+                                <div class="flex justify-between items-start mb-4 pl-2">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span
+                                                class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full 
+                                                {{ $agreement->status === 'active'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : ($agreement->status === 'completed'
+                                                        ? 'bg-blue-100 text-blue-700'
+                                                        : 'bg-yellow-100 text-yellow-700') }}">
+                                                {{ str_replace('_', ' ', $agreement->status) }}
+                                            </span>
+                                            <span class="text-xs text-neutral-400">Contract
+                                                #{{ substr($agreement->id, 0, 8) }}</span>
+                                        </div>
+                                        <h3
+                                            class="text-h-6 font-bold text-neutral-900 group-hover:text-primary-600 transition">
+                                            {{ $agreement->project_title }}
+                                        </h3>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-b-2 font-bold text-neutral-900">
+                                            Rp{{ number_format($agreement->final_price, 0, ',', '.') }}
+                                        </p>
+                                        <p class="text-xs text-neutral-500">Agreed Price</p>
+                                    </div>
+                                </div>
+
+                                <div class="pl-2 mb-6">
+                                    <p class="text-b-2 text-neutral-600 line-clamp-2">
+                                        {{ $agreement->scope_projects ?? 'No detailed scope provided.' }}
+                                    </p>
+                                </div>
+
+                                <div class="pl-2 flex items-center justify-between pt-4 border-t border-neutral-100">
+                                    <!-- Developer Info -->
+                                    <div class="flex items-center gap-3">
+                                        @if ($agreement->developer)
+                                            <img src="{{ $agreement->developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($agreement->developer->name) }}"
+                                                class="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-sm">
+                                            <div>
+                                                <p class="text-b-3 font-bold text-neutral-900">
+                                                    {{ $agreement->developer->name }}</p>
+                                                <p class="text-xs text-neutral-500">Developer</p>
+                                            </div>
+                                        @else
+                                            <span class="text-xs text-neutral-400">Developer account deleted</span>
+                                        @endif
+                                    </div>
+
+                                    <a href="#"
+                                        class="px-4 py-2 bg-neutral-900 text-white text-b-3 font-medium rounded-lg hover:bg-neutral-800 transition">
+                                        Manage Work
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        {{-- 2. LOOP PROJECTS (BIDDING PHASE) --}}
+                        @foreach ($projects as $project)
+                            <div
+                                class="group bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span
+                                                class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-neutral-100 text-neutral-600">
+                                                Open Bidding
+                                            </span>
+                                            <span class="text-xs text-neutral-400">
+                                                Posted {{ $project->created_at->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                        <h3
+                                            class="text-h-6 font-bold text-neutral-900 group-hover:text-primary-600 transition">
+                                            {{ $project->title }}
+                                        </h3>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-b-2 font-bold text-neutral-900">
+                                            Rp{{ number_format($project->budget, 0, ',', '.') }}
+                                        </p>
+                                        <p class="text-xs text-neutral-500">Est. Budget</p>
+                                    </div>
+                                </div>
+
+                                <div class="mb-6">
+                                    <p class="text-b-2 text-neutral-600 line-clamp-2">
+                                        {{ $project->description }}
+                                    </p>
+                                </div>
+
+                                <!-- Skills Tags -->
+                                @if ($project->skills->count() > 0)
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        @foreach ($project->skills->take(3) as $skill)
+                                            <span
+                                                class="px-2.5 py-1 bg-neutral-50 text-neutral-600 text-xs rounded-md border border-neutral-100">
+                                                {{ $skill->name }}
+                                            </span>
+                                        @endforeach
+                                        @if ($project->skills->count() > 3)
+                                            <span
+                                                class="px-2.5 py-1 text-neutral-400 text-xs">+{{ $project->skills->count() - 3 }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="flex items-center justify-between pt-4 border-t border-neutral-100">
+                                    <div class="flex items-center gap-2 text-neutral-600">
+                                        <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        <span class="text-b-2 font-medium">{{ $project->offers_count }}
+                                            Proposals</span>
+                                    </div>
+
+                                    <a href="{{ route('consumer.project.show', $project->id) }}"
+                                        class="px-4 py-2 border border-neutral-200 text-neutral-700 text-b-3 font-medium rounded-lg hover:bg-neutral-50 hover:border-neutral-300 transition">
+                                        View Proposals
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    <!-- EMPTY STATE -->
+                    @if ($projects->isEmpty() && $agreements->isEmpty())
+                        <div class="bg-white rounded-2xl border border-neutral-200 p-12 text-center mt-4">
+                            <div
+                                class="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                </svg>
+                            </div>
+                            <p class="text-h-6 font-bold text-neutral-900 mb-2">No projects yet</p>
+                            <p class="text-b-2 text-neutral-600 mb-6 max-w-md mx-auto">
+                                You haven't posted any projects or started any contracts yet. Post a project to get
+                                started!
+                            </p>
+                            <a href="{{ route('consumer.project.create') }}"
+                                class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white text-b-2 font-medium rounded-xl hover:bg-primary-600 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Post a Project
+                            </a>
+                        </div>
+                    @endif
+
+                </div>
             </div>
         </div>
-
     </section>
-
 </x-app-layout>

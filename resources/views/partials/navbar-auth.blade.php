@@ -204,15 +204,15 @@
                 <div class="relative" x-data="{ open: false }" @click.away="open=false">
                     <button @click="open=!open"
                         class="flex items-center gap-2 hover:bg-neutral-100 px-3 py-2 rounded-lg transition">
+
                         @php
-                            $avatarSrc = Auth::user()->avatar
-                                ? (Str::startsWith(Auth::user()->avatar, 'http')
-                                    ? Auth::user()->avatar
-                                    : asset('storage/' . Auth::user()->avatar))
+                            $avatarSrc = Auth::user()->getRawOriginal('avatar')
+                                ? (filter_var(Auth::user()->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                    ? Auth::user()->getRawOriginal('avatar')
+                                    : asset('storage/' . Auth::user()->getRawOriginal('avatar')))
                                 : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name);
                         @endphp
                         <img src="{{ $avatarSrc }}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
-
                         <svg class="w-4 h-4 text-neutral-600 mt-0.5" :class="open ? 'rotate-180' : ''" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

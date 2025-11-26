@@ -34,7 +34,7 @@
                     {{-- User Tab --}}
                     <div class="show messenger-tab users-tab app-scroll" data-view="users">
                         {{-- Favorites Section --}}
-                        <div class="favorites-section" style="display: none;">
+                        <div class="favorites-section px-4" style="display: none;">
                             <p class="messenger-title px-6 py-2 text-b-3 text-neutral-500 font-semibold">
                                 <span>Favorites</span></p>
                             <div class="messenger-favorites app-scroll-hidden"></div>
@@ -53,7 +53,6 @@
 
                     {{-- Search Tab (hidden by default) --}}
                     <div class="messenger-tab search-tab app-scroll" data-view="search" style="display: none;">
-                        <p class="messenger-title px-6 py-2 text-b-3 text-neutral-500 font-semibold"><span>Search</span>
                         </p>
                         <div class="search-records">
                             <p class="message-hint center-el text-b-3 text-neutral-400 text-center py-8"><span>Type to

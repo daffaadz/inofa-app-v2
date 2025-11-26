@@ -38,12 +38,14 @@
                                 class="activeStatus absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                         @endif
                         @php
-                            $src = Str::startsWith($user->avatar, 'http')
-                                ? $user->avatar
-                                : asset('storage/' . $user->avatar);
+                            $avatarSrc = $user->getRawOriginal('avatar')
+                                ? (filter_var($user->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                    ? $user->getRawOriginal('avatar')
+                                    : asset('storage/' . $user->getRawOriginal('avatar')))
+                                : 'https://ui-avatars.com/api/?name=' . urlencode($user->name);
                         @endphp
-                        <img src="{{ $user->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
-                            alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
+                        <img src="{{ $avatarSrc }}" alt="Avatar"
+                            class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
                     </div>
 
                     {{-- center side --}}
@@ -92,12 +94,14 @@
             <td class="block px-6 py-4">
                 <div class="flex items-center gap-3">
                     @php
-                        $src = Str::startsWith($user->avatar, 'http')
-                            ? $user->avatar
-                            : asset('storage/' . $user->avatar);
+                        $avatarSrc = $user->getRawOriginal('avatar')
+                            ? (filter_var($user->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                ? $user->getRawOriginal('avatar')
+                                : asset('storage/' . $user->getRawOriginal('avatar')))
+                            : 'https://ui-avatars.com/api/?name=' . urlencode($user->name);
                     @endphp
-                    <img src="{{ $user->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) }}"
-                        alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
+                    <img src="{{ $avatarSrc }}" alt="Avatar"
+                        class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
 
                     <div class="flex-1 min-w-0">
                         <p class="text-b-1 font-semibold text-neutral-900 truncate" data-id="{{ $user->id }}"

@@ -38,7 +38,7 @@
         </x-sidebar-link>
 
         {{-- Chat --}}
-        <x-sidebar-link :href="route('chat')" :active="request()->routeIs('chat')" icon="chat" description="Messages">
+        <x-sidebar-link :href="route('chat')" :active="request()->is('chat*')" icon="chat" description="Messages">
             Chat
         </x-sidebar-link>
         

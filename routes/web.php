@@ -7,6 +7,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\RedirectAfterLoginController;
 use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
 use App\Http\Controllers\Developer\SearchController as SearchProjects;
+use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\SkillController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,11 +38,31 @@ Route::middleware(['auth'])
     ->get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
-// NEED CHANGE
+// Profile Management
 Route::middleware('auth')->group(function () {
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Password update route
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+
+    // Avatar update route
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+
+    // Skills routes (for developers only)
+    Route::middleware('role:developer')->group(function () {
+        Route::post('/profile/skills', [SkillController::class, 'store'])->name('skills.store');
+        Route::delete('/profile/skills/{skill}', [SkillController::class, 'destroy'])->name('skills.destroy');
+        Route::patch('/profile/skills/{skill}/proficiency', [SkillController::class, 'updateProficiency'])->name('skills.proficiency');
+
+        // Portfolio routes
+        Route::post('/profile/portfolios', [PortfolioController::class, 'store'])->name('portfolios.store');
+        Route::patch('/profile/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolios.update');
+        Route::delete('/profile/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolios.destroy');
+        Route::post('/profile/portfolios/{portfolio}/toggle-featured', [PortfolioController::class, 'toggleFeatured'])->name('portfolios.toggle-featured');
+    });
 });
 
 // socialite authentication
@@ -76,30 +98,32 @@ Route::get('/search/projects/{id}', [SearchProjects::class, 'show'])
 
 require __DIR__ . '/auth.php';
 
-// CHAT ROUTING
-// use App\Http\Controllers\Chat\ConversationController;
-// use App\Http\Controllers\Chat\MessageController;
-// use App\Http\Controllers\Chat\AgreementController;
+// PROPOSAL ROUTING
+use App\Http\Controllers\ProposalController;
 
-// Route::middleware('auth')->prefix('chat')->group(function () {
-//     Route::get('conversations', [ConversationController::class, 'index'])->name('chat.conversations');
-//     Route::get('conversations/{conversation}', [ConversationController::class, 'show'])->name('chat.conversations.show');
-//     Route::get('conversations/{conversation}/messages', [MessageController::class, 'index'])->name('chat.conversations.messages');
-//     Route::post('conversations', [ConversationController::class, 'store'])
-//         ->name('chat.conversations.store');
-//     Route::post('conversations/{conversation}/messages', [MessageController::class, 'send'])
-//         ->name('chat.messages.send');
-//     Route::post('conversations/{conversation}/read', [MessageController::class, 'markRead'])
-//         ->name('chat.conversations.read');
-//     Route::post('conversations/{conversation}/agreements', [AgreementController::class, 'send'])
-//         ->name('chat.agreements.send');
-//     Route::patch('agreements/{agreement}', [AgreementController::class, 'updateStatus'])
-//         ->name('chat.agreements.update');
-// });
+// Proposal Routes
+Route::middleware(['auth'])->group(function () {
+    // Hanya developer yang bisa membuat proposal
+    Route::middleware(['role:developer'])->group(function () {
+        Route::get('/proposals/create', [ProposalController::class, 'create'])
+            ->name('proposals.create');
+        Route::post('/proposals', [ProposalController::class, 'store'])
+            ->name('proposals.store');
+    });
+
+    // Client (consumer) yang bisa accept/reject
+    Route::middleware(['role:consumer'])->group(function () {
+        Route::post('/proposals/{offer}/accept', [ProposalController::class, 'accept'])
+            ->name('proposals.accept');
+        Route::post('/proposals/{offer}/reject', [ProposalController::class, 'reject'])
+            ->name('proposals.reject');
+    });
+});
 
 // COSTUMER SERVICE ROUTING
-Route::get('/chat/admin', function () {return redirect('/chat?user=admin');})->name('chat.admin');
-
+Route::get('/chat/admin', function () {
+    return redirect('/chat?user=admin');
+})->name('chat.admin');
 
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;
@@ -150,9 +174,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
 
 // CUSTOMER ROUTING
 use App\Http\Controllers\Customer\ProjectController as CustProject;
-    // Agreement Detail Controller & Payment Controller
-    use App\Http\Controllers\Customer\AgreementDetailController As AgreementDetail;
-    use App\Http\Controllers\Customer\CheckoutController as PaymentCheckout;
+use App\Http\Controllers\Customer\AgreementDetailController as AgreementDetail;
+use App\Http\Controllers\Customer\CheckoutController as PaymentCheckout;
 
 Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function () {
     Route::resource('project', CustProject::class);
@@ -179,4 +202,68 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
     Route::post('project/store-budget',      [CustProject::class, 'storeBudget'])->name('project.storeBudget');
     Route::post('project/store-requirements',  [CustProject::class, 'storeRequirements'])->name('project.storeRequirements');
     Route::post('project/reset-session',     [CustProject::class, 'resetSession'])->name('project.resetSession');
+});
+
+
+/**
+ * -----------------------------------------------------------------
+ * CHATIFY OVERRIDE ROUTES
+ * -----------------------------------------------------------------
+ */
+
+use App\Http\Controllers\Chat\MessagesController;
+
+Route::group([
+    'middleware' => config('chatify.routes.middleware'),
+    'prefix' => config('chatify.routes.prefix'),
+], function () {
+
+    // 1. View Index
+    Route::get('/', [MessagesController::class, 'index'])->name('chat');
+
+    // 2. Fetch Info
+    Route::post('/idInfo', [MessagesController::class, 'idFetchData']);
+
+    // 3. Send Message
+    Route::post('/sendMessage', [MessagesController::class, 'send'])->name('send.message');
+
+    // 4. Fetch Messages
+    Route::post('/fetchMessages', [MessagesController::class, 'fetch'])->name('fetch.messages');
+
+    // 5. Download
+    Route::get('/download/{fileName}', [MessagesController::class, 'download'])->name(config('chatify.attachments.download_route_name'));
+
+    // 6. Auth Pusher
+    Route::post('/chat/auth', [MessagesController::class, 'pusherAuth'])->name('pusher.auth');
+
+    // 7. Make Seen
+    Route::post('/makeSeen', [MessagesController::class, 'seen'])->name('messages.seen');
+
+    // 8. Get Contacts
+    Route::get('/getContacts', [MessagesController::class, 'getContacts'])->name('contacts.get');
+
+    // 9. Update Contact
+    Route::post('/updateContacts', [MessagesController::class, 'updateContactItem'])->name('contacts.update');
+
+    // 10. Favorites
+    Route::post('/star', [MessagesController::class, 'favorite'])->name('star');
+    Route::post('/favorites', [MessagesController::class, 'getFavorites'])->name('favorites');
+
+    // 11. Search
+    Route::get('/search', [MessagesController::class, 'search'])->name('search');
+
+    // 12. Shared Photos
+    Route::post('/shared', [MessagesController::class, 'sharedPhotos'])->name('shared');
+
+    // 13. Delete Conversation/Message
+    Route::post('/deleteConversation', [MessagesController::class, 'deleteConversation'])->name('conversation.delete');
+    Route::post('/deleteMessage', [MessagesController::class, 'deleteMessage'])->name('message.delete');
+
+    // 14. Settings & Status
+    Route::post('/updateSettings', [MessagesController::class, 'updateSettings'])->name('avatar.update');
+    Route::post('/setActiveStatus', [MessagesController::class, 'setActiveStatus'])->name('activeStatus.set');
+
+    // 15. Specific User/Group Routes (Harus ditaruh di akhir karena wildcard {id})
+    Route::get('/group/{id}', [MessagesController::class, 'index'])->name('group');
+    Route::get('/{id}', [MessagesController::class, 'index'])->name('user');
 });

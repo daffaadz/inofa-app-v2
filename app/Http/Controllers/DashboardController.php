@@ -32,12 +32,12 @@ class DashboardController extends Controller
     {
         return $this->consumerDashboard();
     }
-    
+
     public function developer()
     {
         return $this->developerDashboard();
     }
-    
+
     public function admin()
     {
         return $this->adminDashboard();
@@ -51,39 +51,37 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Get all projects with relationships
         $projects = Project::where('consumer_id', $user->id)
             ->with([
                 'skills',
-                'offers' => function($query) {
+                'offers' => function ($query) {
                     $query->where('status', 'pending');
-                },
-                'agreement.developer'
+                }
             ])
             ->withCount('offers')
             ->latest()
             ->get();
 
-        // Stats
-        $totalProjects = $projects->count();
-        
-        $inProgressCount = Project::where('consumer_id', $user->id)
-            ->where('status', 'in_progress')
-            ->count();
+        $agreements = ProjectAgreement::where('consumer_id', $user->id)
+            ->with('developer')
+            ->latest()
+            ->get();
 
-        $completedCount = Project::where('consumer_id', $user->id)
-            ->where('status', 'completed')
-            ->count();
+        $totalProjects = $projects->count() + $agreements->count();
 
-        // Total spent - sum of all payments confirmed or transferred
-        $totalSpent = Payment::whereHas('agreement', function($query) use ($user) {
-                $query->where('consumer_id', $user->id);
-            })
+        $inProgressCount = $agreements->where('status', 'active')->count();
+
+        $completedCount = $agreements->where('status', 'completed')->count();
+
+        $totalSpent = Payment::whereHas('agreement', function ($query) use ($user) {
+            $query->where('consumer_id', $user->id);
+        })
             ->whereIn('status', ['confirmed', 'transferred'])
             ->sum('amount');
 
         return view('dashboard.consumer.index', compact(
             'projects',
+            'agreements',
             'totalProjects',
             'inProgressCount',
             'completedCount',
@@ -103,7 +101,7 @@ class DashboardController extends Controller
         // 1. Available open projects (with consumer info)
         $availableProjects = Project::with('consumer')
             ->where('status', 'open')
-            ->whereDoesntHave('offers', function($query) use ($user) {
+            ->whereDoesntHave('offers', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->latest()
@@ -123,9 +121,9 @@ class DashboardController extends Controller
             ->get();
 
         // 4. Total earnings (transferred payments only)
-        $earnings = Payment::whereHas('agreement', function($query) use ($user) {
-                $query->where('developer_id', $user->id);
-            })
+        $earnings = Payment::whereHas('agreement', function ($query) use ($user) {
+            $query->where('developer_id', $user->id);
+        })
             ->where('status', 'transferred')
             ->where('admin_transferred', true)
             ->sum('amount');
@@ -155,7 +153,7 @@ class DashboardController extends Controller
     private function adminDashboard()
     {
         $user = Auth::user();
-        
+
         // Total users
         $totalUsers = User::count();
         $totalDevelopers = User::where('role', 'developer')->count();
