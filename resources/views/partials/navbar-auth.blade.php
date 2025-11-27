@@ -225,7 +225,7 @@
 
                         {{-- Menu items --}}
                         <div class="py-2">
-                            <a href="{{ route('dashboard') }}"
+                            <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
                                 class="flex items-center gap-3 px-4 py-3 text-neutral-800 hover:bg-neutral-10 font-sans text-b-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

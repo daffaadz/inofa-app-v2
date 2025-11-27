@@ -22,6 +22,7 @@
   /* Firefox */
   html {
     scrollbar-width: thin;
-    scrollbar-color: theme(colors.primary.400) theme(colors.neutral.100);
+    /* Tailwind theme() */
+    scrollbar-color: theme('colors.primary.400') theme('colors.neutral.100');
   }
 }
