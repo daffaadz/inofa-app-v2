@@ -30,11 +30,6 @@
         {{-- TABLES --}}
         <div class="mt-6">
 
-            {{-- VALIDASI PROYEK --}}
-            <div x-show="tab === 'projects'">
-                @include('admin.components.table-projects', ['items' => $projects])
-            </div>
-
             {{-- VALIDASI PEMBAYARAN --}}
             <div x-show="tab === 'payments'">
                 @include('admin.components.table-payments', ['items' => $payments])

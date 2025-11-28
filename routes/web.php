@@ -2,96 +2,41 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\ComplainController;
+use App\Http\Controllers\Admin\AgreementValidationController;
 
-// Admin utilities: export + action stubs used by admin dashboard components
-Route::middleware(['web','auth','role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Export endpoint used by filters component
+Route::middleware(['web','auth','role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+    // Dashboard export
     Route::get('/export', [DashboardController::class, 'export'])->name('export');
 
-    // Sidebar target index pages (stubs)
-    Route::get('/users', function (Request $request) {
-        // Temporary inline admin users listing with basic search & role filter
-        $query = \App\Models\User::query();
+    /* ---------------- USERS ---------------- */
+    Route::get('/users',                [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{id}',           [UserController::class, 'show'])->name('users.show');
+    Route::post('/users/{id}/suspend',  [UserController::class, 'suspend'])->name('users.suspend');
+    Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")->orWhere('email', 'like', "%$search%");
-            });
-        }
-        if ($role = $request->input('role')) {
-            $query->where('role', $role); // assumes `role` column exists
-        }
+    /* ---------------- PROJECTS ---------------- */
+    Route::get('/projects',              [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/{id}',         [ProjectController::class, 'show'])->name('projects.show');
+    Route::post('/projects/{id}/approve',[ProjectController::class, 'approve'])->name('projects.approve');
+    Route::post('/projects/{id}/reject', [ProjectController::class, 'reject'])->name('projects.reject');
 
-        $users = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+    /* ---------------- PAYMENTS ---------------- */
+    Route::get('/payments/{id}',         [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{id}/approve',[PaymentController::class, 'approve'])->name('payments.approve');
+    Route::post('/payments/{id}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
 
-        return view('admin.users.index', [
-            'users' => $users,
-            'search' => $search,
-            'selectedRole' => $role,
-        ]);
-    })->name('users.index');
+    /* ---------------- COMPLAINTS ---------------- */
+    Route::get('/complains', [ComplainController::class, 'index'])->name('complains.index');
+    Route::get('/complains/{id}', [ComplainController::class, 'show'])->name('complains.show');
 
-    Route::get('/projects', function (Request $request) {
-        $query = \App\Models\Project::query();
-
-        // Basic search by title
-        if ($search = $request->input('search')) {
-            $query->where('title', 'like', "%$search%");
-        }
-        // Optional status filter
-        if ($status = $request->input('status')) {
-            $query->where('status', $status);
-        }
-
-        $projects = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
-
-        $stats = [
-            'total'     => \App\Models\Project::count(),
-            'ongoing'   => \App\Models\Project::where('status', 'in_progress')->count(),
-            'completed' => \App\Models\Project::where('status', 'completed')->count(),
-            'budget'    => (float) \App\Models\Project::sum('budget'),
-        ];
-
-        return view('admin.projects.index', [
-            'projects' => $projects,
-            'stats'    => $stats,
-            'search'   => $search,
-            'status'   => $status,
-        ]);
-    })->name('projects.index');
-
-    // Projects actions (stubs for now)
-    Route::get('/projects/{id}', function (int $id) {
-        return back()->with('info', 'Admin project view not implemented yet.');
-    })->name('projects.show');
-    Route::post('/projects/{id}/approve', function (int $id) {
-        return back()->with('success', 'Project approved (stub).');
-    })->name('projects.approve');
-    Route::post('/projects/{id}/reject', function (Request $request, int $id) {
-        return back()->with('warning', 'Project rejected (stub): '.$request->input('reason'));
-    })->name('projects.reject');
-
-    // Payments actions (stubs for now)
-    Route::get('/payments/{id}', function (int $id) {
-        return back()->with('info', 'Admin payment view not implemented yet.');
-    })->name('payments.show');
-    Route::post('/payments/{id}/approve', function (int $id) {
-        return back()->with('success', 'Payment approved (stub).');
-    })->name('payments.approve');
-    Route::post('/payments/{id}/reject', function (Request $request, int $id) {
-        return back()->with('warning', 'Payment rejected (stub): '.$request->input('reason'));
-    })->name('payments.reject');
-
-    // Complaints actions (stubs for now)
-    Route::get('/complaints/{id}', function (int $id) {
-        return back()->with('info', 'Complaint detail not implemented yet.');
-    })->name('complaints.show');
-    Route::post('/complaints/{id}/process', function (int $id) {
-        return back()->with('success', 'Complaint marked in progress (stub).');
-    })->name('complaints.process');
-    Route::post('/complaints/{id}/close', function (Request $request, int $id) {
-        return back()->with('success', 'Complaint closed (stub): '.$request->input('reason'));
-    })->name('complaints.close');
 });
 
 use App\Http\Controllers\ProfileController;
