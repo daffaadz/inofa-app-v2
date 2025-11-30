@@ -1,29 +1,65 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-neutral-10 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-2xl">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <h2 class="text-h-3 text-neutral-900 mb-2">Complete Your Personal Information</h2>
-                <p class="text-b-1 text-neutral-600">Tell us more about yourself</p>
+    {{-- PAGE WRAPPER --}}
+    <div class="min-h-screen grid md:grid-cols-2">
+
+        {{-- LEFT PANEL : ILLUSTRATION --}}
+        <div
+            class="hidden md:flex sticky top-0 items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 max-h-screen p-6">
+
+            {{-- Logo --}}
+            <div class="absolute left-24 top-12 mb-10">
+                <a href="{{ url('/') }}" class="flex items-center justify-center gap-4">
+                    <img src="{{ asset('assets/vector/logo.svg') }}" alt="Inofa" class="h-8 w-auto">
+                    <span class="text-neutral-800 text-h-5 font-sans">Inofa</span>
+                </a>
             </div>
 
-            <!-- Form Card -->
-            <div class="bg-white rounded-lg shadow-md border border-neutral-200 p-8">
-                <form method="POST" action="{{ route('personal-information.store') }}" enctype="multipart/form-data">
+            <div class="max-w-xl text-center">
+                <h2 class="font-sans text-h-3 text-start text-neutral-800 mb-3 tracking-tight">
+                    Let's Get to<br>
+                    Know You Better!
+                </h2>
+                <p class="font-sans text-b-1 text-neutral-800 text-start mt-4">
+                    Complete your profile to unlock the full Inofa experience.
+                </p>
+            </div>
+
+            {{-- FOOTER --}}
+            <footer class="absolute left-1/4 bottom-6 py-6 text-center border-t border-neutral-200">
+                <p class="font-sans text-b-2 text-neutral-500">
+                    © 2025 Inofa. All rights reserved.
+                    <a href="#" class="text-primary-500 hover:underline">Terms of Use</a> &
+                    <a href="#" class="text-primary-500 hover:underline">Privacy Policy</a>
+                </p>
+            </footer>
+        </div>
+
+        {{-- RIGHT PANEL : FORM --}}
+        <div class="flex items-center justify-center p-6 overflow-y-auto">
+            <div class="w-full max-w-lg">
+
+                {{-- Heading --}}
+                <h1 class="font-sans text-h-5 text-neutral-800 mb-1">
+                    Complete Your Profile
+                </h1>
+                <p class="font-sans text-b-2 text-neutral-600 mb-4">Tell us more about yourself</p>
+
+                {{-- FORM --}}
+                <form method="POST" action="{{ route('personal-information.store') }}" enctype="multipart/form-data" class="space-y-3">
                     @csrf
 
-                    <!-- Avatar Upload Section -->
-                    <div class="mb-8 flex flex-col items-center">
-                        <div class="mb-4">
+                    {{-- Avatar Upload Section --}}
+                    <div class="flex flex-col items-center py-4 border-b border-neutral-200">
+                        <div class="mb-3">
                             <div class="relative">
-                                <!-- Avatar Preview -->
+                                {{-- Avatar Preview --}}
                                 <div id="avatar-preview"
-                                    class="w-32 h-32 rounded-full border-4 border-neutral-200 overflow-hidden bg-neutral-100 flex items-center justify-center">
+                                    class="w-24 h-24 rounded-full border-4 border-neutral-200 overflow-hidden bg-neutral-100 flex items-center justify-center">
                                     @if (auth()->user()->avatar)
                                         <img src="{{ Storage::url(auth()->user()->avatar) }}" alt="Current avatar"
                                             class="w-full h-full object-cover" id="preview-image">
                                     @else
-                                        <svg class="w-16 h-16 text-neutral-400" fill="none" viewBox="0 0 24 24"
+                                        <svg class="w-12 h-12 text-neutral-400" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor" id="placeholder-icon">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -33,10 +69,10 @@
                                     @endif
                                 </div>
 
-                                <!-- Upload Button Overlay -->
+                                {{-- Upload Button Overlay --}}
                                 <label for="avatar"
-                                    class="absolute bottom-0 right-0 bg-primary-500 text-white p-2.5 rounded-full cursor-pointer hover:bg-primary-600 transition-colors shadow-lg">
-                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    class="absolute bottom-0 right-0 bg-primary-500 text-white p-2 rounded-full cursor-pointer hover:bg-primary-600 transition-colors shadow-lg">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -48,80 +84,75 @@
 
                         <div class="text-center">
                             <input type="file" name="avatar" id="avatar" accept="image/*" class="hidden">
-                            <p class="text-b-2 text-neutral-600 mb-1">Upload your profile photo</p>
-                            <p class="text-b-3 text-neutral-500">JPG, PNG or GIF. Max size 2MB</p>
+                            <p class="font-sans text-b-3 text-neutral-600">Upload your profile photo (Max 2MB)</p>
                             <button type="button" id="remove-avatar"
-                                class="mt-2 text-b-3 text-red-600 hover:text-red-700 hidden">
+                                class="mt-1 font-sans text-b-3 text-red-500 hover:text-red-600 hidden">
                                 Remove Photo
                             </button>
                         </div>
-                        <x-input-error :messages="$errors->get('avatar')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('avatar')" class="mt-1" />
                     </div>
 
-                    <!-- Personal Information Fields -->
-                    <div class="space-y-6">
-                        <!-- Full Name -->
-                        <div>
-                            <label for="name" class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                Full Name <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="name" id="name"
-                                value="{{ old('name', auth()->user()->name) }}" required
-                                placeholder="Enter your full name"
-                                class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                            <x-input-error :messages="$errors->get('name')" class="mt-1" />
-                        </div>
+                    {{-- Full Name --}}
+                    <div>
+                        <label for="name" class="font-sans text-b-3 text-neutral-700">
+                            Full Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name"
+                            value="{{ old('name', auth()->user()->name) }}" required
+                            placeholder="Enter your full name"
+                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
+                        <x-input-error :messages="$errors->get('name')" class="mt-1" />
+                    </div>
 
-                        <!-- Bio -->
-                        <div>
-                            <label for="bio" class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                Bio
-                            </label>
-                            <textarea name="bio" id="bio" rows="4"
-                                placeholder="Tell us about yourself, your interests, or what you do..."
-                                class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none">{{ old('bio') }}</textarea>
-                            <p class="mt-1 text-b-3 text-neutral-600">Maximum 1000 characters</p>
-                            <x-input-error :messages="$errors->get('bio')" class="mt-1" />
-                        </div>
+                    {{-- Bio --}}
+                    <div>
+                        <label for="bio" class="font-sans text-b-3 text-neutral-700">
+                            Bio
+                        </label>
+                        <textarea name="bio" id="bio" rows="3"
+                            placeholder="Tell us about yourself, your interests, or what you do..."
+                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 resize-none">{{ old('bio') }}</textarea>
+                        <p class="mt-1 font-sans text-b-3 text-neutral-600">Max 1000 characters</p>
+                        <x-input-error :messages="$errors->get('bio')" class="mt-1" />
+                    </div>
 
-                        <!-- Location -->
-                        <div>
-                            <label for="location" class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                Location
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg class="h-5 w-5 text-neutral-400" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </div>
-                                <input type="text" name="location" id="location" value="{{ old('location') }}"
-                                    placeholder="e.g., Jakarta, Indonesia"
-                                    class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                    {{-- Location --}}
+                    <div>
+                        <label for="location" class="font-sans text-b-3 text-neutral-700">
+                            Location
+                        </label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-neutral-400" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
                             </div>
-                            <x-input-error :messages="$errors->get('location')" class="mt-1" />
+                            <input type="text" name="location" id="location" value="{{ old('location') }}"
+                                placeholder="e.g., Jakarta, Indonesia"
+                                class="block w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
                         </div>
+                        <x-input-error :messages="$errors->get('location')" class="mt-1" />
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="mt-8 flex gap-4">
-                        <button type="submit"
-                            class="flex-1 px-6 py-3.5 bg-primary-500 text-white text-b-1 font-semibold rounded-lg hover:bg-primary-600 transition-colors shadow-sm hover:shadow-md">
-                            Save & Continue
-                        </button>
-                    </div>
+                    {{-- CTA --}}
+                    <button type="submit"
+                        class="w-full px-4 py-2 rounded-lg bg-primary-500 font-sans text-b-2 text-white font-semibold hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 mt-1">
+                        Save & Continue
+                    </button>
+                    
+                    {{-- Helper Text --}}
+                    <p class="font-sans text-b-3 text-neutral-600 text-center">
+                        This information will be visible on your profile
+                    </p>
                 </form>
             </div>
-
-            <!-- Helper Text -->
-            <p class="text-center text-b-2 text-neutral-600 mt-6">
-                This information will be visible on your profile
-            </p>
         </div>
+
     </div>
 
     <script>
@@ -198,3 +229,4 @@
         });
     </script>
 </x-guest-layout>
+

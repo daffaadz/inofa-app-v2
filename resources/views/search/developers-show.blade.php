@@ -147,8 +147,20 @@
                                 </path>
                             </svg>
                         </div>
-                        <h3 class="text-h-7 text-neutral-900 mb-1">Educations</h3>
-                        <p class="text-b-2 text-neutral-600">{{ $educations }}</p>
+                        <h3 class="text-h-7 text-neutral-900 mb-1">Education</h3>
+                        @if(count($educations) > 0)
+                            <div class="space-y-2">
+                                @foreach($educations as $edu)
+                                    <div class="text-b-2 text-neutral-600">
+                                        <p class="font-semibold">{{ $edu['degree'] ?? '' }}</p>
+                                        <p class="text-b-3">{{ $edu['institution'] ?? '' }}</p>
+                                        <p class="text-b-4 text-neutral-500">{{ $edu['start_year'] ?? '' }} - {{ $edu['end_year'] ?? '' }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-b-2 text-neutral-500">Not specified</p>
+                        @endif
                     </div>
 
                     <!-- Clean Code -->
@@ -162,8 +174,13 @@
                             </svg>
                         </div>
                         <h3 class="text-h-7 text-neutral-900 mb-1">My Rate Range</h3>
-                        <p class="text-b-2 text-neutral-600">Rp{{ number_format($rateMin, 0, ',', '.') }} -
-                            Rp{{ number_format($rateMax, 0, ',', '.') }}
+                        <p class="text-b-2 text-neutral-600">
+                            @if ($rateMin > 0 && $rateMax > 0)
+                                Rp{{ number_format($rateMin, 0, ',', '.') }} -
+                                Rp{{ number_format($rateMax, 0, ',', '.') }}
+                            @else
+                                N/A
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -265,53 +282,124 @@
             </section>
 
             <!-- Portfolio -->
-            <section class="p-6 mb-6">
-                <h2 class="text-h-4 text-neutral-900 mb-6">Portfolio</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section class="bg-gradient-to-br from-primary-50 via-white to-secondary-50 rounded-lg shadow-sm p-8 mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-h-4 text-neutral-900 font-bold">Portfolio Showcase</h2>
+                    <span class="px-3 py-1.5 bg-primary-100 text-primary-700 text-b-3 font-semibold rounded-full">
+                        {{ $developer->portfolios->count() }}
+                        {{ $developer->portfolios->count() === 1 ? 'Project' : 'Projects' }}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @forelse($developer->portfolios as $portfolio)
-                        <div class="group">
-                            <div class="relative overflow-hidden rounded-lg mb-4 aspect-video bg-neutral-100">
+                        <div
+                            class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-neutral-100 hover:border-primary-300 transform hover:-translate-y-1">
+                            <!-- Image Container -->
+                            <div
+                                class="relative overflow-hidden aspect-video bg-gradient-to-br from-neutral-100 to-neutral-200">
                                 @if ($portfolio->image_url)
                                     <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    </div>
                                 @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <svg class="w-16 h-16 text-neutral-300" fill="none" stroke="currentColor"
+                                    <div
+                                        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-secondary-100">
+                                        <svg class="w-16 h-16 text-primary-300" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                             </path>
                                         </svg>
                                     </div>
                                 @endif
+
+                                <!-- Featured Badge -->
+                                @if ($portfolio->is_featured)
+                                    <div
+                                        class="absolute top-2 right-2 px-2 py-0.5 bg-amber-500 text-white text-b-3 font-bold rounded-full shadow-lg flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        Featured
+                                    </div>
+                                @endif
+
+                                <!-- Completion Date -->
+                                @if ($portfolio->completed_at)
+                                    <div
+                                        class="absolute bottom-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm text-neutral-700 text-b-3 font-medium rounded-full shadow-md flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        {{ $portfolio->completed_at->format('M Y') }}
+                                    </div>
+                                @endif
                             </div>
-                            <h3 class="text-h-7 text-neutral-900 mb-2">{{ $portfolio->title }}</h3>
-                            <p class="text-b-2 text-neutral-600 mb-3 line-clamp-2">{{ $portfolio->description }}</p>
 
-                            @if ($portfolio->technologies)
-                                <div class="flex flex-wrap gap-2 mb-3">
-                                    @foreach (json_decode($portfolio->technologies, true) ?? [] as $tech)
-                                        <span
-                                            class="px-2 py-1 bg-neutral-100 text-neutral-700 text-b-3 rounded">{{ $tech }}</span>
-                                    @endforeach
-                                </div>
-                            @endif
+                            <!-- Content -->
+                            <div class="p-6">
+                                <h3
+                                    class="text-h-7 text-neutral-900 font-bold mb-1.5 line-clamp-1 group-hover:text-primary-600 transition-colors">
+                                    {{ $portfolio->title }}
+                                </h3>
+                                <p class="text-b-3 text-neutral-600 mb-3 line-clamp-2 leading-relaxed">
+                                    {{ $portfolio->description }}
+                                </p>
 
-                            @if ($portfolio->project_url)
-                                <a href="{{ $portfolio->project_url }}" target="_blank"
-                                    class="inline-flex items-center text-b-2 text-primary-500 font-medium hover:text-primary-600">
-                                    View Portfolio
-                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                    </svg>
-                                </a>
-                            @endif
+                                <!-- Technologies -->
+                                @if ($portfolio->technologies)
+                                    <div class="flex flex-wrap gap-1.5 mb-3">
+                                        @foreach ($portfolio->technologies ?? [] as $tech)
+                                            <span
+                                                class="px-3 py-1 bg-gradient-to-r from-secondary-100/50 to-secondary-100 text-primary-700 text-b-3 font-medium rounded-full border border-primary-200 hover:border-primary-400 transition-colors">
+                                                {{ $tech }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- View Project Link -->
+                                @if ($portfolio->project_url)
+                                    <a href="{{ $portfolio->project_url }}" target="_blank"
+                                        class="inline-flex items-center gap-1.5 text-primary-500 text-b-2 font-semibold rounded-lg transition-all duration-300 hover:scale-95 group/link">
+                                        View Portfolio
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto"
+                                            fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                @else
+                                    <div
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 text-neutral-500 text-b-3 font-medium rounded-lg">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                        Private
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     @empty
-                        <div class="bg-white rounded-xl border-2 border-neutral-200 col-span-2 text-center py-8">
-                            <p class="text-b-1 text-neutral-500">No portfolio items yet.</p>
+                        <div
+                            class="bg-white rounded-xl border-2 border-dashed border-neutral-300 col-span-full text-center py-12 px-6">
+                            <svg class="w-16 h-16 text-neutral-300 mx-auto mb-3" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <h3 class="text-h-7 text-neutral-700 font-semibold mb-1">No Portfolio Yet</h3>
+                            <p class="text-b-3 text-neutral-500">This developer hasn't added any portfolio items yet.
+                            </p>
                         </div>
                     @endforelse
                 </div>

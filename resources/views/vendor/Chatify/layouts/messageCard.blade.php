@@ -8,40 +8,59 @@ $timeAndSeen =
         <span class='time text-neutral-500'>$timeAgo</span>
     </span>";
 ?>
+<div class="message-card mb-4 flex {{ $isSender ? 'mc-sender justify-end' : 'justify-start' }}"
+    data-id="{{ $id }}">
+    <div class="max-w-[70%] {{ $isSender ? 'items-end' : 'items-start' }} flex flex-col">
 
-@if (isset($metadata['type']) && $metadata['type'] == 'proposal')
-    {{-- Proposal Attachment --}}
-    <div class="proposal-wrapper mt-2">
-        @include('vendor.Chatify.layouts.proposalCard', [
-            'isSender' => $isSender,
-            'message_id' => $id,
-            'metadata' => $metadata,
-            'status' => $metadata['status'] ?? 'pending',
-            'agreement' => isset($metadata['agreement_id'])
-                ? \App\Models\ProjectAgreement::find($metadata['agreement_id'])
-                : null,
-            'created_at_human' => isset($created_at)
-                ? \Carbon\Carbon::parse($created_at)->locale('id')->diffForHumans()
-                : '',
-        ])
-    </div>
-@else
-    <div class="message-card mb-4 flex {{ $isSender ? 'mc-sender justify-end' : 'justify-start' }}"
-        data-id="{{ $id }}">
-        <div class="max-w-[70%] {{ $isSender ? 'items-end' : 'items-start' }} flex flex-col">
+        {{-- Message Content --}}
+        <div class="relative group">
 
-            {{-- Message Content --}}
-            <div class="relative group">
+            {{-- Delete Button (for sender) --}}
+            @if ($isSender)
+                <div class="actions absolute -left-8 top-2 opacity-0 group-hover:opacity-100 transition">
+                    <button class="delete-btn p-1.5 hover:bg-neutral-100 rounded-lg" data-id="{{ $id }}">
+                        <i class="fas fa-trash text-neutral-400 text-xs"></i>
+                    </button>
+                </div>
+            @endif
 
-                {{-- Delete Button (for sender) --}}
-                @if ($isSender)
-                    <div class="actions absolute -left-8 top-2 opacity-0 group-hover:opacity-100 transition">
-                        <button class="delete-btn p-1.5 hover:bg-neutral-100 rounded-lg" data-id="{{ $id }}">
-                            <i class="fas fa-trash text-neutral-400 text-xs"></i>
-                        </button>
-                    </div>
-                @endif
-
+            @if (isset($metadata['type']) && $metadata['type'] == 'proposal')
+                {{-- Proposal Attachment --}}
+                @include('vendor.Chatify.layouts.proposalCard', [
+                    'isSender' => $isSender,
+                    'message_id' => $id,
+                    'metadata' => $metadata,
+                    'project_agreement_id' => $project_agreement_id ?? null,
+                    'status' => $metadata['status'] ?? 'pending',
+                    'agreement' => isset($metadata['agreement_id'])
+                        ? \App\Models\ProjectAgreement::find($metadata['agreement_id'])
+                        : null,
+                    'created_at' => $created_at ?? null,
+                    'created_at_human' => isset($created_at)
+                        ? \Carbon\Carbon::parse($created_at)->locale('id')->diffForHumans()
+                        : '',
+                    'seen' => $seen ?? false,
+                ])
+            @elseif (isset($metadata['type']) && $metadata['type'] == 'agreement_request')
+                {{-- Agreement Request Message --}}
+                <div
+                    class="px-4 py-3 rounded-2xl {{ $isSender ? 'bg-primary-500 text-white rounded-br-sm' : 'bg-white text-neutral-900 rounded-bl-sm shadow-sm border border-neutral-200' }}">
+                    
+                    @if (isset($metadata['to_id']))
+                        <a href="{{ route('proposals.create', ['to_id' => $metadata['to_id'], 'project_id' => $metadata['project_id'] ?? null]) }}"
+                            class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl px-4 py-2.5 text-b-2 font-semibold transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {{ $metadata['button_text'] ?? 'Buat Agreement' }}
+                        </a>
+                    @endif
+                </div>
+                <div class="mx-2 flex {{ $isSender ? 'justify-end text-white' : 'justify-start text-gray-600' }}">
+                    {!! $timeAndSeen !!}
+                </div>
+            @else
                 {{-- Text Message --}}
                 @if (@$attachment->type != 'image' || $message)
                     <div
@@ -69,7 +88,7 @@ $timeAndSeen =
                         </div>
                     </div>
                 @endif
-            </div>
+            @endif
         </div>
     </div>
-@endif
+</div>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Skill;
 use App\Models\Review;
+use Illuminate\Support\Facades\Auth;
 
 class SearchController extends Controller
 {
@@ -27,7 +28,10 @@ class SearchController extends Controller
         /** ----------------------------------------
          * 1️⃣ Base Query - Developers Only
          * ---------------------------------------- */
-        $query = User::where('role', 'developer')->with([
+        $query = User::where('role', 'developer')
+            ->leftJoin('developer_profiles', 'users.id', '=', 'developer_profiles.user_id')
+            ->select('users.*', 'developer_profiles.rating_average', 'developer_profiles.projects_completed')
+            ->with([
             'developerProfile',
             'skills' => function ($q) {
                 $q->orderBy('proficiency_level', 'desc');
@@ -91,35 +95,25 @@ class SearchController extends Controller
          * ---------------------------------------- */
         switch ($sortBy) {
             case 'rating_high':
-                $query->orderByDesc(function ($q) {
-                    $q->select('rating_average')->from('developer_profiles')->whereColumn('developer_profiles.user_id', 'users.id')->limit(1);
-                });
+                $query->orderByDesc('developer_profiles.rating_average');
                 break;
 
             case 'rating_low':
-                $query->orderBy(function ($q) {
-                    $q->select('rating_average')->from('developer_profiles')->whereColumn('developer_profiles.user_id', 'users.id')->limit(1);
-                });
+                $query->orderBy('developer_profiles.rating_average');
                 break;
 
             case 'projects_completed':
-                $query->orderByDesc(function ($q) {
-                    $q->select('projects_completed')->from('developer_profiles')->whereColumn('developer_profiles.user_id', 'users.id')->limit(1);
-                });
+                $query->orderByDesc('developer_profiles.projects_completed');
                 break;
 
             case 'newest':
-                $query->latest('created_at');
+                $query->latest('users.created_at');
                 break;
 
             case 'recommended':
             default:
                 // Sort by: rating * projects_completed (best match)
-                $query->orderByRaw('(
-                    SELECT rating_average * projects_completed
-                    FROM developer_profiles
-                    WHERE developer_profiles.user_id = users.id
-                ) DESC');
+                $query->orderByRaw('(COALESCE(developer_profiles.rating_average, 0) * COALESCE(developer_profiles.projects_completed, 0)) DESC');
                 break;
         }
 
@@ -167,6 +161,11 @@ class SearchController extends Controller
             abort(404);
         }
 
+        // Increment profile view count (only if visitor is not the profile owner)
+        if ($developer->developerProfile && Auth::check() && Auth::id() !== (int)$developer->id) {
+            $developer->developerProfile->incrementViewCount();
+        }
+
         // Get reviews for this developer
         $reviews = Review::with('consumer')->where('developer_id', $id)->where('is_public', true)->orderBy('created_at', 'desc')->get();
 
@@ -189,9 +188,12 @@ class SearchController extends Controller
             }
         }
 
-        $educations = $developer->developerProfile->education ?? 'Not specified';
-        $rateMin = $developer->developerProfile->rate_min_byproject ?? 'N/A';
-        $rateMax = $developer->developerProfile->rate_max_byproject ?? 'N/A';
+        $educations = $developer->developerProfile->education ?? [];
+        if (!is_array($educations)) {
+            $educations = [];
+        }
+        $rateMin = $developer->developerProfile->rate_min_byproject ?? 0;
+        $rateMax = $developer->developerProfile->rate_max_byproject ?? 0;
 
         // Calculate review statistics for distribution
         $reviewStats = [

@@ -39,12 +39,12 @@ class Conversation extends Model
 
     public function messages()
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(ChMessage::class, 'conversation_id');
     }
 
     public function latestMessage()
     { 
-        return $this->hasOne(Message::class)->latestOfMany('sent_at'); 
+        return $this->hasOne(ChMessage::class, 'conversation_id')->latest('created_at');
     }
 
     public function participantLinks()

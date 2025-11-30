@@ -43,33 +43,6 @@
                                     }
                                 </script>
 
-                                <!-- Filter: Job Type -->
-                                <div class="mb-6">
-                                    <h3 class="text-b-1 font-semibold text-neutral-900 mb-3">Job Type</h3>
-                                    <div class="space-y-1">
-                                        <button type="button" onclick="document.querySelector('[name=job_type]').value='all'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ empty(request('job_type')) || request('job_type') === 'all' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            All types
-                                        </button>
-                                        <input type="hidden" name="job_type" value="{{ request('job_type', 'all') }}">
-                                        
-                                        <button type="button" onclick="document.querySelector('[name=job_type]').value='full-time'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('job_type') === 'full-time' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Full-time
-                                        </button>
-                                        
-                                        <button type="button" onclick="document.querySelector('[name=job_type]').value='part-time'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('job_type') === 'part-time' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Part-time
-                                        </button>
-                                        
-                                        <button type="button" onclick="document.querySelector('[name=job_type]').value='contract'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('job_type') === 'contract' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Contract
-                                        </button>
-                                    </div>
-                                </div>
-
                                 <!-- Filter: Experience Level -->
                                 <div class="mb-6">
                                     <h3 class="text-b-1 font-semibold text-neutral-900 mb-3">Experience Level</h3>
@@ -80,19 +53,24 @@
                                         </button>
                                         <input type="hidden" name="experience" value="{{ request('experience', 'all') }}">
                                         
-                                        <button type="button" onclick="document.querySelector('[name=experience]').value='junior'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'junior' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Junior
+                                        <button type="button" onclick="document.querySelector('[name=experience]').value='beginner'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'beginner' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Beginner
                                         </button>
                                         
-                                        <button type="button" onclick="document.querySelector('[name=experience]').value='mid-level'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'mid-level' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Mid-level
+                                        <button type="button" onclick="document.querySelector('[name=experience]').value='intermediate'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'intermediate' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Intermediate
                                         </button>
                                         
-                                        <button type="button" onclick="document.querySelector('[name=experience]').value='senior'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'senior' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Senior
+                                        <button type="button" onclick="document.querySelector('[name=experience]').value='advance'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'advance' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Advance
+                                        </button>
+                                        
+                                        <button type="button" onclick="document.querySelector('[name=experience]').value='expert'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('experience') === 'expert' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Expert
                                         </button>
                                     </div>
                                 </div>
@@ -106,28 +84,48 @@
                                             All budgets
                                         </button>
                                         
-                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='1000000'; document.querySelector('[name=max_budget]').value='2000000'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '1000000' && request('max_budget') == '2000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Rp1,000 - Rp2,000
+                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='0'; document.querySelector('[name=max_budget]').value='500000'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '0' && request('max_budget') == '500000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Rp0 - Rp500K
                                         </button>
                                         
-                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='2000000'; document.querySelector('[name=max_budget]').value='3000000'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '2000000' && request('max_budget') == '3000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Rp2,000 - Rp3,000
+                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='500000'; document.querySelector('[name=max_budget]').value='1000000'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '500000' && request('max_budget') == '1000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Rp500K - Rp1M
                                         </button>
                                         
-                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='3000000'; document.querySelector('[name=max_budget]').value='5000000'; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '3000000' && request('max_budget') == '5000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Rp3,000 - Rp5,000
+                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='1000000'; document.querySelector('[name=max_budget]').value='5000000'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '1000000' && request('max_budget') == '5000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Rp1M - Rp5M
                                         </button>
                                         
-                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='5000000'; document.querySelector('[name=max_budget]').value=''; submitProjectSearchForm();"
-                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '5000000' && empty(request('max_budget')) ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
-                                            Rp5,000+
+                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='5000000'; document.querySelector('[name=max_budget]').value='10000000'; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '5000000' && request('max_budget') == '10000000' ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Rp5M - Rp10M
+                                        </button>
+                                        
+                                        <button type="button" onclick="document.querySelector('[name=min_budget]').value='10000000'; document.querySelector('[name=max_budget]').value=''; submitProjectSearchForm();"
+                                            class="w-full text-left text-b-2 py-2.5 px-4 rounded-lg transition-colors {{ request('min_budget') == '10000000' && empty(request('max_budget')) ? 'bg-primary-500 text-white font-medium' : 'text-neutral-700 font-medium bg-[#F5F5F5] hover:bg-neutral-50' }}">
+                                            Rp10M+
                                         </button>
                                         
                                         <input type="hidden" name="min_budget" value="{{ request('min_budget', '') }}">
                                         <input type="hidden" name="max_budget" value="{{ request('max_budget', '') }}">
+                                    </div>
+                                    
+                                    <!-- Custom Range Input -->
+                                    <div class="mt-4 pt-4 border-t border-neutral-200">
+                                        <h4 class="text-b-2 font-medium text-neutral-700 mb-2">Custom Range</h4>
+                                        <div class="flex gap-2">
+                                            <input type="number" id="custom_min" placeholder="Min" 
+                                                class="w-1/2 px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                            <input type="number" id="custom_max" placeholder="Max"
+                                                class="w-1/2 px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        </div>
+                                        <button type="button" onclick="applyCustomBudget()" 
+                                            class="w-full mt-2 text-b-2 py-2 px-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
+                                            Apply
+                                        </button>
                                     </div>
                                 </div>
 
@@ -158,13 +156,57 @@
                                 <!-- Filter: Skills Required -->
                                 <div class="mb-6">
                                     <h3 class="text-b-1 font-semibold text-neutral-900 mb-3">Skills Required</h3>
+
+                                    <!-- Search Input -->
+                                    <div class="mb-3 relative">
+                                        <input type="text" id="skillSearch" placeholder="Search skills..."
+                                            class="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                            autocomplete="off">
+                                        <!-- Suggestion Dropdown -->
+                                        <div id="skillSuggestions"
+                                            class="absolute z-10 w-full mt-1 bg-white border border-neutral-300 rounded-lg shadow-lg hidden max-h-48 overflow-y-auto">
+                                            <!-- Suggestions will be populated here -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Selected Skills (Chips) -->
+                                    <div id="selectedSkillsContainer" class="mb-3 flex flex-wrap gap-2">
+                                        @foreach ($skills ?? [] as $selectedSkill)
+                                            <div
+                                                class="inline-flex items-center bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
+                                                <span>{{ $selectedSkill }}</span>
+                                                <button type="button" onclick="removeSkill('{{ $selectedSkill }}')"
+                                                    class="ml-2 text-primary-700 hover:text-primary-900">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <!-- Hidden Inputs for Selected Skills -->
+                                    <div id="hiddenSkillsContainer">
+                                        @foreach ($skills ?? [] as $selectedSkill)
+                                            <input type="hidden" name="skills[]" value="{{ $selectedSkill }}"
+                                                data-skill="{{ $selectedSkill }}">
+                                        @endforeach
+                                    </div>
+
+                                    <!-- All Skills List (Checkboxes) -->
                                     <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-                                        @foreach ($allSkills->take(12) as $skill)
-                                            <label class="flex items-center text-b-2 text-neutral-700 cursor-pointer group">
-                                                <input type="checkbox" name="skills[]" value="{{ $skill->name }}"
-                                                    onchange="submitProjectSearchForm()" @checked(in_array($skill->name, $skills ?? []))
-                                                    class="h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500 cursor-pointer">
-                                                <span class="ml-3 group-hover:text-neutral-900">{{ $skill->name }}</span>
+                                        @foreach ($allSkills->take(8) as $skill)
+                                            <label
+                                                class="flex items-center text-b-2 text-neutral-700 cursor-pointer group skill-item"
+                                                data-skill-name="{{ strtolower($skill->name) }}">
+                                                <input type="checkbox" value="{{ $skill->name }}"
+                                                    onchange="toggleSkill('{{ $skill->name }}')"
+                                                    @checked(in_array($skill->name, $skills ?? []))
+                                                    class="h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500 cursor-pointer skill-checkbox">
+                                                <span
+                                                    class="ml-3 group-hover:text-neutral-900">{{ $skill->name }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -197,7 +239,7 @@
                                         <option value="budget_high" @selected($sortBy === 'budget_high')>Budget: High to Low</option>
                                         <option value="budget_low" @selected($sortBy === 'budget_low')>Budget: Low to High</option>
                                         <option value="deadline_soon" @selected($sortBy === 'deadline_soon')>Deadline: Soonest</option>
-                                        <option value="most_applicants" @selected($sortBy === 'most_applicants')>Most Applicants</option>
+                                        <option value="most_proposals" @selected($sortBy === 'most_proposals')>Most Proposals</option>
                                     </select>
                                 </div>
                             </div>
@@ -237,18 +279,27 @@
                                                             {{ $project->consumer->location }}
                                                         </div>
                                                     @endif
-                                                    <div class="flex items-center">
-                                                        <svg class="h-4 w-4 mr-1 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                        </svg>
-                                                        Full-time
-                                                    </div>
+                                                    @php
+                                                        $avgLevel = $project->skills->avg('pivot.required_level');
+                                                        $experienceLabel = 'N/A';
+                                                        if ($avgLevel >= 1 && $avgLevel <= 2) {
+                                                            $experienceLabel = 'Beginner';
+                                                        } elseif ($avgLevel > 2 && $avgLevel <= 3.5) {
+                                                            $experienceLabel = 'Intermediate';
+                                                        } elseif ($avgLevel > 3.5 && $avgLevel <= 4.5) {
+                                                            $experienceLabel = 'Advance';
+                                                        } elseif ($avgLevel > 4.5 && $avgLevel <= 5) {
+                                                            $experienceLabel = 'Expert';
+                                                        }
+                                                    @endphp
+                                                    @if($avgLevel)
                                                     <div class="flex items-center">
                                                         <svg class="h-4 w-4 mr-1 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                         </svg>
-                                                        Senior
+                                                        {{ $experienceLabel }}
                                                     </div>
+                                                    @endif
                                                     <div class="flex items-center">
                                                         <svg class="h-4 w-4 mr-1 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -257,7 +308,7 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- Budget & Applicants -->
+                                                <!-- Budget & Proposals -->
                                                 <div class="flex items-center gap-4 mb-3">
                                                     <div class="flex items-center text-primary-600 font-semibold">
                                                         <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -266,7 +317,7 @@
                                                         </svg>
                                                         Rp {{ number_format($project->budget, 0, ',', '.') }}/month
                                                     </div>
-                                                    <span class="text-b-2 text-neutral-600">• {{ $project->offers_count ?? rand(8, 15) }} applicants</span>
+                                                    <span class="text-b-2 text-neutral-600">• {{ $project->offers_count ?? 0 }} proposals</span>
                                                 </div>
 
                                                 <!-- Deskripsi -->
@@ -287,7 +338,7 @@
                                                 <div class="flex justify-end">
                                                     <a href="{{ route('search.projects.show', $project->id) }}"
                                                         class="inline-flex bg-primary-500 text-white text-b-2 font-medium px-6 py-2.5 rounded-lg hover:bg-primary-600 transition-colors">
-                                                        Apply Now
+                                                        View Project
                                                     </a>
                                                 </div>
                                             </div>
@@ -353,4 +404,149 @@
             </div>
         </div>
     </div>
+
+    {{-- JavaScript for Skills Search & Selection --}}
+    <script>
+        // All available skills from backend
+        const allSkillsData = @json($allSkills->pluck('name'));
+        let selectedSkills = @json($skills ?? []);
+
+        const searchInput = document.getElementById('skillSearch');
+        const suggestionsBox = document.getElementById('skillSuggestions');
+        const selectedContainer = document.getElementById('selectedSkillsContainer');
+        const hiddenContainer = document.getElementById('hiddenSkillsContainer');
+
+        // Search and show suggestions
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            if (searchTerm.length < 1) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            const matches = allSkillsData.filter(skill => 
+                skill.toLowerCase().includes(searchTerm) && !selectedSkills.includes(skill)
+            );
+
+            if (matches.length === 0) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            suggestionsBox.innerHTML = matches.map(skill =>
+                `<div class="px-3 py-2 hover:bg-primary-50 cursor-pointer text-sm suggestion-item" data-skill="${skill}">
+                    ${skill}
+                </div>`
+            ).join('');
+
+            suggestionsBox.classList.remove('hidden');
+
+            // Add click handlers to suggestions
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    addSkill(this.dataset.skill);
+                    searchInput.value = '';
+                    suggestionsBox.classList.add('hidden');
+                });
+            });
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.classList.add('hidden');
+            }
+        });
+
+        // Toggle skill from checkbox
+        function toggleSkill(skillName) {
+            if (selectedSkills.includes(skillName)) {
+                removeSkill(skillName);
+            } else {
+                addSkill(skillName);
+            }
+        }
+
+        // Add skill
+        function addSkill(skillName) {
+            if (selectedSkills.includes(skillName)) return;
+
+            selectedSkills.push(skillName);
+
+            // Add chip
+            const chip = document.createElement('div');
+            chip.className = 'inline-flex items-center bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm';
+            chip.innerHTML = `
+                <span>${skillName}</span>
+                <button type="button" onclick="removeSkill('${skillName}')" class="ml-2 text-primary-700 hover:text-primary-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            `;
+            selectedContainer.appendChild(chip);
+
+            // Add hidden input
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'skills[]';
+            hiddenInput.value = skillName;
+            hiddenInput.dataset.skill = skillName;
+            hiddenContainer.appendChild(hiddenInput);
+
+            // Check the checkbox
+            updateCheckboxes();
+
+            // Submit form
+            submitProjectSearchForm();
+        }
+
+        // Remove skill
+        function removeSkill(skillName) {
+            selectedSkills = selectedSkills.filter(s => s !== skillName);
+
+            // Remove chip
+            const chips = selectedContainer.querySelectorAll('div');
+            chips.forEach(chip => {
+                if (chip.textContent.includes(skillName)) {
+                    chip.remove();
+                }
+            });
+
+            // Remove hidden input
+            const hiddenInput = hiddenContainer.querySelector(`input[data-skill="${skillName}"]`);
+            if (hiddenInput) {
+                hiddenInput.remove();
+            }
+
+            // Uncheck the checkbox
+            updateCheckboxes();
+
+            // Submit form
+            submitProjectSearchForm();
+        }
+
+        // Update checkboxes based on selected skills
+        function updateCheckboxes() {
+            document.querySelectorAll('.skill-checkbox').forEach(checkbox => {
+                checkbox.checked = selectedSkills.includes(checkbox.value);
+            });
+        }
+
+        // Apply custom budget
+        function applyCustomBudget() {
+            const minBudget = document.getElementById('custom_min').value;
+            const maxBudget = document.getElementById('custom_max').value;
+            
+            if (minBudget) {
+                document.querySelector('[name=min_budget]').value = minBudget;
+            }
+            if (maxBudget) {
+                document.querySelector('[name=max_budget]').value = maxBudget;
+            }
+            
+            submitProjectSearchForm();
+        }
+    </script>
 </x-app-layout>

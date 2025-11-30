@@ -1,52 +1,87 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-neutral-10 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-3xl">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <h2 class="text-h-3 text-neutral-900 mb-2">Complete Your Developer Profile</h2>
-                <p class="text-b-1 text-neutral-600">Tell us about your skills and experience</p>
+    {{-- PAGE WRAPPER --}}
+    <div class="min-h-screen grid md:grid-cols-2">
+
+        {{-- LEFT PANEL : ILLUSTRATION --}}
+        <div
+            class="hidden md:flex sticky top-0 items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 max-h-screen p-6">
+
+            {{-- Logo --}}
+            <div class="absolute left-24 top-12 mb-10">
+                <a href="{{ url('/') }}" class="flex items-center justify-center gap-4">
+                    <img src="{{ asset('assets/vector/logo.svg') }}" alt="Inofa" class="h-8 w-auto">
+                    <span class="text-neutral-800 text-h-5 font-sans">Inofa</span>
+                </a>
             </div>
 
-            <!-- Form Card -->
-            <div class="bg-white rounded-lg shadow-md border border-neutral-200 p-8">
-                <form method="POST" action="{{ route('developer.information.store') }}" id="developer-form">
+            <div class="max-w-xl text-center">
+                <h2 class="font-sans text-h-3 text-start text-neutral-800 mb-3 tracking-tight">
+                    Showcase Your<br>
+                    Developer Skills!
+                </h2>
+                <p class="font-sans text-b-1 text-neutral-800 text-start mt-4">
+                    Complete your developer profile to connect with clients and land exciting projects.
+                </p>
+            </div>
+
+            {{-- FOOTER --}}
+            <footer class="absolute left-1/4 bottom-6 py-6 text-center border-t border-neutral-200">
+                <p class="font-sans text-b-2 text-neutral-500">
+                    © 2025 Inofa. All rights reserved.
+                    <a href="#" class="text-primary-500 hover:underline">Terms of Use</a> &
+                    <a href="#" class="text-primary-500 hover:underline">Privacy Policy</a>
+                </p>
+            </footer>
+        </div>
+
+        {{-- RIGHT PANEL : FORM --}}
+        <div class="flex items-center justify-center py-16 overflow-y-auto">
+            <div class="w-full max-w-lg">
+
+                {{-- Heading --}}
+                <h1 class="font-sans text-h-5 text-neutral-800 mb-1">
+                    Complete Your Developer Profile
+                </h1>
+                <p class="font-sans text-b-2 text-neutral-600 mb-4">Tell us about your skills and experience</p>
+
+                {{-- FORM --}}
+                <form method="POST" action="{{ route('developer.information.store') }}" id="developer-form" class="space-y-3">
                     @csrf
 
-                    <!-- Professional Info Section -->
-                    <div class="mb-8">
-                        <h3 class="text-h-6 text-neutral-900 mb-4 pb-2 border-b border-neutral-200">Professional
-                            Information</h3>
+                    {{-- Professional Info Section --}}
+                    <div class="pb-3 border-b border-neutral-200">
+                        <h3 class="font-sans text-b-1 font-semibold text-neutral-800 mb-3">Professional Information</h3>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Headline -->
-                            <div class="md:col-span-2">
-                                <label for="headline" class="block text-b-1 font-medium text-neutral-900 mb-2">
+                        <div class="space-y-3">
+                            {{-- Professional Headline --}}
+                            <div>
+                                <label for="headline" class="font-sans text-b-3 text-neutral-700">
                                     Professional Headline
                                 </label>
                                 <input type="text" name="headline" id="headline" value="{{ old('headline') }}"
                                     placeholder="e.g., Full-Stack Developer"
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                                    class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
                                 <x-input-error :messages="$errors->get('headline')" class="mt-1" />
                             </div>
 
-                            <!-- Experience Years -->
+                            {{-- Experience Years --}}
                             <div>
-                                <label for="experience_years" class="block text-b-1 font-medium text-neutral-900 mb-2">
+                                <label for="experience_years" class="font-sans text-b-3 text-neutral-700">
                                     Years of Experience
                                 </label>
                                 <input type="number" name="experience_years" id="experience_years"
                                     value="{{ old('experience_years', 0) }}" min="0" placeholder="0"
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                                    class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
                                 <x-input-error :messages="$errors->get('experience_years')" class="mt-1" />
                             </div>
 
-                            <!-- Availability -->
+                            {{-- Availability --}}
                             <div>
-                                <label for="availability" class="block text-b-1 font-medium text-neutral-900 mb-2">
+                                <label for="availability" class="font-sans text-b-3 text-neutral-700">
                                     Availability Status
                                 </label>
                                 <select name="availability" id="availability"
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors bg-white">
+                                    class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 focus:ring-2 focus:ring-primary-500 bg-white">
                                     <option value="available"
                                         {{ old('availability') === 'available' ? 'selected' : '' }}>Available for Work
                                     </option>
@@ -59,162 +94,117 @@
                                 <x-input-error :messages="$errors->get('availability')" class="mt-1" />
                             </div>
 
-                            <!-- Rate Range -->
-                            <div>
-                                <label for="rate_min_byproject"
-                                    class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                    Minimum Rate (per project)
-                                </label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500">Rp</span>
-                                    <input type="number" name="rate_min_byproject" id="rate_min_byproject"
-                                        value="{{ old('rate_min_byproject') }}" min="0" placeholder="1,000,000"
-                                        class="w-full pl-12 pr-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                            {{-- Rate Range --}}
+                            <div class="flex flex-row justify-between w-full items-center">
+                                <div>
+                                    <label for="rate_min_byproject" class="font-sans text-b-3 text-neutral-700">
+                                        Minimum Rate (per project)
+                                    </label>
+                                    <div class="relative mt-1">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 font-sans text-b-2 text-neutral-500">Rp</span>
+                                        <input type="number" name="rate_min_byproject" id="rate_min_byproject"
+                                            value="{{ old('rate_min_byproject') }}" min="0" placeholder="1,000,000"
+                                            class="block w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                    <x-input-error :messages="$errors->get('rate_min_byproject')" class="mt-1" />
                                 </div>
-                                <x-input-error :messages="$errors->get('rate_min_byproject')" class="mt-1" />
+    
+                                <div>
+                                    <label for="rate_max_byproject" class="font-sans text-b-3 text-neutral-700">
+                                        Maximum Rate (per project)
+                                    </label>
+                                    <div class="relative mt-1">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 font-sans text-b-2 text-neutral-500">Rp</span>
+                                        <input type="number" name="rate_max_byproject" id="rate_max_byproject"
+                                            value="{{ old('rate_max_byproject') }}" min="0" placeholder="10,000,000"
+                                            class="block w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                    <x-input-error :messages="$errors->get('rate_max_byproject')" class="mt-1" />
+                                </div>
                             </div>
 
+                            {{-- Professional Experience --}}
                             <div>
-                                <label for="rate_max_byproject"
-                                    class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                    Maximum Rate (per project)
-                                </label>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500">Rp</span>
-                                    <input type="number" name="rate_max_byproject" id="rate_max_byproject"
-                                        value="{{ old('rate_max_byproject') }}" min="0" placeholder="10,000,000"
-                                        class="w-full pl-12 pr-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                                </div>
-                                <x-input-error :messages="$errors->get('rate_max_byproject')" class="mt-1" />
-                            </div>
-
-                            <!-- Experience -->
-                            <div class="md:col-span-2">
-                                <label for="experience" class="block text-b-1 font-medium text-neutral-900 mb-2">
+                                <label for="experience" class="font-sans text-b-3 text-neutral-700">
                                     Professional Experience
                                 </label>
-                                <textarea name="experience" id="experience" rows="4"
+                                <textarea name="experience" id="experience" rows="3"
                                     placeholder="Describe your work experience, projects, and achievements..."
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none">{{ old('experience') }}</textarea>
+                                    class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300 font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500 resize-none">{{ old('experience') }}</textarea>
                                 <x-input-error :messages="$errors->get('experience')" class="mt-1" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- Education & Certifications -->
-                    <div class="mb-8">
-                        <h3 class="text-h-6 text-neutral-900 mb-4 pb-2 border-b border-neutral-200">Education &
-                            Certifications</h3>
+                    {{-- Skills Section --}}
+                    <div class="pb-3 border-b border-neutral-200">
+                        <h3 class="font-sans text-b-1 font-semibold text-neutral-800 mb-3">Skills & Technologies</h3>
 
-                        <div class="grid grid-cols-1 gap-6">
-                            <!-- Education -->
-                            <div>
-                                <label for="education" class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                    Education
-                                </label>
-                                <input type="text" name="education" id="education" value="{{ old('education') }}"
-                                    placeholder="e.g., Bachelor's in Computer Science - University of Indonesia"
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
-                                <x-input-error :messages="$errors->get('education')" class="mt-1" />
-                            </div>
-
-                            <!-- Certifications -->
-                            <div>
-                                <label for="certifications" class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                    Certifications
-                                </label>
-                                <textarea name="certifications" id="certifications" rows="3"
-                                    placeholder="List your certifications (one per line)&#10;e.g., AWS Certified Developer&#10;Google Cloud Professional"
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none">{{ old('certifications') }}</textarea>
-                                <x-input-error :messages="$errors->get('certifications')" class="mt-1" />
-                            </div>
-
-                            <!-- Portfolio Links -->
-                            <div>
-                                <label for="portfolio_links" class="block text-b-1 font-medium text-neutral-900 mb-2">
-                                    Portfolio Links
-                                </label>
-                                <textarea name="portfolio_links" id="portfolio_links" rows="3"
-                                    placeholder="Add links to your portfolio, GitHub, LinkedIn, etc. (comma separated)&#10;e.g., https://github.com/username, https://portfolio.com"
-                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none">{{ old('portfolio_links') }}</textarea>
-                                <x-input-error :messages="$errors->get('portfolio_links')" class="mt-1" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Skills Section -->
-                    <div class="mb-8">
-                        <h3 class="text-h-6 text-neutral-900 mb-4 pb-2 border-b border-neutral-200">Skills &
-                            Technologies</h3>
-
-                        <!-- Selected Skills Display -->
+                        {{-- Selected Skills Display --}}
                         <div id="selected-skills"
-                            class="mb-4 min-h-[60px] p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+                            class="mb-3 min-h-[50px] p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
                             <div class="flex flex-wrap gap-2" id="selected-skills-container">
-                                <span class="text-b-2 text-neutral-500">No skills selected yet. Add skills
-                                    below.</span>
+                                <span class="font-sans text-b-3 text-neutral-500">No skills selected yet</span>
                             </div>
                         </div>
 
-                        <!-- Add New Skill -->
-                        <div class="mb-4">
-                            <label for="new-skill-input" class="block text-b-1 font-medium text-neutral-900 mb-2">
+                        {{-- Add Custom Skill --}}
+                        <div class="mb-3">
+                            <label for="new-skill-input" class="font-sans text-b-3 text-neutral-700">
                                 Add Custom Skill
                             </label>
-                            <div class="flex gap-2">
+                            <div class="flex gap-2 mt-1">
                                 <input type="text" id="new-skill-input"
-                                    placeholder="Type skill name and press Add"
-                                    class="flex-1 px-4 py-3 border border-neutral-300 rounded-lg text-b-1 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                                    placeholder="Type skill name"
+                                    class="flex-1 px-4 py-2 border border-neutral-300 rounded-lg font-sans text-b-1 placeholder-neutral-400 focus:ring-2 focus:ring-primary-500">
                                 <button type="button" id="add-skill-btn"
-                                    class="px-6 py-3 bg-primary-500 text-white text-b-2 font-medium rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap">
-                                    Add Skill
+                                    class="px-4 py-2 bg-primary-500 text-white font-sans text-b-2 font-semibold rounded-lg hover:bg-primary-600 whitespace-nowrap">
+                                    Add
                                 </button>
                             </div>
-                            <p class="mt-1 text-b-3 text-neutral-600">Add skills that aren't listed below</p>
+                            <p class="mt-1 font-sans text-b-3 text-neutral-600">Add skills not listed below</p>
                         </div>
 
-                        <!-- Existing Skills -->
+                        {{-- Existing Skills --}}
                         <div>
-                            <label class="block text-b-1 font-medium text-neutral-900 mb-3">
+                            <label class="font-sans text-b-3 text-neutral-700 mb-2 block">
                                 Select from Existing Skills
                             </label>
                             <div
-                                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-64 overflow-y-auto p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
-                                @foreach ($skills as $skill)
+                                class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                                @foreach ($skills->take(10) as $skill)
                                     <label
-                                        class="flex items-center gap-2 text-b-2 text-neutral-700 cursor-pointer hover:text-neutral-900 group">
+                                        class="flex items-center gap-2 font-sans text-b-3 text-neutral-700 cursor-pointer hover:text-neutral-900">
                                         <input type="checkbox" name="skills[]" value="{{ $skill->id }}"
                                             class="w-4 h-4 text-primary-500 border-neutral-300 rounded focus:ring-primary-500 cursor-pointer skill-checkbox"
                                             data-skill-name="{{ $skill->name }}"
                                             data-skill-id="{{ $skill->id }}">
-                                        <span
-                                            class="group-hover:font-medium transition-all">{{ $skill->name }}</span>
+                                        <span>{{ $skill->name }}</span>
                                     </label>
                                 @endforeach
                             </div>
                         </div>
 
-                        <x-input-error :messages="$errors->get('skills')" class="mt-2" />
+                        <x-input-error :messages="$errors->get('skills')" class="mt-1" />
 
-                        <!-- Hidden inputs for custom skills -->
+                        {{-- Hidden inputs for custom skills --}}
                         <div id="custom-skills-container"></div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="flex gap-4">
-                        <button type="submit"
-                            class="flex-1 px-6 py-3.5 bg-primary-500 text-white text-b-1 font-semibold rounded-lg hover:bg-primary-600 transition-colors shadow-sm hover:shadow-md">
-                            Complete Registration
-                        </button>
-                    </div>
+                    {{-- Submit Button --}}
+                    <button type="submit"
+                        class="w-full px-4 py-2 rounded-lg bg-primary-500 font-sans text-b-2 text-white font-semibold hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 mt-1">
+                        Complete Registration
+                    </button>
+                    
+                    {{-- Helper Text --}}
+                    <p class="font-sans text-b-3 text-neutral-600 text-center">
+                        You can update this later from your profile
+                    </p>
                 </form>
             </div>
-
-            <!-- Helper Text -->
-            <p class="text-center text-b-2 text-neutral-600 mt-6">
-                You can update this information later from your profile settings
-            </p>
         </div>
+
     </div>
 
     <script>
@@ -233,13 +223,13 @@
         function updateSelectedDisplay() {
             if (selectedSkills.size === 0) {
                 selectedSkillsContainer.innerHTML =
-                    '<span class="text-b-2 text-neutral-500">No skills selected yet. Add skills below.</span>';
+                    '<span class="font-sans text-b-3 text-neutral-500">No skills selected yet</span>';
             } else {
                 selectedSkillsContainer.innerHTML = '';
                 selectedSkills.forEach(skill => {
                     const badge = document.createElement('span');
                     badge.className =
-                        'inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-3 py-1.5 rounded-md text-b-2 font-medium';
+                        'inline-flex items-center gap-2 bg-primary-100 text-primary-700 px-3 py-1 rounded-md font-sans text-b-3 font-medium';
                     badge.innerHTML = `
                         ${skill.name}
                         <button type="button" class="hover:text-primary-900 transition-colors" onclick="removeSkill('${skill.id}', '${skill.type}')">

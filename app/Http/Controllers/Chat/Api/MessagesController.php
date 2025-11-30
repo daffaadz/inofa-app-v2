@@ -275,7 +275,17 @@ class MessagesController extends Controller
     public function search(Request $request)
     {
         $input = trim(filter_var($request['input']));
-        $records = User::where('id', '!=', Auth::user()->id)
+        
+        // Get user IDs that have conversations with the authenticated user
+        $conversationUserIds = DB::table('conversation_participants as cp1')
+            ->join('conversation_participants as cp2', 'cp1.conversation_id', '=', 'cp2.conversation_id')
+            ->where('cp1.user_id', Auth::user()->id)
+            ->where('cp2.user_id', '!=', Auth::user()->id)
+            ->distinct()
+            ->pluck('cp2.user_id');
+        
+        // Search only from users who have had conversations with the authenticated user
+        $records = User::whereIn('id', $conversationUserIds)
             ->where('name', 'LIKE', "%{$input}%")
             ->paginate($request->per_page ?? $this->perPage);
 

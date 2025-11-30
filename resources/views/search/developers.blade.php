@@ -497,9 +497,9 @@
             });
         }
 
-        // Submit search form (your existing function)
+        // Submit search form
         function submitSearchForm() {
-            document.getElementById('searchForm').submit();
+            document.getElementById('developer-search-form').submit();
         }
     </script>
 </x-app-layout>

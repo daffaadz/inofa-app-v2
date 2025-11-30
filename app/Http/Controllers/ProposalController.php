@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 
 class ProposalController extends Controller
@@ -20,6 +21,7 @@ class ProposalController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'to_id' => 'required|exists:users,id',
+            'project_id' => 'nullable|exists:projects,id',
         ]);
 
         if ($validator->fails()) {
@@ -27,6 +29,7 @@ class ProposalController extends Controller
         }
 
         $toUserId = $request->to_id;
+        $projectId = $request->project_id;
 
         if (Auth::user()->role !== 'developer') {
             return redirect()->back()->with('error', 'Only developers can create proposals');
@@ -34,7 +37,11 @@ class ProposalController extends Controller
 
         $client = User::findOrFail($toUserId);
         $project = null;
-        $projectId = null;
+        
+        // Load project if project_id is provided
+        if ($projectId) {
+            $project = \App\Models\Project::find($projectId);
+        }
 
         return view('proposals.create', compact('client', 'project', 'toUserId', 'projectId'));
     }
@@ -46,6 +53,7 @@ class ProposalController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'to_id' => 'required|exists:users,id',
+            'project_id' => 'nullable|exists:projects,id',
             'project_title' => 'required|string|max:255',
             'client_name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -82,6 +90,7 @@ class ProposalController extends Controller
 
             // 1. Create Project Agreement
             $agreement = ProjectAgreement::create([
+                'project_id' => $request->project_id,
                 'project_title' => $request->project_title,
                 'consumer_id' => $toUserId,
                 'developer_id' => Auth::id(),
@@ -99,27 +108,17 @@ class ProposalController extends Controller
                 'milestones' => null,
             ]);
 
-            // 2. Buat attachment virtual untuk proposal
-            $attachmentId = (string) \Illuminate\Support\Str::uuid();
-            $attachmentData = json_encode([
-                'new' => true,
-                'id' => $attachmentId,
-                'type' => 'proposal',
-                'title' => $request->project_title,
-                'file' => null,
-                'agreement_id' => $agreement->id,
-            ]);
-
             // 3. Generate Chat Message dengan attachment proposal
             $message = ChMessage::create([
                 'from_id' => Auth::id(),
                 'to_id' => $toUserId,
                 'body' => null, // Kosongkan body karena pakai attachment
-                'attachment' => $attachmentData,
+                'attachment' => null,
                 'seen' => 0,
                 'project_agreement_id' => $agreement->id,
                 'metadata' => json_encode([
                     'type' => 'proposal',
+                    'project_id' => $request->project_id,
                     'project_title' => $request->project_title,
                     'client_name' => $request->client_name,
                     'final_price' => $request->final_price,
@@ -168,31 +167,184 @@ class ProposalController extends Controller
         }
     }
 
+    /**
+     * Show proposal detail
+     */
+    public function show($agreementId)
+    {
+        $agreement = ProjectAgreement::with(['developer.developerProfile', 'project'])
+            ->findOrFail($agreementId);
+        
+        // Check authorization
+        if ($agreement->consumer_id !== Auth::id()) {
+            abort(403, 'You are not authorized to view this proposal');
+        }
+
+        return view('proposals.show', compact('agreement'));
+    }
+
+    /**
+     * Quick apply - Send automatic message to project owner
+     */
+    public function quickApply(Request $request, $projectId)
+    {
+        DB::beginTransaction();
+        try {
+            // Verify user is a developer
+            if (Auth::user()->role !== 'developer') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only developers can apply to projects'
+                ], 403);
+            }
+
+            // Get project
+            $project = \App\Models\Project::findOrFail($projectId);
+            
+            // Check if already applied
+            $existingApplication = ProjectAgreement::where('project_id', $projectId)
+                ->where('developer_id', Auth::id())
+                ->first();
+            
+            if ($existingApplication) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already applied to this project'
+                ], 400);
+            }
+
+            // Create automatic message
+            $developerName = Auth::user()->name;
+            $projectTitle = $project->title;
+            $messageBody = "Hello, I'm {$developerName} and I'm interested in discussing your project titled '{$projectTitle}'. I would love to learn more about your requirements and how I can contribute to making this project successful. Looking forward to hearing from you!";
+
+            // Create chat message
+            $message = ChMessage::create([
+                'from_id' => Auth::id(),
+                'to_id' => $project->consumer_id,
+                'body' => $messageBody,
+                'attachment' => null,
+                'seen' => 0,
+            ]);
+
+            // Create project agreement as "interested"
+            $agreement = ProjectAgreement::create([
+                'project_id' => $project->id,
+                'project_title' => $project->title,
+                'consumer_id' => $project->consumer_id,
+                'developer_id' => Auth::id(),
+                'client_name' => $project->consumer->name,
+                'final_price' => 0,
+                'start_date' => now(),
+                'end_date' => now()->addDays(30),
+                'status' => ProjectAgreement::STATUS_PENDING,
+                'description' => 'Quick apply - awaiting proposal details',
+                'terms' => 'To be discussed',
+                'scope_projects' => 'To be discussed',
+            ]);
+
+            // Real-time notification via Pusher
+            if (config('chatify.pusher.enabled')) {
+                Chatify::push("private-chatify.{$project->consumer_id}", 'messaging', [
+                    'from_id' => Auth::id(),
+                    'to_id' => $project->consumer_id,
+                    'message' => $messageBody
+                ]);
+            }
+
+            // Database notification
+            \App\Models\UserNotification::create([
+                'user_id' => $project->consumer_id,
+                'type' => 'project_application',
+                'title' => 'New Project Application',
+                'message' => Auth::user()->name . ' is interested in your project: ' . $project->title,
+                'data' => json_encode([
+                    'project_id' => $project->id,
+                    'agreement_id' => $agreement->id,
+                    'from_user_id' => Auth::id(),
+                ]),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Application sent successfully! Your interest message has been delivered to the project owner.',
+                'redirect_url' => route('user', ['id' => $project->consumer_id])
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Quick apply failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send application: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function accept(Request $request, $agreementId)
     {
         DB::beginTransaction();
         try {
+            Log::info('Accept proposal request', ['agreementId' => $agreementId, 'userId' => Auth::id()]);
+            
             $agreement = ProjectAgreement::with('developer')->findOrFail($agreementId);
-            if (!$agreement->isPending()) throw new \Exception('This proposal can no longer be processed');
-            if ($agreement->consumer_id !== Auth::id()) throw new \Exception('You are not authorized to accept this proposal');
+            Log::info('Agreement found', ['agreement' => $agreement->toArray()]);
+            
+            if (!$agreement->isPending()) {
+                Log::warning('Proposal not pending', ['status' => $agreement->status]);
+                throw new \Exception('This proposal can no longer be processed');
+            }
+            
+            if ($agreement->consumer_id !== Auth::id()) {
+                Log::warning('Unauthorized access', ['consumer_id' => $agreement->consumer_id, 'user_id' => Auth::id()]);
+                throw new \Exception('You are not authorized to accept this proposal');
+            }
 
             $agreement->update([
                 'status' => ProjectAgreement::STATUS_ACCEPTED,
                 'signed_at' => now(),
             ]);
+            Log::info('Agreement updated');
+
+            // Update project status to in_progress if project_id exists
+            if ($agreement->project_id) {
+                $project = \App\Models\Project::find($agreement->project_id);
+                if ($project) {
+                    $project->update(['status' => 'in_progress']);
+                    Log::info('Project status updated to in_progress', ['project_id' => $project->id]);
+                }
+            }
 
             $message = ChMessage::where('project_agreement_id', $agreementId)->first();
             if ($message) {
-                $metadata = json_decode($message->metadata, true);
+                // metadata and attachment are already arrays (casted by model)
+                $metadata = $message->metadata ?? [];
                 $metadata['status'] = 'accepted';
-                $message->update(['metadata' => json_encode($metadata)]);
+                $message->metadata = $metadata;
 
                 // Update attachment juga
                 if ($message->attachment) {
-                    $attachment = json_decode($message->attachment, true);
+                    $attachment = is_array($message->attachment) ? $message->attachment : json_decode($message->attachment, true);
                     $attachment['status'] = 'accepted';
-                    $message->update(['attachment' => json_encode($attachment)]);
+                    $message->attachment = $attachment;
                 }
+                
+                $message->save();
+                Log::info('Message metadata updated');
+            }
+
+            // Send notification to developer
+            try {
+                $agreement->developer->notify(new \App\Notifications\ProposalStatusUpdated($agreement, Auth::user()));
+                Log::info('Notification sent');
+            } catch (\Exception $e) {
+                Log::error('Notification failed', ['error' => $e->getMessage()]);
+                // Continue even if notification fails
             }
 
             \App\Models\UserNotification::create([
@@ -202,12 +354,29 @@ class ProposalController extends Controller
                 'message' => 'Your proposal has been accepted by ' . Auth::user()->name,
                 'data' => json_encode(['agreement_id' => $agreement->id]),
             ]);
+            Log::info('User notification created');
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Proposal successfully accepted', 'data' => ['agreement_id' => $agreement->id, 'status' => 'accepted']]);
+            Log::info('Transaction committed');
+            
+            return response()->json([
+                'success' => true, 
+                'message' => 'Proposal successfully accepted', 
+                'data' => [
+                    'agreement_id' => $agreement->id, 
+                    'status' => 'accepted'
+                ]
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            Log::error('Accept proposal failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false, 
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
@@ -234,6 +403,9 @@ class ProposalController extends Controller
                     $message->update(['attachment' => json_encode($attachment)]);
                 }
             }
+
+            // Send notification to developer
+            $agreement->developer->notify(new \App\Notifications\ProposalStatusUpdated($agreement, Auth::user()));
 
             \App\Models\UserNotification::create([
                 'user_id' => $agreement->developer_id,

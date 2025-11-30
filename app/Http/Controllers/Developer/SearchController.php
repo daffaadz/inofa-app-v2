@@ -21,17 +21,21 @@ class SearchController extends Controller
         $maxBudget = $request->get('max_budget');
         $category = $request->get('category');
         $location = $request->get('location');
+        $experience = $request->get('experience');
         $skills = $request->get('skills', []);
         $sortBy = $request->get('sort_by', 'most_recent');
         $perPage = $request->get('per_page', 10);
 
         /** ----------------------------------------
-         * 1️⃣ Base Query - Open Projects Only
+         * 1️⃣ Base Query - Open Projects Only (exclude in_progress)
          * ---------------------------------------- */
-        $query = Project::where('status', 'open')->with([
+        $query = Project::where('status', 'open')
+            ->whereNotIn('status', ['in_progress', 'completed', 'cancelled'])
+            ->withCount('offers')
+            ->with([
             'consumer:id,name,avatar,location',
             'skills' => function ($q) {
-                $q->select('skills.id', 'skills.name');
+                $q->select('skills.id', 'skills.name')->withPivot('required_level');
             },
         ]);
 
@@ -46,6 +50,23 @@ class SearchController extends Controller
                         $s->where('name', 'LIKE', "%{$keyword}%");
                     });
             });
+        }
+
+        /** ----------------------------------------
+         * 3️⃣ Filter by Experience Level (calculated from required_level)
+         * Beginner: avg 1-2, Intermediate: avg 2.1-3.5, Advance: avg 3.6-4.5, Expert: avg 4.6-5
+         * ---------------------------------------- */
+        if ($experience && $experience !== 'all') {
+            $levelRanges = $this->getExperienceLevelRange($experience);
+            
+            if ($levelRanges) {
+                $query->whereIn('id', function ($subQuery) use ($levelRanges) {
+                    $subQuery->select('project_id')
+                        ->from('project_skills')
+                        ->groupBy('project_id')
+                        ->havingRaw('AVG(required_level) >= ? AND AVG(required_level) <= ?', $levelRanges);
+                });
+            }
         }
 
         /** ----------------------------------------
@@ -103,8 +124,8 @@ class SearchController extends Controller
                 $query->orderBy('deadline');
                 break;
 
-            case 'most_applicants':
-                $query->withCount('offers')->orderByDesc('offers_count');
+            case 'most_proposals':
+                $query->orderByDesc('offers_count');
                 break;
 
             case 'most_recent':
@@ -140,7 +161,26 @@ class SearchController extends Controller
         /** ----------------------------------------
          * 1️⃣2️⃣ Return View
          * ---------------------------------------- */
-        return view('search.projects', compact('projects', 'categories', 'locations', 'allSkills', 'keyword', 'minBudget', 'maxBudget', 'category', 'location', 'skills', 'sortBy'));
+        return view('search.projects', compact('projects', 'categories', 'locations', 'allSkills', 'keyword', 'minBudget', 'maxBudget', 'category', 'location', 'experience', 'skills', 'sortBy'));
+    }
+
+    /**
+     * Helper method to get experience level range
+     */
+    private function getExperienceLevelRange($experience)
+    {
+        switch ($experience) {
+            case 'beginner':
+                return [1, 2];
+            case 'intermediate':
+                return [2.01, 3.5];
+            case 'advance':
+                return [3.51, 4.5];
+            case 'expert':
+                return [4.51, 5];
+            default:
+                return null;
+        }
     }
 
     /**
@@ -152,18 +192,13 @@ class SearchController extends Controller
         $project = Project::where('status', 'open')
             ->with([
                 'consumer' => function ($q) {
-                    $q->select('id', 'name', 'avatar', 'location', 'created_at')->withCount('projects');
+                    $q->select('id', 'name', 'avatar', 'location', 'created_at')->withCount('postedProjects');
                 },
-                'skills',
-                'offers' => function ($q) {
-                    $q->select('id', 'project_id', 'status')->whereIn('status', ['pending', 'accepted']);
-                },
-            ])
-            ->withCount([
-                'offers as total_applicants' => function ($q) {
-                    $q->where('status', 'pending');
+                'skills' => function ($q) {
+                    $q->select('skills.id', 'skills.name')->withPivot('required_level');
                 },
             ])
+            ->withCount('offers')
             ->findOrFail($id);
 
         // Check if current user already applied
@@ -171,7 +206,7 @@ class SearchController extends Controller
         $userOffer = null;
 
         if (Auth::check() && Auth::user()->role === 'developer') {
-            $userOffer = $project->offers()->where('user_id', Auth::id())->first();
+            $userOffer = $project->agreements()->where('developer_id', Auth::id())->first();
             $hasApplied = $userOffer !== null;
         }
 
@@ -182,6 +217,7 @@ class SearchController extends Controller
                 $q->whereIn('skills.id', $project->skills->pluck('id'));
             })
             ->with('consumer:id,name,avatar', 'skills')
+            ->withCount('offers')
             ->limit(4)
             ->latest()
             ->get();

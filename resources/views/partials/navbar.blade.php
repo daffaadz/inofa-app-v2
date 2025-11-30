@@ -173,8 +173,8 @@
         <div class="flex items-center md:w-2/5 gap-2">
 
             {{-- Search --}}
-            <div class="hidden lg:flex flex-1 max-w-xl mx-4 items-center">
-                <form action="#" method="GET" class="relative w-full">
+            <div class="hidden lg:flex flex-1 max-w-xl mx-4 items-center" x-data="searchComponent()">
+                <div class="relative w-full">
                     {{-- Search icon --}}
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 pointer-events-none"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -183,12 +183,21 @@
                     </svg>
 
                     {{-- input --}}
-                    <input type="text" name="q" placeholder="Search"
+                    <input type="text" 
+                        x-model="query"
+                        @keydown.enter="performSearch()"
+                        placeholder="Search"
                         class="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-300
                       font-sans text-b-3 text-neutral-700
                       placeholder:text-neutral-400
                       focus:outline-none focus:ring-1 focus:ring-primary-500">
-                </form>
+                    
+                    {{-- Search hint --}}
+                    <div x-show="query.length > 0" 
+                         class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">
+                        Press Enter to search
+                    </div>
+                </div>
             </div>
 
             {{-- Auth --}}
@@ -209,3 +218,26 @@
 
 {{-- Alpine CDN (drop-in, no bundle) --}}
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+{{-- Search Component for Guest --}}
+<script>
+    function searchComponent() {
+        return {
+            query: '',
+            
+            performSearch() {
+                const searchQuery = this.query.trim();
+                
+                if (searchQuery.length === 0) {
+                    return;
+                }
+                
+                // Guest/default mengarah ke developers
+                const searchUrl = '{{ route("search.developers") }}';
+                
+                // Redirect ke halaman search dengan query parameter
+                window.location.href = searchUrl + '?q=' + encodeURIComponent(searchQuery);
+            }
+        }
+    }
+</script>

@@ -32,10 +32,24 @@
             My Projects
         </x-sidebar-link>
 
+        {{-- Proposals (Developer Only) --}}
+        @if(Auth::user()->role === 'developer')
+            <x-sidebar-link :href="route('developer.proposals.index')" :active="request()->routeIs('developer.proposals.*')" icon="proposals" description="My proposals">
+                Proposals
+            </x-sidebar-link>
+        @endif
+
+        {{-- Proposals (Consumer Only) --}}
+        @if(Auth::user()->role === 'consumer')
+            <x-sidebar-link :href="route('consumer.proposals.index')" :active="request()->routeIs('consumer.proposals.*')" icon="proposals" description="Review proposals">
+                Proposals
+            </x-sidebar-link>
+        @endif
+
         {{-- Notifikasi --}}
-        <x-sidebar-link :href="route('landing')" :active="request()->routeIs('notifications.index')" icon="notifikasi" description="All notifications">
+        {{-- <x-sidebar-link :href="route('landing')" :active="request()->routeIs('notifications.index')" icon="notifikasi" description="All notifications">
             Notifikasi
-        </x-sidebar-link>
+        </x-sidebar-link> --}}
 
         {{-- Chat --}}
         <x-sidebar-link :href="route('chat')" :active="request()->is('chat*')" icon="chat" description="Messages">

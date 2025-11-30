@@ -6,13 +6,11 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Conversation;
-use App\Models\Offer;
-use App\Policies\OfferPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        Offer::class => OfferPolicy::class,
+        // Add policies here if needed
     ];
 
     public function boot(): void

@@ -40,11 +40,6 @@
                             <div class="messenger-favorites app-scroll-hidden"></div>
                         </div>
 
-                        {{-- Saved Messages --}}
-                        <p class="messenger-title px-6 py-2 text-b-3 text-neutral-500 font-semibold"><span>Your
-                                Space</span></p>
-                        {!! view('Chatify::layouts.listItem', ['get' => 'saved']) !!}
-
                         {{-- All Messages --}}
                         <p class="messenger-title px-6 py-2 text-b-3 text-neutral-500 font-semibold"><span>All
                                 Messages</span></p>
@@ -63,7 +58,7 @@
             </div>
 
             {{-- Chat Messages Area (Right Panel) --}}
-            <div class="flex-1 flex flex-col messenger-messagingView">
+            <div class="relative flex-1 flex flex-col messenger-messagingView">
 
                 {{-- Chat Header --}}
                 <div class="px-6 py-4 bg-white border-b border-neutral-100 m-header m-header-messaging">
@@ -73,18 +68,18 @@
                             <div>
                                 <a href="#"
                                     class="user-name text-b-1 font-semibold text-neutral-900">{{ config('chatify.name') }}</a>
-                                <p class="text-b-3 text-neutral-500">Online</p>
+                                <p class="text-b-3 text-neutral-500 conversation-title-display">
+                                    @if(!$conversation)
+                                        No conversation
+                                    @else
+                                        {{ $conversation->title ?? 'No conversation title' }}
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button class="add-to-favorite p-2 hover:bg-neutral-50 rounded-lg transition">
-                                <i class="fas fa-star text-neutral-400"></i>
-                            </button>
-                            <a href="/" class="p-2 hover:bg-neutral-50 rounded-lg transition">
-                                <i class="fas fa-home text-neutral-400"></i>
-                            </a>
                             <button class="show-infoSide p-2 hover:bg-neutral-50 rounded-lg transition">
-                                <i class="fas fa-ellipsis-vertical text-neutral-400"></i>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-auto text-neutral-500" fill="currentColor" viewBox="0 0 256 256"><path d="M112,60a16,16,0,1,1,16,16A16,16,0,0,1,112,60Zm16,52a16,16,0,1,0,16,16A16,16,0,0,0,128,112Zm0,68a16,16,0,1,0,16,16A16,16,0,0,0,128,180Z"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -96,6 +91,9 @@
                         <span class="ic-noInternet">No internet access</span>
                     </div>
                 </div>
+
+                {{-- Project Topic Banner --}}
+                @include('Chatify::layouts.projectTopicBanner')
 
                 {{-- Messages Container --}}
                 <div class="flex-1 overflow-y-auto bg-neutral-10 p-6 m-body messages-container app-scroll">
@@ -126,16 +124,15 @@
             </div>
 
             {{-- Info Sidebar (Hidden by default) --}}
-            <div class="messenger-infoView app-scroll w-80 bg-white border-l border-neutral-100 overflow-y-auto"
-                style="display: none;">
+            <div class="messenger-infoView app-scroll w-80 bg-white border-l border-neutral-100 overflow-y-auto absolute right-0 bottom-0 top-0 mt-16" style="display: none;">
                 <div class="px-6 py-6">
                     <div class="flex items-center justify-between mb-6">
-                        <p class="text-h-6">User Details</p>
-                        <button class="text-neutral-400 hover:text-neutral-600">
+                        <p class="text-h-6">Details</p>
+                        <button class="hide-infoSide text-neutral-400 hover:text-neutral-600 transition">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    {!! view('Chatify::layouts.info')->render() !!}
+                    {!! view('Chatify::layouts.info', ['conversation' => $conversation ?? null])->render() !!}
                 </div>
             </div>
         </div>

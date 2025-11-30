@@ -2,18 +2,18 @@
     <x-slot:title>Complete Your Payment - Inofa</x-slot:title>
 
     <section class="min-h-screen flex">
-        @include('partials.consumer-sidebar')
+        @include('partials.global-sidebar')
 
-        <main class="flex-1 ml-[18rem] p-8 bg-neutral-50">
+        <main class="flex-1 ml-[18rem] mt-16 p-8 bg-neutral-50">
 
             {{-- TOP BACK LINK --}}
-            <a href="{{ route('consumer.payments.offer-detail', $agreement->id) }}"
-               class="flex items-center text-neutral-600 mb-6 text-sm">
+            <a href="javascript:history.back()"
+               class="flex items-center text-neutral-600 mb-6 text-sm hover:text-neutral-800 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M15 19l-7-7 7-7" />
                 </svg>
-                Back to Offer Detail
+                Back to Previous
             </a>
 
             {{-- TITLE --}}
@@ -110,7 +110,7 @@
                         <h3 class="font-semibold mb-4">Project Summary</h3>
 
                         <p class="text-sm text-neutral-600">Project</p>
-                        <p class="font-medium mb-3">{{ $project->title }}</p>
+                        <p class="font-medium mb-3">{{ $agreement->project_title }}</p>
 
                         <p class="text-sm text-neutral-600">Developer</p>
                         <p class="font-medium mb-3">{{ $developer->name }}</p>

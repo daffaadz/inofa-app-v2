@@ -1309,6 +1309,11 @@ $(document).ready(function () {
     $(".messenger-infoView").toggle();
   });
 
+  // hide info side button
+  $("body").on("click", ".hide-infoSide", function () {
+    $(".messenger-infoView").hide();
+  });
+
   // make favorites card dragable on click to slide.
   hScroller(".messenger-favorites");
 

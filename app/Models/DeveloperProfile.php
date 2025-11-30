@@ -29,6 +29,8 @@ class DeveloperProfile extends Model
         'rating_average',
         'rating_count',
         'projects_completed',
+        'profile_view_count',
+        'last_viewed_at',
     ];
 
     protected $casts = [
@@ -36,6 +38,8 @@ class DeveloperProfile extends Model
         'rate_max_byproject' => 'float',
         'rating_average'     => 'float',
         'portfolio_links'    => 'array',
+        'education'          => 'array',
+        'last_viewed_at'     => 'datetime',
     ];
 
     public function user()
@@ -53,5 +57,14 @@ class DeveloperProfile extends Model
             'user_id',      // FK di developer_profiles
             'skill_id'      // FK di skill_user
         );
+    }
+
+    /**
+     * Increment profile view count
+     */
+    public function incrementViewCount(): void
+    {
+        $this->increment('profile_view_count');
+        $this->update(['last_viewed_at' => now()]);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\Message;
+use App\Models\ChMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -13,7 +13,7 @@ class NewMessageNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
-    public function __construct(public Message $message) {}
+    public function __construct(public ChMessage $message) {}
 
     public function via($notifiable)
     {

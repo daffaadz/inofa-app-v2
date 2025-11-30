@@ -224,7 +224,11 @@ class ProjectController extends Controller
         // Hapus data dari session setelah berhasil disimpan
         session()->forget(['project.details', 'project.skills', 'project.budget', 'project.requirements']);
 
-        return redirect()->route('dashboard')->with('success', 'Project created successfully!');
+        return response()->json([
+            'status' => true,
+            'message' => 'Project created successfully!',
+            'data' => $project->load('skills'),
+        ]);
     }
 
     /**

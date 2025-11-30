@@ -86,7 +86,9 @@
                             </div>
                             <p class="text-b-1 text-neutral-600 mb-1">Active Projects</p>
                             <p class="text-h-3 font-bold text-neutral-900 mb-4">{{ $activeAgreements->count() }}</p>
-                            <p class="text-b-3 text-primary-500">+2 from last month</p>
+                            <p class="text-b-3 {{ $activeProjectsIncrease >= 0 ? 'text-primary-500' : 'text-red-500' }}">
+                                {{ $activeProjectsIncrease >= 0 ? '+' : '' }}{{ $activeProjectsIncrease }} from last month
+                            </p>
                         </div>
 
                         <!-- Total Earnings -->
@@ -114,12 +116,14 @@
                             </div>
                             <p class="text-b-1 text-primary-700 mb-1">Total Earnings</p>
                             <p class="text-h-3 font-bold text-primary-900 mb-4">Rp.{{ number_format($earnings, 0) }}</p>
-                            <p class="text-b-3 text-primary-600">+Rp.2,100 this month</p>
+                            <p class="text-b-3 {{ $earningsIncrease >= 0 ? 'text-primary-600' : 'text-red-600' }}">
+                                {{ $earningsIncrease >= 0 ? '+' : '' }}Rp.{{ number_format(abs($earningsIncrease), 0) }} this month
+                            </p>
                         </div>
 
-                        <!-- Pending Inquiries -->
-                        <div
-                            class="bg-white rounded-2xl border border-neutral-200 p-6 relative overflow-hidden hover:shadow-lg transition">
+                        <!-- Pending/Accepted Proposals -->
+                        <a href="{{ route('developer.proposals.index') }}"
+                            class="bg-white rounded-2xl border border-neutral-200 p-6 relative overflow-hidden hover:shadow-lg transition cursor-pointer group">
                             <div class="flex items-center justify-between mb-2">
                                 {{-- left --}}
                                 <svg class="w-14 h-auto" viewBox="0 0 48 48" fill="none"
@@ -146,13 +150,13 @@
 
                                 {{-- right --}}
                                 <span
-                                    class="px-4 py-2 bg-blue-100 text-blue-600 text-b-3 font-medium rounded-xl">{{ __('New') }}</span>
+                                    class="px-4 py-2 bg-blue-100 text-blue-600 text-b-3 font-medium rounded-xl group-hover:bg-blue-200 transition">{{ __('View All') }}</span>
                             </div>
-                            <p class="text-b-1 text-neutral-600 mb-1">Pending Inquiries</p>
+                            <p class="text-b-1 text-neutral-600 mb-1">Pending/Accepted Proposals</p>
                             <p class="text-h-3 font-bold text-neutral-900 mb-4">
-                                {{ $myOffers->where('status', 'pending')->count() }}</p>
-                            <p class="text-b-3 text-blue-500">Respond quickly to win!</p>
-                        </div>
+                                {{ $myAgreements->whereIn('status', ['pending', 'accepted'])->count() }}</p>
+                            <p class="text-b-3 text-blue-500">Click to view all proposals</p>
+                        </a>
 
                         <!-- Profile Views -->
                         <div
@@ -194,7 +198,9 @@
                             </div>
                             <p class="text-b-1 text-neutral-600 mb-1">Profile Views</p>
                             <p class="text-h-3 font-bold text-neutral-900 mb-4">{{ $profileViews }}</p>
-                            <p class="text-b-3 text-yellow-600">+127 this week</p>
+                            <p class="text-b-3 {{ $profileViewsIncrease >= 0 ? 'text-yellow-600' : 'text-red-600' }}">
+                                {{ $profileViewsIncrease >= 0 ? '+' : '' }}{{ $profileViewsIncrease }} this week
+                            </p>
                         </div>
 
                     </div>
@@ -225,12 +231,24 @@
                                     <!-- Left Content -->
                                     <div class="flex-1">
                                         <div class="flex items-start gap-3 mb-3">
-                                            <img src="{{ $agreement->consumer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($agreement->consumer->name) }}"
+                                            @php
+                                                $avatarSrc = $agreement->consumer->getRawOriginal('avatar')
+                                                    ? (filter_var($agreement->consumer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                        ? $agreement->consumer->getRawOriginal('avatar')
+                                                        : asset('storage/' . $agreement->consumer->getRawOriginal('avatar')))
+                                                    : 'https://ui-avatars.com/api/?name=' . urlencode($agreement->consumer->name);
+                                            @endphp
+                                            <img src="{{ $avatarSrc }}"
                                                 alt="{{ $agreement->consumer->name }}"
                                                 class="w-10 h-10 rounded-full object-cover">
                                             <div>
                                                 <h3 class="text-b-1 font-semibold text-neutral-900">
-                                                    {{ $agreement->project->title }}</h3>
+                                                    @if($agreement->project)
+                                                        {{ $agreement->project->title }}
+                                                    @else
+                                                        {{ $agreement->project_title }}
+                                                    @endif
+                                                </h3>
                                                 <p class="text-b-3 text-neutral-600">Client:
                                                     {{ $agreement->consumer->name }}</p>
                                             </div>
@@ -240,13 +258,13 @@
                                         <div class="mb-3">
                                             <div class="flex items-center justify-between mb-1">
                                                 <span class="text-b-3 text-neutral-600">Progress:
-                                                    {{ $agreement->project->progress ?? 65 }}%</span>
+                                                    {{ ($agreement->project && $agreement->project->progress) ? $agreement->project->progress : 0 }}%</span>
                                                 <span class="text-b-3 text-neutral-600">Next:
-                                                    {{ $agreement->milestones[0]['name'] ?? 'Homepage redesign' }}</span>
+                                                    {{ $agreement->milestones[0]['name'] ?? 'TBD' }}</span>
                                             </div>
                                             <div class="w-full bg-neutral-200 rounded-full h-2">
                                                 <div class="bg-primary-500 h-2 rounded-full transition-all"
-                                                    style="width: {{ $agreement->project->progress ?? 65 }}%"></div>
+                                                    style="width: {{ ($agreement->project && $agreement->project->progress) ? $agreement->project->progress : 0 }}%"></div>
                                             </div>
                                         </div>
 

@@ -172,8 +172,8 @@
         <div class="flex items-center justify-end md:w-2/5 gap-2">
 
             {{-- Search --}}
-            <div class="hidden lg:flex flex-1 max-w-sm mx-4 items-center">
-                <form action="#" method="GET" class="relative w-full">
+            <div class="hidden lg:flex flex-1 max-w-sm mx-4 items-center" x-data="searchComponent()">
+                <div class="relative w-full">
                     {{-- Search icon --}}
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500 pointer-events-none"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -182,12 +182,24 @@
                     </svg>
 
                     {{-- input --}}
-                    <input type="text" name="q" placeholder="Search"
+                    <input type="text" 
+                        x-model="query"
+                        @input="handleInput()"
+                        @keydown.enter="performSearch()"
+                        @focus="showResults = true"
+                        @click.away="showResults = false"
+                        placeholder="Search"
                         class="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-300
                       font-sans text-b-3 text-neutral-800
                       placeholder:text-neutral-400
                       focus:outline-none focus:ring-1 focus:ring-primary-500">
-                </form>
+                    
+                    {{-- Search hint/instruction --}}
+                    <div x-show="query.length > 0 && !showResults" 
+                         class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs">
+                        Press Enter to search
+                    </div>
+                </div>
             </div>
 
             {{-- User Menu --}}
@@ -235,24 +247,13 @@
                                 Dashboard
                             </a>
 
-                            <a href="{{ route('landing') }}"
+                            <a href="{{ route('profile.edit') }}"
                                 class="flex items-center gap-3 px-4 py-3 text-neutral-800 hover:bg-neutral-10 font-sans text-b-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                                 My Profile
-                            </a>
-
-                            <a href="{{ route('landing') }}"
-                                class="flex items-center gap-3 px-4 py-3 text-neutral-800 hover:bg-neutral-10 font-sans text-b-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Settings
                             </a>
                         </div>
 
@@ -280,3 +281,50 @@
 
 {{-- Alpine CDN (drop-in, no bundle) --}}
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+{{-- Search Component --}}
+<script>
+    function searchComponent() {
+        return {
+            query: '',
+            showResults: false,
+            searchTimeout: null,
+            
+            handleInput() {
+                // Clear previous timeout
+                clearTimeout(this.searchTimeout);
+                
+                // Reset untuk tidak auto-search, hanya menunggu user tekan Enter
+                // Bisa ditambahkan live suggestions di sini jika diperlukan
+            },
+            
+            performSearch() {
+                const searchQuery = this.query.trim();
+                
+                if (searchQuery.length === 0) {
+                    return;
+                }
+                
+                // Deteksi role user
+                @auth
+                    const userRole = '{{ Auth::user()->role ?? "guest" }}';
+                @else
+                    const userRole = 'guest';
+                @endauth
+                
+                let searchUrl = '';
+                
+                // Tentukan URL berdasarkan role
+                if (userRole === 'developer') {
+                    searchUrl = '{{ route("search.projects") }}';
+                } else {
+                    // customer atau guest mengarah ke developers
+                    searchUrl = '{{ route("search.developers") }}';
+                }
+                
+                // Redirect ke halaman search dengan query parameter
+                window.location.href = searchUrl + '?q=' + encodeURIComponent(searchQuery);
+            }
+        }
+    }
+</script>

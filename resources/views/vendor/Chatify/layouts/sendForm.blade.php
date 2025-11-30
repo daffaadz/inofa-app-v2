@@ -13,14 +13,6 @@
                 accept=".{{ implode(', .', config('chatify.attachments.allowed_images')) }}, .{{ implode(', .', config('chatify.attachments.allowed_files')) }}" />
         </label>
 
-        {{-- Tambahkan di area chat header atau action buttons --}}
-        @if (auth()->user()->role === 'developer')
-            <a href="{{ route('proposals.create', ['to_id' => $id, 'project_id' => request('project_id')]) }}"
-                class="btn btn-success btn-sm hover:bg-primary-200 rounded-xl px-3 py-2">
-                <i class="fas fa-file-contract me-1"></i>
-            </a>
-        @endif
-
         {{-- Message Input --}}
         <div
             class="flex-1 bg-neutral-10 rounded-2xl border border-neutral-200 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-100 transition overflow-hidden">

@@ -28,7 +28,8 @@ class ProfileUpdateRequest extends FormRequest
             'location' => ['nullable', 'string', 'max:255'],
             'bio' => ['nullable', 'string', 'max:500'],
             'job_title' => ['nullable', 'string', 'max:255'],
-            'hourly_rate' => ['nullable', 'numeric', 'min:0'],
+            'rate_min' => ['nullable', 'numeric', 'min:0'],
+            'rate_max' => ['nullable', 'numeric', 'min:0', 'gte:rate_min'],
             'experience_years' => ['nullable', 'integer', 'min:0', 'max:50'],
             'experience' => ['nullable', 'string'],
         ];

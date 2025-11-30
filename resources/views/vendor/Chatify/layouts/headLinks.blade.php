@@ -25,17 +25,6 @@
 {{-- Setting messenger primary color to css --}}
 <style>
     :root {
-        --primary-color: {{ $messengerColor }};
+        --primary-color: #108a00;
     }
-
-    /* CSS PROPOSAL CARD */
-    .proposal-message { margin: 15px 10px; }
-    .proposal-message .card { max-width: 500px; border-radius: 12px; overflow: hidden; }
-    .proposal-message.owner .card { margin-left: auto; }
-    .proposal-message.client .card { margin-right: auto; }
-    .proposal-message .icon-wrapper { width: 35px; height: 35px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .proposal-message .card-header { font-size: 14px; }
-    .proposal-message .alert { font-size: 13px; padding: 10px 12px; margin-bottom: 10px; }
-    .proposal-message .btn { font-size: 14px; font-weight: 500; }
-    .proposal-message .text-sm { font-size: 0.875rem; }
 </style>

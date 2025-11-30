@@ -118,7 +118,7 @@
                                 {{-- Indicator Line --}}
                                 <div
                                     class="absolute left-0 top-0 bottom-0 w-1 
-                                    {{ $agreement->status === 'active' ? 'bg-green-500' : ($agreement->status === 'completed' ? 'bg-blue-500' : 'bg-yellow-500') }}">
+                                    {{ $agreement->status === 'active' ? 'bg-green-500' : ($agreement->status === 'completed' ? 'bg-blue-500' : ($agreement->status === 'accepted' ? 'bg-orange-500' : 'bg-yellow-500')) }}">
                                 </div>
 
                                 <div class="flex justify-between items-start mb-4 pl-2">
@@ -130,11 +130,18 @@
                                                     ? 'bg-green-100 text-green-700'
                                                     : ($agreement->status === 'completed'
                                                         ? 'bg-blue-100 text-blue-700'
-                                                        : 'bg-yellow-100 text-yellow-700') }}">
-                                                {{ str_replace('_', ' ', $agreement->status) }}
+                                                        : ($agreement->status === 'accepted'
+                                                            ? 'bg-orange-100 text-orange-700'
+                                                            : 'bg-yellow-100 text-yellow-700')) }}">
+                                                {{ $agreement->status === 'accepted' ? 'Waiting for Payment' : str_replace('_', ' ', $agreement->status) }}
                                             </span>
                                             <span class="text-xs text-neutral-400">Contract
                                                 #{{ substr($agreement->id, 0, 8) }}</span>
+                                            @if($agreement->project)
+                                                <span class="text-sm text-primary-600 font-medium">• {{ $agreement->project->title }}</span>
+                                            @else
+                                                <span class="text-sm text-neutral-500 italic">• New Project</span>
+                                            @endif
                                         </div>
                                         <h3
                                             class="text-h-6 font-bold text-neutral-900 group-hover:text-primary-600 transition">
@@ -142,7 +149,7 @@
                                         </h3>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-b-2 font-bold text-neutral-900">
+                                        <p class="text-h-7 font-bold text-neutral-900">
                                             Rp{{ number_format($agreement->final_price, 0, ',', '.') }}
                                         </p>
                                         <p class="text-xs text-neutral-500">Agreed Price</p>
@@ -157,24 +164,34 @@
 
                                 <div class="pl-2 flex items-center justify-between pt-4 border-t border-neutral-100">
                                     <!-- Developer Info -->
-                                    <div class="flex items-center gap-3">
-                                        @if ($agreement->developer)
+                                    @if ($agreement->developer)
+                                        <a href="{{ route('user', ['id' => $agreement->developer->id]) }}" 
+                                            class="flex items-center gap-3 hover:bg-neutral-50 rounded-lg px-3 py-2 -mx-3 -my-2 transition group/dev">
                                             <img src="{{ $agreement->developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($agreement->developer->name) }}"
-                                                class="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-sm">
+                                                class="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-sm group-hover/dev:ring-primary-200 transition">
                                             <div>
-                                                <p class="text-b-3 font-bold text-neutral-900">
+                                                <p class="text-b-3 font-bold text-neutral-900 group-hover/dev:text-primary-600 transition">
                                                     {{ $agreement->developer->name }}</p>
-                                                <p class="text-xs text-neutral-500">Developer</p>
+                                                <p class="text-xs text-neutral-500">{{ $agreement->developer->developerProfile->headline ?? 'Developer' }}</p>
                                             </div>
-                                        @else
+                                        </a>
+                                    @else
+                                        <div class="flex items-center gap-3">
                                             <span class="text-xs text-neutral-400">Developer account deleted</span>
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
 
-                                    <a href="#"
-                                        class="px-4 py-2 bg-neutral-900 text-white text-b-3 font-medium rounded-lg hover:bg-neutral-800 transition">
-                                        Manage Work
-                                    </a>
+                                    @if ($agreement->status === 'accepted')
+                                        <a href="{{ route('consumer.payments.create', $agreement->id) }}"
+                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition">
+                                            Go to Payment
+                                        </a>
+                                    @else
+                                        <a href="#"
+                                            class="px-4 py-2 bg-neutral-900 text-white text-b-3 font-medium rounded-lg hover:bg-neutral-800 transition">
+                                            Manage Work
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -200,7 +217,7 @@
                                         </h3>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-b-2 font-bold text-neutral-900">
+                                        <p class="text-h-7 font-bold text-neutral-900">
                                             Rp{{ number_format($project->budget, 0, ',', '.') }}
                                         </p>
                                         <p class="text-xs text-neutral-500">Est. Budget</p>
@@ -240,10 +257,16 @@
                                             Proposals</span>
                                     </div>
 
-                                    <a href="{{ route('consumer.project.show', $project->id) }}"
-                                        class="px-4 py-2 border border-neutral-200 text-neutral-700 text-b-3 font-medium rounded-lg hover:bg-neutral-50 hover:border-neutral-300 transition">
-                                        View Proposals
-                                    </a>
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('consumer.project.show', $project->id) }}"
+                                            class="px-4 py-2 bg-white border border-neutral-200 text-neutral-700 text-b-3 font-medium rounded-lg hover:bg-neutral-50 hover:border-neutral-300 transition">
+                                            View Project
+                                        </a>
+                                        <a href="{{ route('consumer.proposals.index', ['project' => $project->id]) }}"
+                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition">
+                                            View Proposals
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach

@@ -41,14 +41,14 @@ class Project extends Model
                     ->withTimestamps();
     }
 
-    public function offers()
-    {
-        return $this->hasMany(Offer::class);
-    }
-
     public function agreement()
     {
         return $this->hasOne(ProjectAgreement::class);
+    }
+
+    public function agreements()
+    {
+        return $this->hasMany(ProjectAgreement::class);
     }
 
     public function reviews()
@@ -59,5 +59,11 @@ class Project extends Model
     public function conversations()
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    // Alias untuk compatibility dengan code yang menggunakan 'offers'
+    public function offers()
+    {
+        return $this->agreements();
     }
 }

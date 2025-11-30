@@ -7,8 +7,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\RedirectAfterLoginController;
 use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
 use App\Http\Controllers\Developer\SearchController as SearchProjects;
+use App\Http\Controllers\Developer\SkillController;
 use App\Http\Controllers\PortfolioController;
-use App\Http\Controllers\SkillController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -51,11 +51,19 @@ Route::middleware('auth')->group(function () {
     // Avatar update route
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
 
+    // Availability update route (for developers)
+    Route::post('/profile/availability', [ProfileController::class, 'updateAvailability'])->name('profile.availability.update');
+
     // Skills routes (for developers only)
     Route::middleware('role:developer')->group(function () {
+        Route::get('/profile/skills/search', [SkillController::class, 'search'])->name('skills.search');
         Route::post('/profile/skills', [SkillController::class, 'store'])->name('skills.store');
         Route::delete('/profile/skills/{skill}', [SkillController::class, 'destroy'])->name('skills.destroy');
         Route::patch('/profile/skills/{skill}/proficiency', [SkillController::class, 'updateProficiency'])->name('skills.proficiency');
+
+        // Education routes
+        Route::post('/profile/education', [ProfileController::class, 'storeEducation'])->name('education.store');
+        Route::delete('/profile/education/{index}', [ProfileController::class, 'destroyEducation'])->name('education.destroy');
 
         // Portfolio routes
         Route::post('/profile/portfolios', [PortfolioController::class, 'store'])->name('portfolios.store');
@@ -109,13 +117,15 @@ Route::middleware(['auth'])->group(function () {
             ->name('proposals.create');
         Route::post('/proposals', [ProposalController::class, 'store'])
             ->name('proposals.store');
+        Route::post('/projects/{project}/quick-apply', [ProposalController::class, 'quickApply'])
+            ->name('projects.quick-apply');
     });
 
     // Client (consumer) yang bisa accept/reject
     Route::middleware(['role:consumer'])->group(function () {
-        Route::post('/proposals/{offer}/accept', [ProposalController::class, 'accept'])
+        Route::post('/proposals/{agreementId}/accept', [ProposalController::class, 'accept'])
             ->name('proposals.accept');
-        Route::post('/proposals/{offer}/reject', [ProposalController::class, 'reject'])
+        Route::post('/proposals/{agreementId}/reject', [ProposalController::class, 'reject'])
             ->name('proposals.reject');
     });
 });
@@ -127,7 +137,6 @@ Route::get('/chat/admin', function () {
 
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;
-use App\Http\Controllers\Developer\OfferController as DevOffer;
 use App\Http\Controllers\Developer\ProjectController as DevProject;
 use App\Http\Controllers\Developer\EarningsController as DevEarnings;
 use App\Http\Controllers\Developer\SearchController as DevSearch;
@@ -140,11 +149,9 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
     Route::get('/agreements/{agreement}', [DevAgreement::class, 'show'])
         ->name('agreements.show');
 
-    /* ---------- My Offers (penawaran saya) ---------- */
-    Route::get('/offers', [DevOffer::class, 'index'])
-        ->name('offers.index');
-    Route::delete('/offers/{offer}', [DevOffer::class, 'destroy'])
-        ->name('offers.destroy');   // withdraw
+    /* ---------- Proposals (pending / accepted) ---------- */
+    Route::get('/proposals', [DevAgreement::class, 'proposals'])
+        ->name('proposals.index');
 
     /* ---------- Browse Open Projects ---------- */
     Route::get('/projects', [DevProject::class, 'index'])
@@ -176,6 +183,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
 use App\Http\Controllers\Customer\ProjectController as CustProject;
 use App\Http\Controllers\Customer\AgreementDetailController as AgreementDetail;
 use App\Http\Controllers\Customer\CheckoutController as PaymentCheckout;
+use App\Http\Controllers\Customer\ProposalsController;
 
 Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function () {
     Route::resource('project', CustProject::class);
@@ -187,7 +195,7 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
 
     /* ---------- Agreement Detail & Payment Detail ---------- */
     Route::get('/agreements/{agreement}', [AgreementDetail::class, 'show'])
-        ->name('payments.offer-detail');
+        ->name('payments.agreement-detail');
 
     // payment flow
     Route::get('/payments/create/{agreement}', [PaymentCheckout::class, 'create'])->name('payments.create');
@@ -195,6 +203,9 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
 
     Route::post('/payments/checkout/{payment}', [PaymentCheckout::class, 'checkout'])->name('payments.checkout');
     Route::post('/payments/confirm/{payment}', [PaymentCheckout::class, 'confirm'])->name('payments.confirm');
+
+    /* ---------- Proposals Management ---------- */
+    Route::get('/proposals', [ProposalsController::class, 'index'])->name('proposals.index');
 
     // Additional custom routes (must be registered manually)
     Route::post('project/store-details',     [CustProject::class, 'storeDetails'])->name('project.storeDetails');
@@ -263,7 +274,12 @@ Route::group([
     Route::post('/updateSettings', [MessagesController::class, 'updateSettings'])->name('avatar.update');
     Route::post('/setActiveStatus', [MessagesController::class, 'setActiveStatus'])->name('activeStatus.set');
 
-    // 15. Specific User/Group Routes (Harus ditaruh di akhir karena wildcard {id})
+    // 15. Update Project Topic & Conversation Title
+    Route::post('/update-project-topic/{conversationId}', [MessagesController::class, 'updateProjectTopic'])->name('chat.updateProjectTopic');
+    Route::post('/update-conversation-title/{conversationId}', [MessagesController::class, 'updateConversationTitle'])->name('chat.updateConversationTitle');
+    Route::post('/send-agreement-request/{conversationId}', [MessagesController::class, 'sendAgreementRequest'])->name('chat.sendAgreementRequest');
+
+    // 16. Specific User/Group Routes (Harus ditaruh di akhir karena wildcard {id})
     Route::get('/group/{id}', [MessagesController::class, 'index'])->name('group');
     Route::get('/{id}', [MessagesController::class, 'index'])->name('user');
 });

@@ -30,6 +30,12 @@
                             </div>
                         @endif
 
+                        @if(isset($projectId) && $projectId)
+                        <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg mb-4">
+                            Project ID: {{ $projectId }} @if(isset($project)) - {{ $project->title ?? 'N/A' }} @endif
+                        </div>
+                        @endif
+
                         @if ($errors->any())
                             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
                                 <ul class="list-disc list-inside space-y-1">
@@ -40,9 +46,13 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('proposals.store') }}" method="POST" id="proposalForm">
+                        <form action="{{ route('proposals.store') }}"
+                            method="POST" id="proposalForm">
                             @csrf
                             <input type="hidden" name="to_id" value="{{ $toUserId }}">
+                            @if(isset($projectId) && $projectId)
+                            <input type="hidden" name="project_id" value="{{ $projectId }}">
+                            @endif
 
                             <div class="bg-white rounded-xl border border-neutral-100 p-6 mb-4">
                                 <div class="flex items-center gap-3 mb-6">
@@ -638,5 +648,16 @@
 
         startDateInput.addEventListener('change', updateTimelinePreview);
         endDateInput.addEventListener('change', updateTimelinePreview);
+
+        // Debug: Log form data sebelum submit
+        document.getElementById('proposalForm').addEventListener('submit', function(e) {
+            const formData = new FormData(this);
+            console.log('=== FORM DATA DEBUG ===');
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ':', value);
+            }
+            console.log('project_id from hidden input:', document.querySelector('input[name="project_id"]')?.value);
+            // e.preventDefault(); // Uncomment untuk mencegah submit saat debug
+        });
     });
 </script>

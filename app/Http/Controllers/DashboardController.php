@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\Offer;
 use App\Models\ProjectAgreement;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
@@ -52,18 +51,17 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         $projects = Project::where('consumer_id', $user->id)
-            ->with([
-                'skills',
-                'offers' => function ($query) {
-                    $query->where('status', 'pending');
-                }
-            ])
-            ->withCount('offers')
+            ->whereNotIn('status', ['in_progress', 'completed'])
+            ->with('skills')
+            ->withCount(['agreements as offers_count' => function ($query) {
+                $query->where('status', 'pending');
+            }])
             ->latest()
             ->get();
 
         $agreements = ProjectAgreement::where('consumer_id', $user->id)
-            ->with('developer')
+            ->where('status', '!=', 'pending')
+            ->with(['developer', 'project'])
             ->latest()
             ->get();
 
@@ -101,15 +99,14 @@ class DashboardController extends Controller
         // 1. Available open projects (with consumer info)
         $availableProjects = Project::with('consumer')
             ->where('status', 'open')
-            ->whereDoesntHave('offers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
+            ->whereDoesntHave('agreement')
             ->latest()
             ->take(10)
             ->get();
 
-        // 2. My offers (with project details)
-        $myOffers = Offer::where('user_id', $user->id)
+        // 2. My pending/submitted agreements (replace offers)
+        $myAgreements = ProjectAgreement::where('developer_id', $user->id)
+            ->whereIn('status', ['pending', 'accepted'])
             ->with('project.consumer')
             ->latest()
             ->get();
@@ -128,20 +125,70 @@ class DashboardController extends Controller
             ->where('admin_transferred', true)
             ->sum('amount');
 
-        // 5. Pending offers count
-        $pendingOffers = $myOffers->where('status', 'pending')->count();
+        // 4.1 Monthly earnings calculation
+        $currentMonthStart = now()->startOfMonth();
+        $lastMonthStart = now()->subMonth()->startOfMonth();
+        $lastMonthEnd = now()->subMonth()->endOfMonth();
 
-        // 6. Profile views (you can implement analytics later)
-        // For now, use a dummy or query from analytics table if exists
-        $profileViews = 1247; // Replace with actual analytics query
+        $currentMonthEarnings = Payment::whereHas('agreement', function ($query) use ($user) {
+            $query->where('developer_id', $user->id);
+        })
+            ->where('status', 'transferred')
+            ->where('admin_transferred', true)
+            ->where('admin_transferred_at', '>=', $currentMonthStart)
+            ->sum('amount');
+
+        $lastMonthEarnings = Payment::whereHas('agreement', function ($query) use ($user) {
+            $query->where('developer_id', $user->id);
+        })
+            ->where('status', 'transferred')
+            ->where('admin_transferred', true)
+            ->whereBetween('admin_transferred_at', [$lastMonthStart, $lastMonthEnd])
+            ->sum('amount');
+
+        $earningsIncrease = $currentMonthEarnings - $lastMonthEarnings;
+
+        // 4.2 Active projects increase calculation
+        $currentMonthActiveProjects = ProjectAgreement::where('developer_id', $user->id)
+            ->where('status', 'active')
+            ->where('start_date', '>=', $currentMonthStart)
+            ->count();
+
+        $lastMonthActiveProjects = ProjectAgreement::where('developer_id', $user->id)
+            ->where('status', 'active')
+            ->whereBetween('start_date', [$lastMonthStart, $lastMonthEnd])
+            ->count();
+
+        $activeProjectsIncrease = $currentMonthActiveProjects - $lastMonthActiveProjects;
+
+        // 5. Pending agreements count
+        $pendingAgreements = $myAgreements->where('status', 'pending')->count();
+
+        // 6. Profile views from developer_profiles
+        $profileViews = $user->developerProfile->profile_view_count ?? 0;
+        
+        // 6.1 Weekly profile views calculation
+        $currentWeekStart = now()->startOfWeek();
+        
+        // Get total views from last week by checking last_viewed_at timestamps
+        // This is an approximation - for accurate weekly tracking, you'd need a separate views log table
+        // For now, we'll calculate based on the assumption that views are relatively consistent
+        $profileViewsIncrease = 0; // Placeholder - will need proper weekly tracking
+        
+        // Alternative: If you want to estimate weekly increase
+        // You could track daily average and multiply by 7, but this requires historical data
+        // For now, keeping it simple with total count only
 
         return view('dashboard.developer.index', compact(
             'availableProjects',
-            'myOffers',
+            'myAgreements',
             'activeAgreements',
             'earnings',
-            'pendingOffers',
+            'earningsIncrease',
+            'activeProjectsIncrease',
+            'pendingAgreements',
             'profileViews',
+            'profileViewsIncrease',
             'user'
         ));
     }

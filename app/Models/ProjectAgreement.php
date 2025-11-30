@@ -13,6 +13,7 @@ class ProjectAgreement extends Model
 
     protected $fillable = [
         'id',
+        'project_id',
         'project_title',
         'consumer_id',
         'developer_id',
@@ -68,6 +69,11 @@ class ProjectAgreement extends Model
     /**
      * Relationships
      */
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'project_id');
+    }
+
     public function consumer()
     {
         return $this->belongsTo(User::class, 'consumer_id');

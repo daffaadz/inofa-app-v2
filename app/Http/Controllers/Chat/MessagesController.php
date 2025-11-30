@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Response;
 use App\Models\User;
 use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
+use App\Models\Project;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +39,60 @@ class MessagesController extends Controller
     }
 
     /**
+     * Get or create conversation between two users
+     */
+    protected function getOrCreateConversation($userId1, $userId2, $projectId = null)
+    {
+        // Find existing conversation between these two users
+        $conversation = Conversation::whereHas('participants', function ($query) use ($userId1) {
+                $query->where('user_id', $userId1);
+            })
+            ->whereHas('participants', function ($query) use ($userId2) {
+                $query->where('user_id', $userId2);
+            })
+            ->whereDoesntHave('participants', function ($query) use ($userId1, $userId2) {
+                $query->whereNotIn('user_id', [$userId1, $userId2]);
+            })
+            ->first();
+
+        if (!$conversation) {
+            // Determine conversation type based on user roles
+            $user1 = User::find($userId1);
+            $user2 = User::find($userId2);
+            
+            $type = 'private'; // default
+            if (($user1->role === 'consumer' && $user2->role === 'developer') ||
+                ($user1->role === 'developer' && $user2->role === 'consumer')) {
+                $type = 'project';
+            }
+
+            // Create new conversation
+            $conversation = Conversation::create([
+                'type' => $type,
+                'project_id' => $projectId,
+                'title' => 'New conversation',
+                'is_active' => true,
+                'last_message_at' => now(),
+            ]);
+
+            // Add participants
+            $conversation->participants()->attach($userId1, [
+                'role' => 'participant',
+                'joined_at' => now(),
+                'is_active' => true,
+            ]);
+
+            $conversation->participants()->attach($userId2, [
+                'role' => 'participant',
+                'joined_at' => now(),
+                'is_active' => true,
+            ]);
+        }
+
+        return $conversation;
+    }
+
+    /**
      * Returning the view of the app with the required data.
      *
      * @param int $id
@@ -44,10 +101,35 @@ class MessagesController extends Controller
     public function index($id = null)
     {
         $messenger_color = Auth::user()->messenger_color;
+        
+        // Get or create conversation
+        $conversation = null;
+        $currentProject = null;
+        $userProjects = collect();
+        
+        if ($id) {
+            $conversation = $this->getOrCreateConversation(Auth::id(), $id);
+            
+            // Get current project from conversation
+            if ($conversation->project_id) {
+                $currentProject = Project::find($conversation->project_id);
+            }
+            
+            // Get all user's projects if consumer
+            if (Auth::user()->role === 'consumer') {
+                $userProjects = Project::where('consumer_id', Auth::id())
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            }
+        }
+        
         return view('Chatify::pages.app', [
             'id' => $id ?? 0,
             'messengerColor' => $messenger_color ? $messenger_color : Chatify::getFallbackColor(),
             'dark_mode' => Auth::user()->dark_mode < 1 ? 'light' : 'dark',
+            'conversation' => $conversation,
+            'currentProject' => $currentProject,
+            'userProjects' => $userProjects,
         ]);
     }
 
@@ -131,10 +213,16 @@ class MessagesController extends Controller
         }
 
         if (!$error->status) {
+            // Check or create conversation between from_id and to_id
+            $fromId = Auth::user()->id;
+            $toId = $request['id'];
+            
+            $conversation = $this->getOrCreateConversation($fromId, $toId);
+
             // Send to DB
             $message = Chatify::newMessage([
-                'from_id' => Auth::user()->id,
-                'to_id' => $request['id'],
+                'from_id' => $fromId,
+                'to_id' => $toId,
                 'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
                 'attachment' => ($attachment) ? json_encode((object)[
                     'new_name' => $attachment,
@@ -149,7 +237,10 @@ class MessagesController extends Controller
             $meta = $message->metadata;
             $messageData['metadata'] = is_string($meta) ? json_decode($meta, true) : $meta;
 
-            // 3. Push ke Pusher (Realtime)
+            // 3. INJEKSI: project_agreement_id dari database
+            $messageData['project_agreement_id'] = $message->project_agreement_id;
+
+            // 4. Push ke Pusher (Realtime)
             if (Auth::user()->id != $request['id']) {
                 Chatify::push("private-chatify." . $request['id'], 'messaging', [
                     'from_id' => Auth::user()->id,
@@ -208,7 +299,10 @@ class MessagesController extends Controller
             $meta = $message->metadata;
             $msgData['metadata'] = is_string($meta) ? json_decode($meta, true) : $meta;
 
-            // 3. Render Card
+            // 3. INJEKSI: project_agreement_id dari database
+            $msgData['project_agreement_id'] = $message->project_agreement_id;
+
+            // 4. Render Card
             $allMessages .= Chatify::messageCard($msgData);
         }
 
@@ -351,9 +445,20 @@ class MessagesController extends Controller
     {
         $getRecords = null;
         $input = trim(filter_var($request['input']));
-        $records = User::where('id', '!=', Auth::user()->id)
+        
+        // Get user IDs that have conversations with the authenticated user
+        $conversationUserIds = DB::table('conversation_participants as cp1')
+            ->join('conversation_participants as cp2', 'cp1.conversation_id', '=', 'cp2.conversation_id')
+            ->where('cp1.user_id', Auth::user()->id)
+            ->where('cp2.user_id', '!=', Auth::user()->id)
+            ->distinct()
+            ->pluck('cp2.user_id');
+        
+        // Search only from users who have had conversations with the authenticated user
+        $records = User::whereIn('id', $conversationUserIds)
             ->where('name', 'LIKE', "%{$input}%")
             ->paginate($request->per_page ?? $this->perPage);
+            
         foreach ($records->items() as $record) {
             $getRecords .= view('Chatify::layouts.listItem', [
                 'get' => 'search_item',
@@ -499,5 +604,236 @@ class MessagesController extends Controller
         return Response::json([
             'status' => $status,
         ], 200);
+    }
+
+    /**
+     * Update project topic for chat session
+     *
+     * @param Request $request
+     * @param int $conversationId
+     * @return JsonResponse
+     */
+    public function updateProjectTopic(Request $request, $conversationId)
+    {
+        try {
+            // Only consumer can change project topic
+            if (Auth::user()->role !== 'consumer') {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'Only consumers can change project topics'
+                ], 403);
+            }
+
+            $conversation = Conversation::findOrFail($conversationId);
+            
+            // Check if user is a participant
+            $isParticipant = $conversation->participants()
+                ->where('user_id', Auth::id())
+                ->exists();
+            
+            if (!$isParticipant) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'You are not a participant in this conversation'
+                ], 403);
+            }
+
+            $projectId = $request->input('project_id');
+            
+            // Update conversation's project_id
+            $conversation->update([
+                'project_id' => $projectId
+            ]);
+
+            $project = null;
+            if ($projectId) {
+                $project = Project::find($projectId);
+            }
+
+            return Response::json([
+                'success' => true,
+                'message' => 'Project topic updated successfully',
+                'project' => $project ? [
+                    'id' => $project->id,
+                    'title' => $project->title,
+                    'description' => $project->description
+                ] : null
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Conversation not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Failed to update project topic',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update conversation title
+     *
+     * @param Request $request
+     * @param int $conversationId
+     * @return JsonResponse
+     */
+    public function updateConversationTitle(Request $request, $conversationId)
+    {
+        try {
+            // Only consumer can update conversation title
+            if (Auth::user()->role !== 'consumer') {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'Only consumers can update conversation title'
+                ], 403);
+            }
+
+            $request->validate([
+                'title' => 'nullable|string|max:255'
+            ]);
+
+            $conversation = Conversation::findOrFail($conversationId);
+            
+            // Check if user is a participant in this conversation
+            $isParticipant = $conversation->participants()
+                ->where('user_id', Auth::id())
+                ->exists();
+            
+            if (!$isParticipant) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'You are not a participant in this conversation'
+                ], 403);
+            }
+
+            $conversation->update([
+                'title' => $request->input('title')
+            ]);
+
+            return Response::json([
+                'success' => true,
+                'message' => 'Conversation title updated successfully',
+                'title' => $conversation->title ?? 'No conversation title'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Conversation not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Failed to update conversation title',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Send agreement request message to developer
+     *
+     * @param Request $request
+     * @param int $conversationId
+     * @return JsonResponse
+     */
+    public function sendAgreementRequest(Request $request, $conversationId)
+    {
+        try {
+            // Only consumer can request agreement
+            if (Auth::user()->role !== 'consumer') {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'Only consumers can request agreements'
+                ], 403);
+            }
+
+            $conversation = Conversation::findOrFail($conversationId);
+            
+            // Check if user is a participant
+            $isParticipant = $conversation->participants()
+                ->where('user_id', Auth::id())
+                ->exists();
+            
+            if (!$isParticipant) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'You are not a participant in this conversation'
+                ], 403);
+            }
+
+            // Get the developer (other participant)
+            $developerParticipant = ConversationParticipant::where('conversation_id', $conversationId)
+                ->where('user_id', '!=', Auth::id())
+                ->first();
+
+            if (!$developerParticipant) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'Developer not found in conversation'
+                ], 404);
+            }
+
+            $developerId = $developerParticipant->user_id;
+            $customerId = Auth::id();
+            $projectId = $conversation->project_id;
+            
+            // Create message with metadata containing the agreement button
+            $metadata = [
+                'type' => 'agreement_request',
+                'project_id' => $projectId,
+                'to_id' => $customerId,
+                'button_text' => 'Buat Agreement',
+            ];
+
+            $messageBody = $request->input('message', 'Saya ingin meminta Anda untuk membuat agreement formal untuk proyek ini.');
+
+            // Save message to database
+            $message = Chatify::newMessage([
+                'from_id' => Auth::user()->id,
+                'to_id' => $developerId,
+                'body' => htmlentities(trim($messageBody), ENT_QUOTES, 'UTF-8'),
+                'attachment' => null,
+            ]);
+
+            // Update message with metadata
+            $message->update([
+                'metadata' => json_encode($metadata)
+            ]);
+
+            // Parse message data
+            $messageData = Chatify::parseMessage($message);
+            $messageData['metadata'] = $metadata;
+            $messageData['project_agreement_id'] = $message->project_agreement_id;
+
+            // Push to Pusher for realtime
+            if (Auth::user()->id != $developerId) {
+                Chatify::push("private-chatify." . $developerId, 'messaging', [
+                    'from_id' => Auth::user()->id,
+                    'to_id' => $developerId,
+                    'message' => Chatify::messageCard($messageData, true)
+                ]);
+            }
+
+            return Response::json([
+                'success' => true,
+                'message' => 'Agreement request sent successfully',
+                'messageHtml' => Chatify::messageCard($messageData)
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Conversation not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return Response::json([
+                'success' => false,
+                'message' => 'Failed to send agreement request',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

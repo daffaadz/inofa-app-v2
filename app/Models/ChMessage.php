@@ -22,6 +22,7 @@ class ChMessage extends Model
         'body',
         'attachment',
         'seen',
+        'conversation_id',
         'project_agreement_id', 
         'metadata',             
     ];
@@ -30,6 +31,14 @@ class ChMessage extends Model
         'metadata' => 'array',
         'seen' => 'boolean',
     ];
+
+    /**
+     * Relationship dengan conversation
+     */
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class, 'conversation_id');
+    }
 
     /**
      * Relationship dengan sender

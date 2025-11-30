@@ -24,8 +24,8 @@ class CheckoutController extends Controller
             ],
             [
                 'amount' => $agreement->final_price,
-                'status' => 'unpaid',
-                'type' => 'escrow'
+                'status' => 'pending',
+                'type' => 'deposit'
             ]
         );
 
@@ -38,9 +38,8 @@ class CheckoutController extends Controller
         abort_unless($payment->agreement->consumer_id === Auth::id(), 403);
 
         return view('payments.checkout', [
-            'payment' => $payment->load('agreement.project', 'agreement.developer'),
+            'payment' => $payment->load('agreement.developer'),
             'agreement' => $payment->agreement,
-            'project' => $payment->agreement->project,
             'developer' => $payment->agreement->developer,
         ]);
     }
