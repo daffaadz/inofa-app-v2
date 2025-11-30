@@ -47,7 +47,6 @@ use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
 use App\Http\Controllers\Developer\SearchController as SearchProjects;
 use App\Http\Controllers\Developer\SkillController;
 use App\Http\Controllers\PortfolioController;
-use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('landing');
