@@ -1,9 +1,47 @@
 <?php
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\ComplainController;
+use App\Http\Controllers\Admin\AgreementValidationController;
+
+Route::middleware(['web','auth','role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+    // Dashboard export
+    Route::get('/export', [DashboardController::class, 'export'])->name('export');
+
+    /* ---------------- USERS ---------------- */
+    Route::get('/users',                [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{id}',           [UserController::class, 'show'])->name('users.show');
+    Route::post('/users/{id}/suspend',  [UserController::class, 'suspend'])->name('users.suspend');
+    Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
+
+    /* ---------------- PROJECTS ---------------- */
+    Route::get('/projects',              [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/{id}',         [ProjectController::class, 'show'])->name('projects.show');
+    Route::post('/projects/{id}/approve',[ProjectController::class, 'approve'])->name('projects.approve');
+    Route::post('/projects/{id}/reject', [ProjectController::class, 'reject'])->name('projects.reject');
+
+    /* ---------------- PAYMENTS ---------------- */
+    Route::get('/payments/{id}',         [PaymentController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{id}/approve',[PaymentController::class, 'approve'])->name('payments.approve');
+    Route::post('/payments/{id}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
+
+    /* ---------------- COMPLAINTS ---------------- */
+    Route::get('/complains', [ComplainController::class, 'index'])->name('complains.index');
+    Route::get('/complains/{id}', [ComplainController::class, 'show'])->name('complains.show');
+
+});
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Auth\RegistrationFlowController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\RedirectAfterLoginController;
 use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
 use App\Http\Controllers\Developer\SearchController as SearchProjects;
