@@ -1714,3 +1714,172 @@ function updateElementsDateToTimeAgo() {
 setInterval(() => {
   updateElementsDateToTimeAgo();
 }, 60000);
+
+/**
+ *-------------------------------------------------------------
+ * Complaint Modal Functionality
+ *-------------------------------------------------------------
+ */
+// Open complaint modal when button is clicked
+$(document).on('click', '.open-complaint-modal', function(e) {
+  e.preventDefault();
+  // Reset form before opening
+  $('#complaint-form')[0].reset();
+  $('#complaint-description').val('');
+  $('#char-count').text('0 / 10 karakter minimum').removeClass('text-red-500').addClass('text-neutral-600');
+  $('#description-error').addClass('hidden').text('');
+  $('#terms-error').addClass('hidden').text('');
+  $('#submit-complaint-btn').prop('disabled', true);
+  
+  app_modal({ name: 'complaint', show: true });
+});
+
+// Close complaint modal when X button is clicked
+$(document).on('click', '.close-complaint-modal', function(e) {
+  e.preventDefault();
+  app_modal({ name: 'complaint', show: false });
+});
+
+// Close complaint modal when Cancel button is clicked
+$(document).on('click', '.cancel-complaint-btn', function(e) {
+  e.preventDefault();
+  app_modal({ name: 'complaint', show: false });
+});
+
+// Close modal when clicking outside the modal card
+$('.app-modal[data-name="complaint"]').on('click', function(e) {
+  if ($(e.target).hasClass('app-modal') || $(e.target).hasClass('app-modal-container')) {
+    app_modal({ name: 'complaint', show: false });
+  }
+});
+
+// Character counter for complaint description
+$(document).on('input', '#complaint-description', function() {
+  const length = $(this).val().length;
+  const charCount = $('#char-count');
+  const submitBtn = $('#submit-complaint-btn');
+  const termsChecked = $('#complaint-terms').is(':checked');
+  
+  charCount.text(length + ' / 10 karakter minimum');
+  
+  if (length >= 10) {
+    charCount.removeClass('text-red-500').addClass('text-neutral-600');
+  } else {
+    charCount.removeClass('text-neutral-600').addClass('text-red-500');
+  }
+  
+  // Enable submit only if description is valid AND terms are checked
+  submitBtn.prop('disabled', !(length >= 10 && termsChecked));
+});
+
+// Enable/disable submit button when terms checkbox changes
+$(document).on('change', '#complaint-terms', function() {
+  const termsChecked = $(this).is(':checked');
+  const descriptionLength = $('#complaint-description').val().length;
+  const submitBtn = $('#submit-complaint-btn');
+  
+  submitBtn.prop('disabled', !(descriptionLength >= 10 && termsChecked));
+});
+
+// Handle complaint form submission
+$(document).on('submit', '#complaint-form', function(e) {
+  e.preventDefault();
+  
+  const form = $(this);
+  const submitBtn = $('#submit-complaint-btn');
+  const description = $('#complaint-description').val().trim();
+  const termsAccepted = $('#complaint-terms').is(':checked');
+  
+  // Clear previous errors
+  $('#description-error').addClass('hidden').text('');
+  $('#terms-error').addClass('hidden').text('');
+  
+  // Validation
+  let hasError = false;
+  
+  if (description.length < 10) {
+    $('#description-error').removeClass('hidden').text('Deskripsi pengaduan minimal 10 karakter.');
+    hasError = true;
+  }
+  
+  if (!termsAccepted) {
+    $('#terms-error').removeClass('hidden').text('Anda harus menyetujui syarat dan ketentuan.');
+    hasError = true;
+  }
+  
+  if (hasError) {
+    return false;
+  }
+  
+  // Disable button and show loading
+  submitBtn.prop('disabled', true).html(loadingSVG('20px', '', 'margin: 0 auto'));
+  
+  // Submit via AJAX
+  $.ajax({
+    url: form.attr('action'),
+    method: 'POST',
+    data: form.serialize(),
+    success: function(response) {
+      if (response.success) {
+        // Show success alert
+        app_modal({ name: 'complaint', show: false });
+        app_modal({
+          name: 'alert',
+          show: true,
+          header: 'Berhasil!',
+          body: response.message || 'Pengaduan Anda berhasil dikirim.',
+        });
+        
+        // Reset form
+        form[0].reset();
+        $('#char-count').text('0 / 10 karakter minimum');
+      } else {
+        // Show error alert
+        app_modal({
+          name: 'alert',
+          show: true,
+          header: 'Gagal',
+          body: response.message || 'Terjadi kesalahan saat mengirim pengaduan.',
+        });
+      }
+    },
+    error: function(xhr) {
+      let errorMessage = 'Terjadi kesalahan saat mengirim pengaduan.';
+      
+      if (xhr.responseJSON && xhr.responseJSON.errors) {
+        const errors = xhr.responseJSON.errors;
+        if (errors.description) {
+          $('#description-error').removeClass('hidden').text(errors.description[0]);
+        }
+        if (errors.terms_accepted) {
+          $('#terms-error').removeClass('hidden').text(errors.terms_accepted[0]);
+        }
+      } else if (xhr.responseJSON && xhr.responseJSON.message) {
+        errorMessage = xhr.responseJSON.message;
+      }
+      
+      // Show error if not validation error
+      if (!xhr.responseJSON || !xhr.responseJSON.errors) {
+        app_modal({
+          name: 'alert',
+          show: true,
+          header: 'Gagal',
+          body: errorMessage,
+        });
+      }
+    },
+    complete: function() {
+      // Re-enable button based on validation
+      const descriptionLength = $('#complaint-description').val().length;
+      const termsChecked = $('#complaint-terms').is(':checked');
+      submitBtn.prop('disabled', !(descriptionLength >= 10 && termsChecked)).html('Kirim Pengaduan');
+    }
+  });
+  
+  return false;
+});
+
+// Alert modal [cancel/OK button]
+$('.app-modal[data-name="alert"]').find('.app-btn.cancel').on('click', function() {
+  app_modal({ name: 'alert', show: false });
+});

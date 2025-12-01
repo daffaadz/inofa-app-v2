@@ -1,43 +1,47 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\PaymentController;
-use App\Http\Controllers\Admin\ComplainController;
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\AgreementValidationController;
 
-Route::middleware(['web','auth','role:admin'])
+Route::middleware(['web', 'auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-    // Dashboard export
-    Route::get('/export', [DashboardController::class, 'export'])->name('export');
+        // Dashboard export
+        Route::get('/export', [DashboardController::class, 'export'])->name('export');
 
-    /* ---------------- USERS ---------------- */
-    Route::get('/users',                [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{id}',           [UserController::class, 'show'])->name('users.show');
-    Route::post('/users/{id}/suspend',  [UserController::class, 'suspend'])->name('users.suspend');
-    Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
+        /* ---------------- USERS ---------------- */
+        Route::get('/users',                [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{id}',           [UserController::class, 'show'])->name('users.show');
+        Route::post('/users/{id}/suspend',  [UserController::class, 'suspend'])->name('users.suspend');
+        Route::post('/users/{id}/activate', [UserController::class, 'activate'])->name('users.activate');
 
-    /* ---------------- PROJECTS ---------------- */
-    Route::get('/projects',              [ProjectController::class, 'index'])->name('projects.index');
-    Route::get('/projects/{id}',         [ProjectController::class, 'show'])->name('projects.show');
-    Route::post('/projects/{id}/approve',[ProjectController::class, 'approve'])->name('projects.approve');
-    Route::post('/projects/{id}/reject', [ProjectController::class, 'reject'])->name('projects.reject');
+        /* ---------------- PROJECTS ---------------- */
+        Route::get('/projects',              [ProjectController::class, 'index'])->name('projects.index');
+        Route::get('/projects/{id}',         [ProjectController::class, 'show'])->name('projects.show');
+        Route::post('/projects/{id}/approve', [ProjectController::class, 'approve'])->name('projects.approve');
+        Route::post('/projects/{id}/reject', [ProjectController::class, 'reject'])->name('projects.reject');
 
-    /* ---------------- PAYMENTS ---------------- */
-    Route::get('/payments/{id}',         [PaymentController::class, 'show'])->name('payments.show');
-    Route::post('/payments/{id}/approve',[PaymentController::class, 'approve'])->name('payments.approve');
-    Route::post('/payments/{id}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
+        /* ---------------- PAYMENTS ---------------- */
+        Route::get('/payments/{id}',         [PaymentController::class, 'show'])->name('payments.show');
+        Route::post('/payments/{id}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
+        Route::post('/payments/{id}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
+        Route::post('/payments/{id}/review', [PaymentController::class, 'review'])->name('payments.review');
 
-    /* ---------------- COMPLAINTS ---------------- */
-    Route::get('/complains', [ComplainController::class, 'index'])->name('complains.index');
-    Route::get('/complains/{id}', [ComplainController::class, 'show'])->name('complains.show');
-
-});
+        /* ---------------- COMPLAINTS ---------------- */
+        Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints.index');
+        Route::get('/complaints/{id}', [AdminComplaintController::class, 'show'])->name('complaints.show');
+        Route::get('/complaints/{id}/response', [AdminComplaintController::class, 'response'])->name('complaints.response');
+        Route::patch('/complaints/{id}/resolve', [AdminComplaintController::class, 'resolve'])->name('complaints.resolve');
+        Route::patch('/complaints/{id}/reject', [AdminComplaintController::class, 'reject'])->name('complaints.reject');
+    });
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\SocialAuthController;
@@ -47,6 +51,7 @@ use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
 use App\Http\Controllers\Developer\SearchController as SearchProjects;
 use App\Http\Controllers\Developer\SkillController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\ComplaintController;
 
 Route::get('/', function () {
     return view('landing');
@@ -74,6 +79,13 @@ Route::middleware('auth')
 Route::middleware(['auth'])
     ->get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
+
+// Complaint routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
+    Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('/complaints/{id}', [ComplaintController::class, 'show'])->name('complaints.show');
+});
 
 // Profile Management
 Route::middleware('auth')->group(function () {
@@ -166,11 +178,6 @@ Route::middleware(['auth'])->group(function () {
             ->name('proposals.reject');
     });
 });
-
-// COSTUMER SERVICE ROUTING
-Route::get('/chat/admin', function () {
-    return redirect('/chat?user=admin');
-})->name('chat.admin');
 
 // DEVELOPER ROUTING
 use App\Http\Controllers\Developer\AgreementController as DevAgreement;
@@ -319,4 +326,7 @@ Route::group([
     // 16. Specific User/Group Routes (Harus ditaruh di akhir karena wildcard {id})
     Route::get('/group/{id}', [MessagesController::class, 'index'])->name('group');
     Route::get('/{id}', [MessagesController::class, 'index'])->name('user');
+
+    // COSTUMER SERVICE ROUTING
+    Route::get('/1',[MessagesController::class, 'index'])->name('chat.admin');
 });

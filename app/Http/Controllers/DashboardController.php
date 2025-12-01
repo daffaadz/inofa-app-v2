@@ -7,20 +7,21 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\ProjectAgreement;
 use App\Models\Payment;
-use App\Models\Complaint;
+use App\Models\ProjectDispute;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
         if ($user->isAdmin()) {
-            return $this->adminDashboard();
+            return $this->adminDashboard($request);
         } elseif ($user->isDeveloper()) {
             return $this->developerDashboard();
         } else {
@@ -40,7 +41,7 @@ class DashboardController extends Controller
     
     public function admin(Request $request)
     {
-        return $this->adminDashboard($request, $request->query('tab', 'projects'));
+        return $this->adminDashboard($request);
     }
 
     /**
@@ -196,12 +197,13 @@ class DashboardController extends Controller
 
     /**
      * ADMIN DASHBOARD
+     * Load all data at once for client-side tab switching
      */
-    private function adminDashboard(Request $request, string $tab = 'projects')
+    private function adminDashboard(Request $request)
     {
         $user = Auth::user();
 
-        // ---------- GLOBAL KPI (selalu ada, di bagian atas atau sidebar) ----------
+        // ---------- GLOBAL KPI ----------
         $totalUsers       = User::count();
         $totalDevelopers  = User::where('role', 'developer')->count();
         $totalConsumers   = User::where('role', 'consumer')->count();
@@ -213,70 +215,34 @@ class DashboardController extends Controller
         $totalRevenue     = Payment::whereIn('status', ['confirmed', 'transferred'])
                             ->sum('amount');
 
-        // kalau masih mau pakai:
         $pendingPaymentsGlobal = Payment::where('admin_confirmed', false)
             ->where('status', 'pending')
             ->count();
 
-        // ---------- TAB / SLICING ----------
-        $tab = $request->get('tab', 'projects'); // default: projects
+        // ---------- LOAD ALL DATA ----------
+        // Tab dari request (untuk keperluan default active tab)
+        $tab = $request->get('tab', 'payments');
+        
+        // Global stats untuk summary cards
+        $stats = [
+            'pending_payments'    => Payment::where('status', 'pending')->count(),
+            'confirmed_payments'  => Payment::whereIn('status', ['confirmed', 'transferred'])->count(),
+            'complaints'          => \App\Models\Complaint::count(),
+            'total_users'         => User::where('role', '!=', 'admin')->count(),
+        ];
 
-        // Prepare dataset variables expected by view
+        // Load all payments
+        $payments = Payment::with(['agreement.project', 'agreement.consumer', 'agreement.developer'])
+            ->latest()
+            ->get();
+
+        // Load all complaints
+        $complaints = \App\Models\Complaint::with('user')
+            ->latest()
+            ->get();
+
+        // Projects (jika diperlukan di masa depan)
         $projects = collect();
-        $payments = collect();
-        $complaints = collect();
-
-        switch ($tab) {
-            /* =====================================================
-            * 1) VALIDASI PROYEK
-            * ===================================================== */
-            case 'projects':
-                $projects = Project::with(['consumer', 'agreement.developer'])
-                    ->latest()
-                    ->get();
-
-                $stats = [
-                    'pending'  => Project::where('status', 'pending')->count(),
-                    'progress' => Project::where('status', 'in_progress')->count(),
-                    'approved' => Project::where('status', 'completed')->count(),
-                    'total'    => Project::count(),
-                ];
-                break;
-
-            /* =====================================================
-            * 2) VALIDASI PEMBAYARAN
-            * ===================================================== */
-            case 'payments':
-                $payments = Payment::with(['agreement.project', 'agreement.consumer', 'agreement.developer'])
-                    ->latest()
-                    ->get();
-
-                $stats = [
-                    'pending'  => Payment::where('status', 'pending')->count(),
-                    'progress' => Payment::where('status', 'unpaid')->count(),
-                    'approved' => Payment::where('status', 'confirmed')->count(),
-                    'total'    => Payment::count(),
-                ];
-                break;
-
-            /* =====================================================
-            * 3) KELUHAN PENGGUNA
-            * (sesuaikan model & status)
-            * ===================================================== */
-            case 'complaints':
-                $complaints = Complaint::with('user')->latest()->get();
-
-                $stats = [
-                    'pending'  => Complaint::where('status', 'pending')->count(),
-                    'progress' => Complaint::where('status', 'review')->count(),
-                    'approved' => Complaint::where('status', 'resolved')->count(),
-                    'total'    => Complaint::count(),
-                ];
-                break;
-
-            default:
-                abort(404);
-        }
 
         return view('admin.dashboard', [
             'user'       => $user,
@@ -333,28 +299,37 @@ class DashboardController extends Controller
                 break;
 
             case 'payments':
-                $query = Payment::with(['agreement.project', 'agreement.consumer'])->latest();
+                $query = Payment::with(['agreement.project', 'agreement.consumer', 'agreement.developer']);
+                
                 if ($request->filled('status')) {
                     $query->where('status', $request->string('status'));
                 }
-                if ($request->filled('date_from') || $request->filled('date_to')) {
-                    $from = $request->date('date_from', now()->subYears(10));
-                    $to   = $request->date('date_to', now());
-                    $query->whereBetween('created_at', [$from, $to]);
+                if ($request->filled('payment_type')) {
+                    $query->where('type', $request->string('payment_type'));
                 }
-                if ($request->filled('amount_min')) {
-                    $query->where('amount', '>=', (float)$request->input('amount_min'));
+                if ($request->filled('date_from')) {
+                    $query->where('created_at', '>=', $request->date('date_from'));
                 }
-                if ($request->filled('amount_max')) {
-                    $query->where('amount', '<=', (float)$request->input('amount_max'));
+                if ($request->filled('date_to')) {
+                    $query->where('created_at', '<=', $request->date('date_to')->endOfDay());
                 }
+                
+                // Sorting
+                $sort = $request->get('sort', 'newest');
+                match($sort) {
+                    'oldest' => $query->oldest(),
+                    default => $query->latest(),
+                };
+                
                 $items = $query->get();
-                $headers = ['Project', 'Client', 'Amount', 'Status', 'Date'];
+                $headers = ['Project', 'Client', 'Developer', 'Amount', 'Type', 'Status', 'Date'];
                 $rows = $items->map(function ($pay) {
                     return [
                         optional(optional($pay->agreement)->project)->title,
                         optional(optional($pay->agreement)->consumer)->name,
+                        optional(optional($pay->agreement)->developer)->name,
                         $pay->amount,
+                        $pay->type,
                         $pay->status,
                         optional($pay->created_at)?->toDateTimeString(),
                     ];
@@ -363,34 +338,39 @@ class DashboardController extends Controller
                 break;
 
             case 'complaints':
-                if (!class_exists(\App\Models\Complaint::class)) {
-                    $headers = ['Message'];
-                    $rows = collect([['Complaints module not available']]);
-                    $filename = 'complaints_export_'.now()->format('Ymd_His').'.csv';
-                    break;
+                $query = \App\Models\Complaint::with('user');
+                
+                // Search
+                if ($request->filled('search')) {
+                    $search = $request->string('search');
+                    $query->where(function($q) use ($search) {
+                        $q->where('user_name', 'LIKE', "%{$search}%")
+                          ->orWhere('description', 'LIKE', "%{$search}%")
+                          ->orWhereHas('user', function($q2) use ($search) {
+                              $q2->where('name', 'LIKE', "%{$search}%");
+                          });
+                    });
                 }
-                $query = Complaint::with('user')->latest();
+                
+                // Status filter
                 if ($request->filled('status')) {
                     $query->where('status', $request->string('status'));
                 }
-                if ($request->filled('priority')) {
-                    $query->where('priority', $request->string('priority'));
-                }
-                if ($request->filled('date_from') || $request->filled('date_to')) {
-                    $from = $request->date('date_from', now()->subYears(10));
-                    $to   = $request->date('date_to', now());
-                    $query->whereBetween('created_at', [$from, $to]);
-                }
+                
+                // Default sorting: newest
+                $query->latest();
+                
                 $items = $query->get();
-                $headers = ['User', 'Complainant', 'Category', 'Priority', 'Status', 'Date'];
-                $rows = $items->map(function ($c) {
+                $headers = ['User', 'Email', 'Description', 'Status', 'Admin Response', 'Created At', 'Responded At'];
+                $rows = $items->map(function ($complaint) {
                     return [
-                        optional($c->user)->name,
-                        $c->complainant ?? '',
-                        $c->category ?? '',
-                        $c->priority ?? '',
-                        $c->status ?? '',
-                        optional($c->created_at)?->toDateTimeString(),
+                        $complaint->user_name ?? optional($complaint->user)->name ?? 'Unknown',
+                        optional($complaint->user)->email ?? 'N/A',
+                        substr($complaint->description, 0, 200) . (strlen($complaint->description) > 200 ? '...' : ''),
+                        $complaint->status,
+                        substr($complaint->admin_response ?? 'No response', 0, 100),
+                        optional($complaint->created_at)?->toDateTimeString(),
+                        optional($complaint->responded_at)?->toDateTimeString() ?? 'Not responded',
                     ];
                 });
                 $filename = 'complaints_export_'.now()->format('Ymd_His').'.csv';

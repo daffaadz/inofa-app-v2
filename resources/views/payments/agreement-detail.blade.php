@@ -7,7 +7,7 @@
         {{-- SIDEBAR --}}
         @include('partials.global-sidebar')
 
-        <main class="flex-1 ml-[18rem] mt-16 bg-neutral-10 min-h-screen px-8 py-6">
+        <main class="flex-1 lg:ml-[18rem] mt-16 bg-neutral-10 min-h-screen px-8 py-6">
 
             {{-- Back button --}}
             <a href="javascript:history.back()" class="flex items-center text-neutral-600 hover:text-neutral-800 mb-6 transition">

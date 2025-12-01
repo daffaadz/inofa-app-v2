@@ -29,6 +29,7 @@ class ProjectAgreement extends Model
         'milestones',
         'deliverables',
         'signed_at',
+        'conversation_id',
     ];
 
     protected $casts = [
@@ -92,6 +93,11 @@ class ProjectAgreement extends Model
     public function messages()
     {
         return $this->hasMany(ChMessage::class, 'project_agreement_id');
+    }
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class, 'conversation_id');
     }
 
     /**

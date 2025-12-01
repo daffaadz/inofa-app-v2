@@ -1,11 +1,13 @@
 <x-app-layout>
-    <div class="flex h-screen bg-neutral-10 pt-16">
+    <div class="flex h-screen bg-neutral-10 {{ Auth::user()->role === 'admin' ? '' : 'pt-16' }}">
 
-        {{-- Global Sidebar --}}
-        @include('partials.global-sidebar')
+        {{-- Global Sidebar (only for non-admin users) --}}
+        @if(Auth::user()->role !== 'admin')
+            @include('partials.global-sidebar')
+        @endif
 
         {{-- Main Chat Container --}}
-        <div class="flex flex-1 ml-[18rem]">
+        <div class="flex flex-1 {{ Auth::user()->role === 'admin' ? '' : 'lg:ml-[18rem]' }}">
 
             {{-- Contacts List (Middle Panel) --}}
             <div
@@ -13,8 +15,12 @@
 
                 {{-- Header --}}
                 <div class="m-header px-6 py-6 border-b border-neutral-100">
-                    <h1 class="text-h-4 text-neutral-900 mb-2 messenger-headTitle">Messages</h1>
-                    <p class="text-b-2 text-neutral-500">Communicate with your clients and manage project discussions</p>
+                    <h1 class="text-h-4 text-neutral-900 mb-2 messenger-headTitle">
+                        {{ Auth::user()->role === 'admin' ? 'Complaints' : 'Messages' }}
+                    </h1>
+                    <p class="text-b-2 text-neutral-500">
+                        {{ Auth::user()->role === 'admin' ? 'Review and manage user complaints and reports' : 'Communicate with your clients and manage project discussions' }}
+                    </p>
 
                     {{-- Search Bar --}}
                     <div class="relative mt-4">

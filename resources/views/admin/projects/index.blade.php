@@ -64,16 +64,16 @@
         {{-- PROJECT TABLE --}}
         <div class="bg-white rounded-xl shadow-sm border mt-6 p-4">
             <table class="min-w-full">
-                <thead class="text-xs text-gray-500 uppercase border-b">
+                <thead class="text-xs text-gray-500 uppercase border-b border-secondary-800 bg-secondary-100 rounded-t-lg">
                     <tr>
+                        <th class="py-3 px-2 text-left">Agreement ID</th>
                         <th class="py-3 px-2 text-left">Project</th>
                         <th class="py-3 px-2 text-left">Client</th>
                         <th class="py-3 px-2 text-left">Developer</th>
                         <th class="py-3 px-2 text-left">Budget</th>
                         <th class="py-3 px-2 text-left">Timeline</th>
-                        <th class="py-3 px-2 text-left">Progress</th>
                         <th class="py-3 px-2 text-left">Status</th>
-                        <th class="py-3 px-2 text-left">Action</th>
+                        <th class="py-3 px-2 text-left">Payment Status</th>
                     </tr>
                 </thead>
 
@@ -81,51 +81,57 @@
                     @foreach ($projects as $project)
                         <tr class="hover:bg-gray-50 transition">
 
+                            {{-- AGREEMENT ID --}}
+                            <td class="py-3 px-2">
+                                <div class="font-mono text-xs text-gray-600">{{ $project->short_id }}</div>
+                                <div class="text-xs text-gray-400">{{ substr($project->id, -8) }}</div>
+                            </td>
+
                             {{-- PROJECT TITLE --}}
                             <td class="py-3 px-2">
-                                <div class="font-medium">{{ $project->name }}</div>
-                                <div class="text-xs text-gray-500">{{ $project->category }}</div>
+                                <div class="font-medium">{{ $project->project_title }}</div>
+                                <div class="text-xs text-gray-500">{{ $project->project->title ?? '-' }}</div>
                             </td>
 
                             {{-- CLIENT --}}
                             <td class="py-3 px-2">
-                                <div class="font-medium">
-                                    {{ optional($project->client)->name ?? 'No client' }}
+                                <div class="font-medium text-b-2">
+                                    {{ $project->consumer->name ?? 'No client' }}
                                 </div>
                             </td>
-
 
                             {{-- DEVELOPER --}}
                             <td class="py-3 px-2">
                                 <div class="flex items-center gap-2">
-                                    <img src="{{ optional($project->developer)->avatar ?? asset('images/default-avatar.png') }}"
-                                        class="w-7 h-7 rounded-full" />
+                                    @php
+                                        $avatarSrc = $project->developer
+                                            ? ($project->developer->getRawOriginal('avatar')
+                                                ? (filter_var($project->developer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                    ? $project->developer->getRawOriginal('avatar')
+                                                    : asset('storage/' . $project->developer->getRawOriginal('avatar')))
+                                                : 'https://ui-avatars.com/api/?name=' . urlencode($project->developer->name))
+                                            : 'https://ui-avatars.com/api/?name=Unassigned';
+                                    @endphp
+                                    <img src="{{ $avatarSrc }}" alt="Avatar" class="w-7 h-7 rounded-full object-cover" />
 
-                                    <span>
-                                        {{ optional($project->developer)->name ?? 'Unassigned' }}
+                                    <span class="text-b-2">
+                                        {{ $project->developer->name ?? 'Unassigned' }}
                                     </span>
                                 </div>
                             </td>
 
-
                             {{-- BUDGET --}}
                             <td class="py-3 px-2 text-green-600 font-medium">
-                                Rp {{ number_format($project->budget) }}
+                                @php
+                                    $confirmedTotal = $project->payments()->where('status', 'confirmed')->sum('amount');
+                                @endphp
+                                Rp {{ number_format($confirmedTotal) }}
                             </td>
 
                             {{-- TIMELINE --}}
                             <td class="py-3 px-2 text-gray-600 text-sm">
-                                {{ $project->timeline }}
-                            </td>
-
-                            {{-- PROGRESS --}}
-                            <td class="py-3 px-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 h-2 bg-gray-200 rounded-full">
-                                        <div class="h-2 bg-green-500 rounded-full" style="width: {{ $project->progress }}%"></div>
-                                    </div>
-                                    <span class="text-xs">{{ $project->progress }}%</span>
-                                </div>
+                                <div class="text-xs">{{ $project->start_date?->format('d M Y') }}</div>
+                                <div class="text-xs text-gray-400">{{ $project->end_date?->format('d M Y') }}</div>
                             </td>
 
                             {{-- STATUS BADGE --}}
@@ -133,12 +139,22 @@
                                 @include('admin.components.status-badge', ['status' => $project->status])
                             </td>
 
-                            {{-- ACTIONS --}}
+                            {{-- PAYMENT STATUS --}}
                             <td class="py-3 px-2">
-                                <a href="{{ route('admin.projects.show', $project->id) }}"
-                                   class="px-3 py-1 text-sm rounded-lg bg-gray-100 hover:bg-gray-200">
-                                    View
-                                </a>
+                                @php
+                                    $latestPayment = $project->payments()->latest()->first();
+                                    $paymentStatus = $latestPayment ? $latestPayment->status : 'No Payment';
+                                    $statusColors = [
+                                        'pending' => 'bg-yellow-100 text-yellow-700',
+                                        'confirmed' => 'bg-green-100 text-green-700',
+                                        'transferred' => 'bg-blue-100 text-blue-700',
+                                        'failed' => 'bg-red-100 text-red-700',
+                                    ];
+                                    $statusColor = $statusColors[$paymentStatus] ?? 'bg-gray-100 text-gray-700';
+                                @endphp
+                                <span class="px-3 py-1 text-xs rounded-full {{ $statusColor }}">
+                                    {{ ucfirst($paymentStatus) }}
+                                </span>
                             </td>
 
                         </tr>

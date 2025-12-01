@@ -6,29 +6,29 @@
         @include('partials.global-sidebar')
 
         <!-- ===== MAIN CONTENT ===== -->
-        <div class="flex-1 ml-[18rem]">
+        <div class="flex-1 lg:ml-[18rem]">
 
             <!-- MAIN CONTENT AREA -->
             <div class="mt-16">
 
                 <!-- HEADER SECTION -->
                 <div
-                    class="p-8 pb-16 flex flex-row items-center justify-between border-b-[0.5px] border-neutral-100 bg-neutral-0">
+                    class="px-4 md:px-8 py-6 md:py-8 pb-8 md:pb-16 flex flex-col md:flex-row items-start md:items-center justify-between border-b-[0.5px] border-neutral-100 bg-neutral-0 gap-4">
                     <div>
-                        <h1 class="text-h-3 font-bold text-neutral-900">Developer Dashboard</h1>
-                        <p class="mt-1 text-b-1 text-neutral-600">Welcome back! Here's what's happening with your
+                        <h1 class="text-h-4 md:text-h-3 font-bold text-neutral-900">Developer Dashboard</h1>
+                        <p class="mt-1 text-b-2 md:text-b-1 text-neutral-600">Welcome back! Here's what's happening with your
                             projects
                         </p>
                     </div>
 
                     <div>
                         <a href="{{ route('search.developers.show', auth()->user()->id) }}" target="_blank"
-                            class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary-500 text-neutral-0
+                            class="inline-flex items-center justify-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-xl bg-primary-500 text-neutral-0
                                 hover:bg-primary-600 hover:scale-[1.02] active:scale-[0.98]
                                 [box-shadow:inset_0_2px_4px_0_rgba(0,0,0,0.06),0_4px_12px_rgba(16,138,0,0.25)]
-                                transition-all duration-200 group">
+                                transition-all duration-200 group whitespace-nowrap">
 
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-4 md:w-5 h-4 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 20 20">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
                                     d="M1.72 10.29c-.07-.19-.07-.4 0-.59C2.4 8.07 3.54 6.67 5.02 5.68c1.47-.99 3.2-1.51 4.98-1.51s3.51.52 4.98 1.51c1.48.99 2.62 2.39 3.3 4.02.07.19.07.4 0 .59-.68 1.63-1.82 3.03-3.3 4.02-1.47.99-3.2 1.51-4.98 1.51s-3.51-.52-4.98-1.51C3.54 13.32 2.4 11.92 1.72 10.29z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
@@ -36,13 +36,13 @@
                             </svg>
 
                             {{-- Label --}}
-                            <span class="text-b-1 font-light">View Public Profile</span>
+                            <span class="text-b-3 md:text-b-1 font-light">View Public Profile</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- ===== KEY STATS GRID ===== -->
-                <div class="p-8 bg-neutral-10/50">
+                <div class="p-4 md:p-8 bg-neutral-10/50">
                     <h2 class="text-h-5 font-bold text-neutral-900 mb-4">Key Stats</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 

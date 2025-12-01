@@ -1,4 +1,7 @@
-<aside class="w-[18rem] bg-neutral-0 border-r border-neutral-100 fixed left-0 top-0 h-screen flex flex-col mt-16 pb-20 z-10">
+<aside class="w-[18rem] bg-neutral-0 border-r border-neutral-100 fixed left-0 top-0 h-screen flex flex-col mt-16 pb-20 z-30
+              transition-transform duration-300 ease-in-out
+              lg:translate-x-0"
+       :class="mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
     <!-- User Profile Card -->
     <div
@@ -20,7 +23,7 @@
     </div>
 
     <!-- Navigation Menu -->
-    <nav class="flex-1 px-4 py-6 overflow-y-auto border-t border-neutral-100">
+    <nav class="flex-1 px-4 py-6 overflow-y-auto border-t border-neutral-100" @click="if (window.innerWidth < 1024) mobileOpen = false">
 
         {{-- Akun Saya --}}
         <x-sidebar-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" icon="akun-saya" description="Profile and settings">
@@ -83,3 +86,16 @@
     </div>
 
 </aside>
+
+<!-- Mobile Overlay -->
+<div x-show="mobileOpen"
+     @click="mobileOpen = false"
+     x-transition:enter="transition-opacity ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition-opacity ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="lg:hidden fixed inset-0 bg-black/50 z-20 mt-16"
+     style="display: none;">
+</div>

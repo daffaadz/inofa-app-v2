@@ -4,7 +4,7 @@
     <section class="min-h-screen flex bg-neutral-10">
         @include('partials.global-sidebar')
 
-        <div class="flex-1 ml-[18rem] mt-16">
+        <div class="flex-1 lg:ml-[18rem] mt-16">
             <div class="max-w-7xl mx-auto px-6 py-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2">

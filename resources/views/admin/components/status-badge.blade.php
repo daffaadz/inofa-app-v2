@@ -1,18 +1,66 @@
 
 @props(['status'])
 @php
-    $map = [
-        'pending' => 'bg-yellow-100 text-yellow-800',
-        'in_progress' => 'bg-blue-100 text-blue-800',
-        'approved' => 'bg-green-100 text-green-800',
-        'completed' => 'bg-green-100 text-green-800',
-        'confirmed' => 'bg-green-100 text-green-800',
-        'unpaid' => 'bg-red-100 text-red-800',
-        'resolved' => 'bg-green-100 text-green-800',
-        'review' => 'bg-blue-100 text-blue-800',
-        'rejected' => 'bg-red-100 text-red-800',
+    $statusConfig = [
+        'in_progress' => [
+            'bg' => 'bg-blue-100',
+            'text' => 'text-blue-800',
+            'border' => 'border-blue-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>'
+        ],
+        'approved' => [
+            'bg' => 'bg-green-100',
+            'text' => 'text-green-800',
+            'border' => 'border-green-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'
+        ],
+        'completed' => [
+            'bg' => 'bg-green-100',
+            'text' => 'text-green-800',
+            'border' => 'border-green-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'
+        ],
+        'confirmed' => [
+            'bg' => 'bg-green-100',
+            'text' => 'text-green-800',
+            'border' => 'border-green-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'
+        ],
+        'unpaid' => [
+            'bg' => 'bg-red-100',
+            'text' => 'text-red-800',
+            'border' => 'border-red-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>'
+        ],
+        'resolved' => [
+            'bg' => 'bg-green-100',
+            'text' => 'text-green-800',
+            'border' => 'border-green-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'
+        ],
+        'review' => [
+            'bg' => 'bg-blue-100',
+            'text' => 'text-blue-800',
+            'border' => 'border-blue-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>'
+        ],
+        'rejected' => [
+            'bg' => 'bg-red-100',
+            'text' => 'text-red-800',
+            'border' => 'border-red-200',
+            'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>'
+        ],
     ];
-    $cls = $map[$status] ?? 'bg-gray-100 text-gray-800';
-    $label = ucfirst(str_replace('_',' ', $status));
+    $config = $statusConfig[$status] ?? [
+        'bg' => 'bg-gray-100',
+        'text' => 'text-gray-800',
+        'border' => 'border-gray-200',
+        'icon' => '<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>'
+    ];
+    $label = ucfirst(str_replace('_', ' ', $status));
 @endphp
-<span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $cls }}">{{ $label }}</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border 
+             {{ $config['bg'] }} {{ $config['text'] }} {{ $config['border'] }}">
+    {!! $config['icon'] !!}
+    {{ $label }}
+</span>

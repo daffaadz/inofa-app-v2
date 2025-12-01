@@ -25,3 +25,15 @@
         scrollbar-color: theme(colors.primary.400) theme(colors.neutral.100);
     }
 }
+
+/* ========== UTILITY CLASSES ========== */
+@layer utilities {
+    /* Hide scrollbar */
+    .scrollbar-hide {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;  /* Chrome, Safari and Opera */
+    }
+}

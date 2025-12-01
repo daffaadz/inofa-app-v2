@@ -1,8 +1,17 @@
-<nav class="fixed bg-neutral-0 z-20 w-full">
-    <div class="w-screen mx-auto px-8 flex items-center justify-between h-16">
+<nav class="fixed bg-neutral-0 z-40 w-full">
+    <div class="w-screen mx-auto px-4 md:px-8 flex items-center justify-between h-16">
 
-        {{-- Left cluster : Logo + nav links --}}
-        <div class="flex items-center gap-8">
+        {{-- Left cluster : Hamburger + Logo + nav links --}}
+        <div class="flex items-center gap-4 lg:gap-8">
+            
+            {{-- Hamburger Menu Button (Mobile Only) --}}
+            <button @click="mobileOpen = !mobileOpen"
+                    class="lg:hidden p-2 rounded-lg hover:bg-neutral-100 transition">
+                <svg class="w-6 h-6 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            
             {{-- Logo --}}
             <a href="{{ url('/') }}" class="flex items-center gap-4">
                 <img src="{{ asset('assets/vector/logo.svg') }}" alt="Inofa logo" class="h-8 w-auto">
@@ -10,7 +19,7 @@
             </a>
 
             {{-- Desktop links --}}
-            <div class="hidden md:flex items-center gap-6 text-sm font-semibold text-neutral-800">
+            <div class="hidden lg:flex items-center gap-6 text-sm font-semibold text-neutral-800">
                 {{-- “Find Talent” dropdown --}}
                 <div class="relative" x-data="{ open: false }" @click.away="open=false">
                     <button @click="open=!open"
@@ -169,9 +178,9 @@
         </div>
 
         {{-- Search & User Menu --}}
-        <div class="flex items-center justify-end md:w-2/5 gap-2">
+        <div class="flex items-center justify-end gap-2">
 
-            {{-- Search --}}
+            {{-- Search (Desktop Only) --}}
             <div class="hidden lg:flex flex-1 max-w-sm mx-4 items-center" x-data="searchComponent()">
                 <div class="relative w-full">
                     {{-- Search icon --}}
@@ -204,13 +213,35 @@
 
             {{-- User Menu --}}
             <div class="flex items-center gap-2 font-semibold">
-                {{-- Notifications --}}
-                <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition">
-                    <svg class="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
-                </button>
+                {{-- Complaint to Admin --}}
+                <div class="relative" x-data="{ showTooltip: false }">
+                    <a href="{{ route('chat.admin') }}" 
+                       @mouseenter="showTooltip = true" 
+                       @mouseleave="showTooltip = false"
+                       class="relative p-2 rounded-lg hover:bg-neutral-100 transition block">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" 
+                             class="text-neutral-600" viewBox="0 0 256 256">
+                            <path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm-12-80V80a12,12,0,0,1,24,0v52a12,12,0,0,1-24,0Zm28,40a16,16,0,1,1-16-16A16,16,0,0,1,144,172Z"></path>
+                        </svg>
+                    </a>
+                    
+                    {{-- Smooth Tooltip --}}
+                    <div x-show="showTooltip"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 transform scale-100"
+                         x-transition:leave-end="opacity-0 transform scale-95"
+                         class="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-neutral-800 text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-50">
+                        {{-- Arrow --}}
+                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 -mb-px">
+                            <div class="border-4 border-transparent border-b-neutral-800"></div>
+                        </div>
+                        <div class="font-medium">Report to Admin</div>
+                        <div class="text-neutral-300 mt-0.5">Use only for complaints or issues</div>
+                    </div>
+                </div>
 
                 {{-- User dropdown --}}
                 <div class="relative" x-data="{ open: false }" @click.away="open=false">

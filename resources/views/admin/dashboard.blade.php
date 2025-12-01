@@ -1,57 +1,74 @@
 <x-admin-layout title="Admin Dashboard">
 
-<div class="p-8" x-data="{ tab: '{{ request('tab','projects') }}' }">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" x-data="{ tab: '{{ request('tab','payments') }}' }">
 
-    
-        {{-- Page Title --}}
-        <div class="bg-white shadoe rounded-xl p-6 mb-6">
-            <h1 class="text-5xl font-bold">Admin Dashboard</h1>
-            <p class="text-gray-500 mt-1 text-xl">
-                Manage project validation, payments and user complaints
-            </p>
-        </div>
+    <div class="p-4 md:p-8 max-w-[1600px] mx-auto">
         
-    <div class="bg-white shadoe rounded-xl p-6">
-        {{-- Tabs --}}
-        <div class="mt-6">
-            @include('admin.components.tabs')
-        </div>
-
-        {{-- Search Bar --}}
-        <div class="mt-4">
-            @include('admin.components.searchbar', ['tab' => request('tab','projects')])
-        </div>
-
-        {{-- Filters --}}
-        <div class="mt-4">
-            @include('admin.components.filters')
-        </div>
-
-        {{-- TABLES --}}
-        <div class="mt-6">
-
-            {{-- VALIDASI PEMBAYARAN --}}
-            <div x-show="tab === 'payments'">
-                @include('admin.components.table-payments', ['items' => $payments])
+        {{-- Page Header --}}
+        <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 mb-6 border border-gray-100">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
+                        Admin Dashboard
+                    </h1>
+                    <p class="text-gray-600 text-base md:text-lg lg:text-xl">
+                        Manage project validation, payments and user complaints
+                    </p>
+                </div>
+                
+                {{-- Quick Stats Badge --}}
+                <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span class="font-semibold text-sm">Active</span>
+                </div>
             </div>
-
-            {{-- KELUHAN PENGGUNA --}}
-            <div x-show="tab === 'complaints'">
-                @include('admin.components.table-complaints', ['items' => $complaints])
-            </div>
-
         </div>
-        
 
-        {{-- Summary Cards --}}
-        <div class="mt-8">
+        {{-- Summary Cards - Moved to Top --}}
+        <div class="mb-6">
             @include('admin.components.summary-cards', ['stats' => $stats])
         </div>
+        
+        {{-- Main Content Card --}}
+        <div class="bg-white shadow-sm rounded-2xl border border-gray-100 overflow-hidden">
+            
+            {{-- Tabs --}}
+            <div class="px-6 pt-6 border-b border-gray-100">
+                @include('admin.components.tabs')
+            </div>
 
-        {{-- Reject Modal --}}
-        @include('admin.modals.reject-note')
+            {{-- Search & Filters --}}
+            <div class="p-6 bg-gray-50/50">
+                <div class="space-y-4">
+                    @include('admin.components.searchbar', ['tab' => request('tab','payments')])
+                    @include('admin.components.filters')
+                </div>
+            </div>
 
-@include('admin.modals.reject-note')
+            {{-- TABLES --}}
+            <div class="p-6">
+
+                {{-- VALIDASI PEMBAYARAN --}}
+                <div x-show="tab === 'payments'" x-transition>
+                    @include('admin.components.table-payments', ['items' => $payments])
+                </div>
+
+                {{-- KELUHAN PENGGUNA --}}
+                <div x-show="tab === 'complaints'" x-transition>
+                    @include('admin.components.table-complaints', ['items' => $complaints])
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
+
+{{-- Reject Modal --}}
+@include('admin.modals.reject-note')
+
 </x-admin-layout>

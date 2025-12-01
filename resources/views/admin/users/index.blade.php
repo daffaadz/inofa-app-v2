@@ -8,17 +8,17 @@
             <form method="GET" class="flex items-center gap-2">
                 <input type="text" name="search" value="{{ old('search', $search) }}"
                     placeholder="Search name or email"
-                    class="w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" />
+                    class="w-64 px-4 py-2 rounded-md border-gray-300 shadow-md focus:border-indigo-500 focus:ring-indigo-500 text-sm" />
 
                 <select name="role"
-                    class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                    class="rounded-md border-gray-300 shadow-md px-4 py-2 focus:border-indigo-500 focus:ring-indigo-500 text-sm">
                     <option value="">All Roles</option>
                     <option value="admin" @selected($selectedRole==='admin')>Admin</option>
                     <option value="developer" @selected($selectedRole==='developer')>Developer</option>
                     <option value="consumer" @selected($selectedRole==='consumer')>Consumer</option>
                 </select>
 
-                <button class="px-3 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-500">
+                <button class="px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-lg hover:bg-primary-600">
                     Filter
                 </button>
             </form>

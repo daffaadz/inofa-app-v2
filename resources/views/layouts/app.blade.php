@@ -9,7 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="antialiased text-gray-800">
+<body class="antialiased text-gray-800" x-data="{ mobileOpen: false }">
     @auth
         @include('partials.navbar-auth')
     @else

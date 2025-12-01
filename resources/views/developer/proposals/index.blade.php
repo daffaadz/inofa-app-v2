@@ -6,7 +6,7 @@
         @include('partials.global-sidebar')
 
         <!-- ===== MAIN CONTENT ===== -->
-        <div class="flex-1 ml-[18rem]">
+        <div class="flex-1 lg:ml-[18rem]">
 
             <!-- MAIN CONTENT AREA -->
             <div class="mt-16">

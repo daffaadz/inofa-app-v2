@@ -6,11 +6,11 @@
         @include('partials.global-sidebar')
 
         <!-- ===== MAIN CONTENT ===== -->
-        <div class="ml-[18rem] pt-8">
-            <div class="max-w-7xl mx-auto mt-16">
+        <div class="lg:ml-[18rem] pt-8">
+            <div class="max-w-7xl mx-auto mt-16 px-4 md:px-0">
                 <!-- Header Section with Tab Navigation -->
                 <div class="mb-6">
-                    <div class="flex flex-col items-start justify-between mb-2 gap-6 px-6">
+                    <div class="flex flex-col items-start justify-between mb-2 gap-6 px-2 md:px-6">
                         <div class="flex items-center gap-4">
                             <div class="bg-gradient-to-br from-primary-500/10 to-secondary-500/20 p-3 rounded-xl">
                                 <img src="{{ asset('assets/vector/sidebar/akun-saya.svg') }}" alt="akun saya"
@@ -24,53 +24,53 @@
                         </div>
 
                         <!-- Tab Navigation -->
-                        <div class="flex gap-4">
+                        <div class="flex flex-wrap gap-2 md:gap-4">
                             <button onclick="switchTab('profile')" id="tab-profile"
-                                class="tab-btn px-4 py-2 text-b-1 font-medium rounded-xl border  border-primary-500 bg-primary-500 shadow-xl text-neutral-10 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke= "currentColor" viewBox="0 0 24 24">
+                                class="tab-btn px-3 md:px-4 py-2 text-b-3 md:text-b-1 font-medium rounded-xl border  border-primary-500 bg-primary-500 shadow-xl text-neutral-10 flex items-center gap-1 md:gap-2">
+                                <svg class="w-3 md:w-4 h-3 md:h-4" fill="none" stroke= "currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
-                                Profile
+                                <span class="hidden sm:inline">Profile</span>
                             </button>
 
-                            <div class="flex gap-4">
+                            <div class="flex flex-wrap gap-2 md:gap-4">
                                 @if (Auth::user()->role === 'developer')
                                     <button onclick="switchTab('skills')" id="tab-skills"
-                                        class="tab-btn px-4 py-2 text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="tab-btn px-3 md:px-4 py-2 text-b-3 md:text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-1 md:gap-2">
+                                        <svg class="w-3 md:w-4 h-3 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                                         </svg>
-                                        Skills & Expertise
+                                        <span class="hidden sm:inline">Skills</span>
                                     </button>
 
                                     <button onclick="switchTab('portfolio')" id="tab-portfolio"
-                                        class="tab-btn px-4 py-2 text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="tab-btn px-3 md:px-4 py-2 text-b-3 md:text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-1 md:gap-2">
+                                        <svg class="w-3 md:w-4 h-3 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                         </svg>
-                                        Portfolio
+                                        <span class="hidden sm:inline">Portfolio</span>
                                     </button>
                                 @endif
 
                                 <button onclick="switchTab('security')" id="tab-security"
-                                    class="tab-btn px-4 py-2 text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="tab-btn px-3 md:px-4 py-2 text-b-3 md:text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-1 md:gap-2">
+                                    <svg class="w-3 md:w-4 h-3 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
-                                    Security
+                                    <span class="hidden sm:inline">Security</span>
                                 </button>
 
                                 <button onclick="switchTab('preferences')" id="tab-preferences"
-                                    class="tab-btn px-4 py-2 text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="tab-btn px-3 md:px-4 py-2 text-b-3 md:text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-1 md:gap-2">
+                                    <svg class="w-3 md:w-4 h-3 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                     </svg>
-                                    Preferences
+                                    <span class="hidden sm:inline">Preferences</span>
                                 </button>
                             </div>
                         </div>
@@ -85,14 +85,14 @@
 
                 <!-- Content Area -->
                 <div class="bg-neutral-10 rounded-b-lg shadow-sm pb-8">
-                    <div class="flex gap-8 p-8">
+                    <div class="flex flex-col lg:flex-row gap-4 md:gap-8 p-4 md:p-8">
                         <!-- Left Sidebar - User Card -->
-                        <div class="w-96 flex-shrink-0">
+                        <div class="w-full lg:w-96 flex-shrink-0">
                             @include('profile.partials.user-card')
                         </div>
 
                         <!-- Right Content -->
-                        <div class="flex-1 bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex-1 bg-white rounded-xl shadow-sm p-4 md:p-6">
                             <!-- Profile Tab -->
                             <div id="content-profile" class="tab-content">
                                 @include('profile.partials.update-profile-information-form')

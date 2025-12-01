@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\ProjectAgreement;
+use App\Models\Payment;
+use App\Models\ProjectDispute;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -13,10 +17,10 @@ class ProjectController extends Controller
         $search = $request->search;
         $status = $request->status;
 
-        $query = Project::query();
+        $query = ProjectAgreement::with(['consumer', 'developer', 'project', 'payments']);
 
         if ($search) {
-            $query->where('title', 'like', "%$search%");
+            $query->where('project_title', 'like', "%$search%");
         }
 
         if ($status) {
@@ -28,10 +32,10 @@ class ProjectController extends Controller
             'search'   => $search,
             'status'   => $status,
             'stats'    => [
-                'total'     => Project::count(),
-                'ongoing'   => Project::where('status', 'in_progress')->count(),
-                'completed' => Project::where('status', 'completed')->count(),
-                'budget'    => (float) Project::sum('budget'),
+                'total'     => ProjectAgreement::count(),
+                'ongoing'   => ProjectAgreement::where('status', 'active')->count(),
+                'completed' => ProjectAgreement::where('status', 'completed')->count(),
+                'budget'    => (float) Payment::where('status', 'confirmed')->sum('amount'),
             ]
         ]);
     }

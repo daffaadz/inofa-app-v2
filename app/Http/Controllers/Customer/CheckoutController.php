@@ -49,6 +49,14 @@ class CheckoutController extends Controller
     {
         abort_unless($payment->agreement->consumer_id === Auth::id(), 403);
 
+        // Cek apakah sudah pernah upload proof
+        if ($payment->isProofUploaded()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment proof has already been uploaded. Please wait for admin verification.'
+            ], 400);
+        }
+
         $validated = $request->validate([
             'proof' => 'required|mimes:jpg,jpeg,png,pdf|max:5120', // max 5 MB
         ]);
@@ -60,8 +68,14 @@ class CheckoutController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()
-            ->route('consumer.payments.checkout', $payment->id)
-            ->with('success', 'Payment proof uploaded and awaiting verification.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment proof uploaded successfully. Awaiting admin verification.',
+            'data' => [
+                'proof_uploaded' => true,
+                'proof_url' => asset('storage/' . $path),
+                'status' => 'pending'
+            ]
+        ]);
     }
 }

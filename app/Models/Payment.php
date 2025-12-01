@@ -86,6 +86,21 @@ class Payment extends Model
 
     /* ---------------- Helpers ---------------- */
 
+    public function isProofUploaded(): bool
+    {
+        return !empty($this->consumer_payment_proof);
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isConfirmed(): bool
+    {
+        return in_array($this->status, ['confirmed', 'transferred']);
+    }
+
     public function markAsConfirmed(): void
     {
         $this->update([

@@ -60,6 +60,11 @@ class MessagesController extends Controller
             $user1 = User::find($userId1);
             $user2 = User::find($userId2);
             
+            // Validate both users exist
+            if (!$user1 || !$user2) {
+                return null;
+            }
+            
             $type = 'private'; // default
             if (($user1->role === 'consumer' && $user2->role === 'developer') ||
                 ($user1->role === 'developer' && $user2->role === 'consumer')) {
@@ -108,7 +113,17 @@ class MessagesController extends Controller
         $userProjects = collect();
         
         if ($id) {
+            // Validate that the user exists before creating conversation
+            $targetUser = User::find($id);
+            if (!$targetUser) {
+                abort(404, 'User not found');
+            }
+            
             $conversation = $this->getOrCreateConversation(Auth::id(), $id);
+            
+            if (!$conversation) {
+                abort(404, 'Unable to create or find conversation');
+            }
             
             // Get current project from conversation
             if ($conversation->project_id) {
@@ -246,6 +261,40 @@ class MessagesController extends Controller
                     'from_id' => Auth::user()->id,
                     'to_id' => $request['id'],
                     'message' => Chatify::messageCard($messageData, true)
+                ]);
+            }
+
+            // 5. Auto-reply if user sends message to admin
+            $recipientUser = User::find($toId);
+            if ($recipientUser && $recipientUser->isAdmin()) {
+                // Create auto-reply message with complaint button
+                $autoReplyMetadata = [
+                    'type' => 'complaint_button',
+                    'button_text' => 'Buat Pengaduan',
+                ];
+
+                $autoReplyMessage = Chatify::newMessage([
+                    'from_id' => $toId, // from admin
+                    'to_id' => $fromId, // to user
+                    'body' => htmlentities('Terima kasih telah menghubungi admin. Silakan klik tombol di bawah untuk membuat pengaduan resmi.', ENT_QUOTES, 'UTF-8'),
+                    'attachment' => null,
+                ]);
+
+                // Update with metadata
+                $autoReplyMessage->update([
+                    'metadata' => json_encode($autoReplyMetadata)
+                ]);
+
+                // Parse auto-reply message
+                $autoReplyData = Chatify::parseMessage($autoReplyMessage);
+                $autoReplyData['metadata'] = $autoReplyMetadata;
+                $autoReplyData['project_agreement_id'] = $autoReplyMessage->project_agreement_id;
+
+                // Push auto-reply to user
+                Chatify::push("private-chatify." . $fromId, 'messaging', [
+                    'from_id' => $toId,
+                    'to_id' => $fromId,
+                    'message' => Chatify::messageCard($autoReplyData, true)
                 ]);
             }
         }

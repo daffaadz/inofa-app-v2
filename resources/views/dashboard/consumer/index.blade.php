@@ -6,20 +6,20 @@
         @include('partials.global-sidebar')
 
         <!-- ===== MAIN CONTENT ===== -->
-        <div class="flex-1 ml-[18rem]">
+        <div class="flex-1 lg:ml-[18rem]">
 
             <!-- MAIN CONTENT AREA -->
             <div class="mt-16">
 
                 <!-- HEADER SECTION -->
-                <div class="px-8 py-8 flex flex-row items-center justify-between bg-white border-b border-neutral-100">
+                <div class="px-4 md:px-8 py-6 md:py-8 flex flex-col md:flex-row items-start md:items-center justify-between bg-white border-b border-neutral-100 gap-4">
                     <div>
-                        <h1 class="text-h-3 font-bold text-neutral-900">My Projects</h1>
-                        <p class="mt-1 text-b-1 text-neutral-600">Manage and track all your project collaborations</p>
+                        <h1 class="text-h-4 md:text-h-3 font-bold text-neutral-900">My Projects</h1>
+                        <p class="mt-1 text-b-2 md:text-b-1 text-neutral-600">Manage and track all your project collaborations</p>
                     </div>
                     <a href="{{ route('consumer.project.create') }}"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white text-b-2 font-medium rounded-xl hover:bg-primary-600 transition shadow-sm hover:shadow-md">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 bg-primary-500 text-white text-b-3 md:text-b-2 font-medium rounded-xl hover:bg-primary-600 transition shadow-sm hover:shadow-md whitespace-nowrap">
+                        <svg class="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Post New Project
@@ -27,7 +27,7 @@
                 </div>
 
                 <!-- ===== KEY STATS GRID ===== -->
-                <div class="p-8">
+                <div class="p-4 md:p-8">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
                         <!-- Total Projects -->
@@ -167,7 +167,14 @@
                                     @if ($agreement->developer)
                                         <a href="{{ route('user', ['id' => $agreement->developer->id]) }}" 
                                             class="flex items-center gap-3 hover:bg-neutral-50 rounded-lg px-3 py-2 -mx-3 -my-2 transition group/dev">
-                                            <img src="{{ $agreement->developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($agreement->developer->name) }}"
+                                            @php
+                                                $avatarSrc = $agreement->developer->getRawOriginal('avatar')
+                                                    ? (filter_var($agreement->developer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                        ? $agreement->developer->getRawOriginal('avatar')
+                                                        : asset('storage/' . $agreement->developer->getRawOriginal('avatar')))
+                                                    : 'https://ui-avatars.com/api/?name=' . urlencode($agreement->developer->name);
+                                            @endphp
+                                            <img src="{{ $avatarSrc }}" alt="Avatar"
                                                 class="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-sm group-hover/dev:ring-primary-200 transition">
                                             <div>
                                                 <p class="text-b-3 font-bold text-neutral-900 group-hover/dev:text-primary-600 transition">
