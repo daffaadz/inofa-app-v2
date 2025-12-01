@@ -245,7 +245,7 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
     Route::get('/payments/create/{agreement}', [PaymentCheckout::class, 'create'])->name('payments.create');
     Route::get('/payments/checkout/{payment}', [PaymentCheckout::class, 'checkout'])->name('payments.checkout');
 
-    Route::post('/payments/checkout/{payment}', [PaymentCheckout::class, 'checkout'])->name('payments.checkout');
+    Route::post('/payments/checkout/{payment}', [PaymentCheckout::class, 'checkout'])->name('payments.checkout.process');
     Route::post('/payments/confirm/{payment}', [PaymentCheckout::class, 'confirm'])->name('payments.confirm');
 
     /* ---------- Proposals Management ---------- */
