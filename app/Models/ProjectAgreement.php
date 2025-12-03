@@ -26,7 +26,7 @@ class ProjectAgreement extends Model
         'terms',
         'scope_projects',
         'projects_mvp',
-        'milestones',
+        'progress',
         'deliverables',
         'signed_at',
         'conversation_id',
@@ -38,7 +38,7 @@ class ProjectAgreement extends Model
         'end_date' => 'date',
         'price_details' => 'array',
         'projects_mvp' => 'array',
-        'milestones' => 'array',
+        'progress' => 'integer',
         'deliverables' => 'array',
         'signed_at' => 'datetime',
     ];

@@ -6,14 +6,16 @@
     <div class="mb-8">
         <div class="flex items-start justify-center gap-6">
             {{-- Profile Image --}}
-            @if ($developer->avatar)
-                @php
-                    $src = Str::startsWith($developer->avatar, 'http')
-                        ? $developer->avatar
-                        : asset('storage/' . $developer->avatar);
-                @endphp
+            @php
+                $avatarSrc = $developer->getRawOriginal('avatar')
+                    ? (filter_var($developer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                        ? $developer->getRawOriginal('avatar')
+                        : asset('storage/' . $developer->getRawOriginal('avatar')))
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name);
+            @endphp
+            @if ($developer->getRawOriginal('avatar') || true)
                 <div class="relative flex-shrink-0">
-                    <img src="{{ $developer->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) }}" alt="{{ $developer->name }}"
+                    <img src="{{ $avatarSrc }}" alt="{{ $developer->name }}"
                         class="w-24 h-24 rounded-2xl object-cover">
                     {{-- Rating Badge on Image --}}
                     @if ($developer->developerProfile && $developer->developerProfile->rating_count > 0)

@@ -106,7 +106,14 @@
                                         <div class="flex-1">
                                             <!-- Header with Status Badge -->
                                             <div class="flex items-start gap-3 mb-4">
-                                                <img src="{{ $proposal->consumer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($proposal->consumer->name) }}"
+                                                @php
+                                                    $avatarSrc = $proposal->consumer->getRawOriginal('avatar')
+                                                        ? (filter_var($proposal->consumer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                            ? $proposal->consumer->getRawOriginal('avatar')
+                                                            : asset('storage/' . $proposal->consumer->getRawOriginal('avatar')))
+                                                        : 'https://ui-avatars.com/api/?name=' . urlencode($proposal->consumer->name);
+                                                @endphp
+                                                <img src="{{ $avatarSrc }}"
                                                     alt="{{ $proposal->consumer->name }}"
                                                     class="w-12 h-12 rounded-full object-cover border-2 border-neutral-200">
                                                 <div class="flex-1">

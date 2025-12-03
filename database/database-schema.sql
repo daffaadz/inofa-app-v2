@@ -1,436 +1,895 @@
--- ============================================================================
--- INOFA PLATFORM DATABASE SCHEMA (MySQL)
--- ============================================================================
--- This schema represents a complete freelance platform with user management,
--- project posting, bidding system, agreements, payments, messaging, and reviews.
--- ============================================================================
+-- MySQL dump 10.13  Distrib 8.0.30, for Win64 (x86_64)
+--
+-- Host: localhost    Database: inofa-v2
+-- ------------------------------------------------------
+-- Server version	8.0.30
 
--- Set character set and collation for the database
-SET NAMES utf8mb4;
-SET CHARACTER SET utf8mb4;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- ============================================================================
--- CORE TABLES
--- ============================================================================
+--
+-- Table structure for table `agreement_validations`
+--
 
--- Users table: Core user information for all platform users
-CREATE TABLE `users` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL,
-  `email` VARCHAR(255) NOT NULL UNIQUE,
-  `email_verified_at` TIMESTAMP NULL DEFAULT NULL,
-  `password` VARCHAR(255) NOT NULL,
-  `remember_token` VARCHAR(100) NULL DEFAULT NULL,
-  `role` ENUM('consumer', 'developer', 'admin') NOT NULL DEFAULT 'consumer',
-  `avatar` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Profile avatar URL',
-  `bio` TEXT NULL DEFAULT NULL COMMENT 'User biography',
-  `location` VARCHAR(255) NULL DEFAULT NULL COMMENT 'User location',
-  `dark_mode` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Chatify dark mode preference',
-  `messenger_color` VARCHAR(7) NOT NULL DEFAULT '#5aa07f' COMMENT 'Chatify messenger color',
-  `active_status` BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'User online status',
-  `provider` VARCHAR(255) NULL DEFAULT NULL COMMENT 'OAuth provider (google, github, etc)',
-  `provider_id` VARCHAR(255) NULL DEFAULT NULL COMMENT 'OAuth provider ID',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  INDEX `idx_role_active_status` (`role`, `active_status`),
-  INDEX `idx_email_verified_at` (`email_verified_at`),
-  INDEX `idx_created_at` (`created_at`),
-  INDEX `idx_provider_provider_id` (`provider`, `provider_id`)
+DROP TABLE IF EXISTS `agreement_validations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `agreement_validations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `project_agreement_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `admin_id` bigint unsigned NOT NULL,
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `validated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `agreement_validations_admin_id_foreign` (`admin_id`),
+  KEY `agreement_validations_project_agreement_id_foreign` (`project_agreement_id`),
+  CONSTRAINT `agreement_validations_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `agreement_validations_project_agreement_id_foreign` FOREIGN KEY (`project_agreement_id`) REFERENCES `project_agreements` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Developer Profiles table: Extended profile information for developers
-CREATE TABLE `developer_profiles` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `user_id` BIGINT UNSIGNED NOT NULL UNIQUE,
-  `headline` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Professional headline',
-  `experience` TEXT NULL DEFAULT NULL COMMENT 'Professional experience description',
-  `rate_min_byproject` DECIMAL(15, 2) NULL DEFAULT NULL COMMENT 'Minimum project rate',
-  `rate_max_byproject` DECIMAL(15, 2) NULL DEFAULT NULL COMMENT 'Maximum project rate',
-  `availability` ENUM('available', 'busy', 'unavailable') NOT NULL DEFAULT 'available',
-  `experience_years` INT NOT NULL DEFAULT 0 COMMENT 'Years of experience',
-  `education` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Educational background',
-  `certifications` TEXT NULL DEFAULT NULL COMMENT 'Professional certifications',
-  `portfolio_links` JSON NULL DEFAULT NULL COMMENT 'Links to portfolio projects',
-  `rating_average` DECIMAL(3, 2) NOT NULL DEFAULT 0 COMMENT 'Average rating (0-5)',
-  `rating_count` INT NOT NULL DEFAULT 0 COMMENT 'Total number of ratings',
-  `projects_completed` INT NOT NULL DEFAULT 0 COMMENT 'Number of completed projects',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_developer_profiles_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `chk_devprof_rate_range` CHECK (`rate_min_byproject` <= `rate_max_byproject`),
-  CONSTRAINT `chk_devprof_experience` CHECK (`experience_years` >= 0),
-  CONSTRAINT `chk_devprof_rating` CHECK (`rating_average` >= 0 AND `rating_average` <= 5),
-  
-  INDEX `idx_availability_rating` (`availability`, `rating_average`),
-  INDEX `idx_rating_count` (`rating_average`, `rating_count`),
-  INDEX `idx_rate_range` (`rate_min_byproject`, `rate_max_byproject`)
+
+
+--
+-- Table structure for table `attachments`
+--
+
+DROP TABLE IF EXISTS `attachments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `attachments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `message_id` bigint unsigned NOT NULL,
+  `disk` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'public',
+  `path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `original_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mime` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `size` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `attachments_message_id_index` (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Skills table: Master list of available skills
-CREATE TABLE `skills` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(255) NOT NULL UNIQUE COMMENT 'Skill name (e.g., PHP, React)',
-  `slug` VARCHAR(100) NOT NULL UNIQUE COMMENT 'URL-friendly slug',
-  `category` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Skill category (e.g., Backend, Frontend)',
-  `is_active` BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Whether skill is available for selection',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  INDEX `idx_category_active` (`category`, `is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--
 
--- Skill User table: Many-to-many relationship between users and skills
-CREATE TABLE `skill_user` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `user_id` BIGINT UNSIGNED NOT NULL,
-  `skill_id` BIGINT UNSIGNED NOT NULL,
-  `proficiency_level` TINYINT NOT NULL DEFAULT 1 COMMENT '1=Beginner, 2=Intermediate, 3=Advanced, 4=Expert',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_skill_user_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_skill_user_skill_id` FOREIGN KEY (`skill_id`) 
-    REFERENCES `skills` (`id`) ON DELETE CASCADE,
-  UNIQUE KEY `uq_user_skill` (`user_id`, `skill_id`),
-  
-  INDEX `idx_skill_proficiency` (`skill_id`, `proficiency_level`),
-  INDEX `idx_user_proficiency` (`user_id`, `proficiency_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Portfolios table: Developer portfolio items
-CREATE TABLE `portfolios` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `user_id` BIGINT UNSIGNED NOT NULL,
-  `title` VARCHAR(255) NOT NULL COMMENT 'Portfolio item title',
-  `description` TEXT NOT NULL COMMENT 'Detailed description of the work',
-  `image_url` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Portfolio item image',
-  `project_url` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Link to live project',
-  `technologies` JSON NULL DEFAULT NULL COMMENT 'Technologies used (JSON array)',
-  `completed_at` DATE NULL DEFAULT NULL COMMENT 'Project completion date',
-  `is_featured` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether to feature on profile',
-  `sort_order` INT NOT NULL DEFAULT 0 COMMENT 'Display order',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_portfolios_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  
-  INDEX `idx_user_featured` (`user_id`, `is_featured`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--
+-- Table structure for table `cache`
+--
 
--- Projects table: Project postings by consumers
-CREATE TABLE `projects` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `consumer_id` BIGINT UNSIGNED NOT NULL COMMENT 'User who posted the project',
-  `title` VARCHAR(255) NOT NULL COMMENT 'Project title',
-  `description` TEXT NOT NULL COMMENT 'Detailed project description',
-  `budget` DECIMAL(15, 2) NOT NULL COMMENT 'Project budget',
-  `deadline` DATE NOT NULL COMMENT 'Project deadline',
-  `status` ENUM('draft', 'open', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'open',
-  `views_count` INT NOT NULL DEFAULT 0 COMMENT 'Number of views',
-  `is_featured` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Featured project',
-  `requirements` JSON NULL DEFAULT NULL COMMENT 'Project requirements (JSON)',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_projects_consumer_id` FOREIGN KEY (`consumer_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `chk_projects_budget` CHECK (`budget` >= 0),
-  
-  INDEX `idx_status_created` (`status`, `created_at`),
-  INDEX `idx_consumer_status` (`consumer_id`, `status`),
-  INDEX `idx_budget_deadline` (`budget`, `deadline`),
-  INDEX `idx_featured_status` (`is_featured`, `status`),
-  INDEX `idx_deadline_status` (`deadline`, `status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Project Skills table: Many-to-many relationship between projects and required skills
-CREATE TABLE `project_skills` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `project_id` BIGINT UNSIGNED NOT NULL,
-  `skill_id` BIGINT UNSIGNED NOT NULL,
-  `required_level` TINYINT NOT NULL DEFAULT 2 COMMENT '1=Beginner, 2=Intermediate, 3=Advanced, 4=Expert',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_project_skills_project_id` FOREIGN KEY (`project_id`) 
-    REFERENCES `projects` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_project_skills_skill_id` FOREIGN KEY (`skill_id`) 
-    REFERENCES `skills` (`id`) ON DELETE CASCADE,
-  UNIQUE KEY `uq_project_skill` (`project_id`, `skill_id`),
-  
-  INDEX `idx_skill_required_level` (`skill_id`, `required_level`),
-  INDEX `idx_project_id` (`project_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Offers table: Developer bids on projects
-CREATE TABLE `offers` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `project_id` BIGINT UNSIGNED NOT NULL,
-  `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'Developer making the offer',
-  `proposed_price` DECIMAL(15, 2) NOT NULL COMMENT 'Proposed project price',
-  `proposed_deadline` DATE NOT NULL COMMENT 'Proposed completion date',
-  `cover_letter` TEXT NOT NULL COMMENT 'Developer cover letter/proposal',
-  `milestones` JSON NULL DEFAULT NULL COMMENT 'Proposed milestones (JSON)',
-  `status` ENUM('pending', 'accepted', 'rejected', 'withdrawn') NOT NULL DEFAULT 'pending',
-  `accepted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When offer was accepted',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_offers_project_id` FOREIGN KEY (`project_id`) 
-    REFERENCES `projects` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_offers_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `chk_offers_price` CHECK (`proposed_price` >= 0),
-  UNIQUE KEY `uq_project_user` (`project_id`, `user_id`),
-  
-  INDEX `idx_status_created` (`status`, `created_at`),
-  INDEX `idx_user_status` (`user_id`, `status`),
-  INDEX `idx_project_status_created` (`project_id`, `status`, `created_at`),
-  INDEX `idx_accepted_at` (`accepted_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Project Agreements table: Formal agreement between consumer and developer
-CREATE TABLE `project_agreements` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `project_id` BIGINT UNSIGNED NOT NULL,
-  `consumer_id` BIGINT UNSIGNED NOT NULL,
-  `developer_id` BIGINT UNSIGNED NOT NULL,
-  `offer_id` BIGINT UNSIGNED NOT NULL,
-  `final_price` DECIMAL(15, 2) NOT NULL COMMENT 'Final agreed price',
-  `start_date` DATE NOT NULL COMMENT 'Project start date',
-  `end_date` DATE NOT NULL COMMENT 'Project end date',
-  `status` ENUM('draft', 'active', 'completed', 'terminated', 'disputed') NOT NULL DEFAULT 'draft',
-  `terms` TEXT NULL DEFAULT NULL COMMENT 'Agreement terms and conditions',
-  `milestones` JSON NULL DEFAULT NULL COMMENT 'Project milestones (JSON)',
-  `signed_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When agreement was signed',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_project_agreements_project_id` FOREIGN KEY (`project_id`) 
-    REFERENCES `projects` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_project_agreements_consumer_id` FOREIGN KEY (`consumer_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_project_agreements_developer_id` FOREIGN KEY (`developer_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_project_agreements_offer_id` FOREIGN KEY (`offer_id`) 
-    REFERENCES `offers` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `chk_project_agreements_price` CHECK (`final_price` >= 0),
-  
-  INDEX `idx_status_start_date` (`status`, `start_date`),
-  INDEX `idx_developer_status` (`developer_id`, `status`),
-  INDEX `idx_consumer_status` (`consumer_id`, `status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Payments table: Payment transactions for project agreements
-CREATE TABLE `payments` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `project_agreement_id` BIGINT UNSIGNED NOT NULL,
-  `amount` DECIMAL(15, 2) NOT NULL COMMENT 'Payment amount',
-  `type` ENUM('deposit', 'milestone', 'final', 'refund') NOT NULL DEFAULT 'deposit',
-  `payment_method` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Payment method used',
-  `consumer_payment_proof` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Payment proof document',
-  `status` ENUM('pending', 'confirmed', 'transferred', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
-  `admin_confirmed` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Admin confirmed payment',
-  `admin_confirmed_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When admin confirmed',
-  `admin_transferred` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Admin transferred funds',
-  `admin_transferred_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When admin transferred',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_payments_project_agreement_id` FOREIGN KEY (`project_agreement_id`) 
-    REFERENCES `project_agreements` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `chk_payments_amount` CHECK (`amount` >= 0),
-  
-  INDEX `idx_status_created` (`status`, `created_at`),
-  INDEX `idx_admin_workflow` (`admin_confirmed`, `admin_transferred`),
-  INDEX `idx_agreement_status` (`project_agreement_id`, `status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Reviews table: Reviews and ratings for completed projects
-CREATE TABLE `reviews` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `project_id` BIGINT UNSIGNED NOT NULL,
-  `consumer_id` BIGINT UNSIGNED NOT NULL COMMENT 'Consumer who wrote review',
-  `developer_id` BIGINT UNSIGNED NOT NULL COMMENT 'Developer being reviewed',
-  `rating` TINYINT NOT NULL COMMENT 'Rating 1-5',
-  `comment` TEXT NULL DEFAULT NULL COMMENT 'Review comment',
-  `rating_breakdown` JSON NULL DEFAULT NULL COMMENT 'Detailed rating breakdown (JSON)',
-  `is_public` BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Whether review is public',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_reviews_project_id` FOREIGN KEY (`project_id`) 
-    REFERENCES `projects` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_reviews_consumer_id` FOREIGN KEY (`consumer_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_reviews_developer_id` FOREIGN KEY (`developer_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `chk_reviews_rating` CHECK (`rating` >= 1 AND `rating` <= 5),
-  UNIQUE KEY `uq_project_consumer` (`project_id`, `consumer_id`),
-  
-  INDEX `idx_developer_rating` (`developer_id`, `rating`),
-  INDEX `idx_consumer_id` (`consumer_id`),
-  INDEX `idx_rating_created` (`rating`, `created_at`),
-  INDEX `idx_developer_created` (`developer_id`, `created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- MESSAGING TABLES
--- ============================================================================
-
--- Conversations table: Chat conversations between users
-CREATE TABLE `conversations` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `title` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Conversation title',
-  `type` ENUM('private', 'project', 'support') NOT NULL DEFAULT 'private',
-  `project_id` BIGINT UNSIGNED NULL DEFAULT NULL COMMENT 'Associated project (if type=project)',
-  `metadata` JSON NULL DEFAULT NULL COMMENT 'Additional metadata (JSON)',
-  `is_active` BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Whether conversation is active',
-  `last_message_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Timestamp of last message',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_conversations_project_id` FOREIGN KEY (`project_id`) 
-    REFERENCES `projects` (`id`) ON DELETE CASCADE,
-  
-  INDEX `idx_type_active` (`type`, `is_active`),
-  INDEX `idx_project_active` (`project_id`, `is_active`),
-  INDEX `idx_last_message_at` (`last_message_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Conversation Participants table: Users in a conversation
-CREATE TABLE `conversation_participants` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `conversation_id` BIGINT UNSIGNED NOT NULL,
-  `user_id` BIGINT UNSIGNED NOT NULL,
-  `role` ENUM('admin', 'participant') NOT NULL DEFAULT 'participant',
-  `joined_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_read_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last time user read messages',
-  `is_active` BOOLEAN NOT NULL DEFAULT TRUE COMMENT 'Whether participant is active',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_conversation_participants_conversation_id` FOREIGN KEY (`conversation_id`) 
-    REFERENCES `conversations` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_conversation_participants_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  UNIQUE KEY `uq_conversation_user` (`conversation_id`, `user_id`),
-  
-  INDEX `idx_conversation_last_read` (`conversation_id`, `last_read_at`),
-  INDEX `idx_user_active` (`user_id`, `is_active`),
-  INDEX `idx_last_read_at` (`last_read_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Messages table: Individual messages in conversations
-CREATE TABLE `messages` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `conversation_id` BIGINT UNSIGNED NOT NULL,
-  `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'Message sender',
-  `body` TEXT NULL DEFAULT NULL COMMENT 'Message content',
-  `type` ENUM('text', 'file', 'image', 'system') NOT NULL DEFAULT 'text',
-  `attachment` VARCHAR(255) NULL DEFAULT NULL COMMENT 'File/image path or URL',
-  `metadata` JSON NULL DEFAULT NULL COMMENT 'Additional metadata (size, mimetype, etc)',
-  `deleted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Soft delete timestamp',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_messages_conversation_id` FOREIGN KEY (`conversation_id`) 
-    REFERENCES `conversations` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_messages_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  
-  INDEX `idx_conversation_created` (`conversation_id`, `created_at`),
-  INDEX `idx_conversation_id` (`conversation_id`, `id`),
-  INDEX `idx_user_created` (`user_id`, `created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- NOTIFICATION TABLES
--- ============================================================================
-
--- User Notifications table: User notifications and alerts
-CREATE TABLE `user_notifications` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `user_id` BIGINT UNSIGNED NOT NULL,
-  `type` VARCHAR(50) NOT NULL COMMENT 'Notification type (offer_received, payment_confirmed, etc)',
-  `title` VARCHAR(255) NOT NULL COMMENT 'Notification title',
-  `message` TEXT NOT NULL COMMENT 'Notification message',
-  `data` JSON NULL DEFAULT NULL COMMENT 'Additional data (JSON)',
-  `is_read` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Whether notification is read',
-  `read_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When notification was read',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  CONSTRAINT `fk_user_notifications_user_id` FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) ON DELETE CASCADE,
-  
-  INDEX `idx_user_is_read` (`user_id`, `is_read`),
-  INDEX `idx_user_created` (`user_id`, `created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- SYSTEM TABLES
--- ============================================================================
-
--- Failed Jobs table: Queue job failures
-CREATE TABLE `failed_jobs` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `connection` VARCHAR(255) NOT NULL COMMENT 'Queue connection name',
-  `queue` VARCHAR(255) NOT NULL COMMENT 'Queue name',
-  `payload` LONGTEXT NOT NULL COMMENT 'Job payload',
-  `exception` LONGTEXT NOT NULL COMMENT 'Exception message',
-  `failed_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  
-  INDEX `idx_queue_failed_at` (`queue`, `failed_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Password Reset Tokens table: Password reset tokens
-CREATE TABLE `password_reset_tokens` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `email` VARCHAR(255) NOT NULL COMMENT 'User email',
-  `token` VARCHAR(64) NOT NULL COMMENT 'Reset token',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  INDEX `idx_email` (`email`),
-  INDEX `idx_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Cache table: Application cache storage
+DROP TABLE IF EXISTS `cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache` (
-  `key` VARCHAR(255) NOT NULL PRIMARY KEY,
-  `value` MEDIUMTEXT NOT NULL,
-  `expiration` INT NOT NULL
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Cache Locks table: Cache lock mechanism
+--
+
+
+--
+-- Table structure for table `cache_locks`
+--
+
+DROP TABLE IF EXISTS `cache_locks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache_locks` (
-  `key` VARCHAR(255) NOT NULL PRIMARY KEY,
-  `owner` VARCHAR(255) NOT NULL,
-  `expiration` INT NOT NULL
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Personal Access Tokens table: API authentication tokens
+--
+
+
+--
+-- Table structure for table `ch_favorites`
+--
+
+DROP TABLE IF EXISTS `ch_favorites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ch_favorites` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint NOT NULL,
+  `favorite_id` bigint NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `ch_messages`
+--
+
+DROP TABLE IF EXISTS `ch_messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ch_messages` (
+  `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `from_id` bigint NOT NULL,
+  `to_id` bigint NOT NULL,
+  `conversation_id` bigint unsigned DEFAULT NULL,
+  `body` varchar(5000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `attachment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `project_agreement_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `metadata` text COLLATE utf8mb4_unicode_ci,
+  `seen` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ch_messages_project_agreement_id_foreign` (`project_agreement_id`),
+  KEY `ch_messages_conversation_id_foreign` (`conversation_id`),
+  CONSTRAINT `ch_messages_conversation_id_foreign` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ch_messages_project_agreement_id_foreign` FOREIGN KEY (`project_agreement_id`) REFERENCES `project_agreements` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `conversation_participants`
+--
+
+DROP TABLE IF EXISTS `conversation_participants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `conversation_participants` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `conversation_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `role` enum('admin','participant') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'participant',
+  `joined_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_read_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `last_sent_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `conversation_participants_conversation_id_user_id_unique` (`conversation_id`,`user_id`),
+  KEY `conversation_participants_conversation_id_last_read_at_index` (`conversation_id`,`last_read_at`),
+  KEY `conversation_participants_user_id_is_active_index` (`user_id`,`is_active`),
+  KEY `conversation_participants_last_read_at_index` (`last_read_at`),
+  KEY `conversation_participants_last_sent_at_index` (`last_sent_at`),
+  CONSTRAINT `conversation_participants_conversation_id_foreign` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `conversation_participants_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `conversations`
+--
+
+DROP TABLE IF EXISTS `conversations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `conversations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` enum('private','project','support') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'private',
+  `project_id` bigint unsigned DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `last_message_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `conversations_type_is_active_index` (`type`,`is_active`),
+  KEY `conversations_project_id_is_active_index` (`project_id`,`is_active`),
+  KEY `conversations_last_message_at_index` (`last_message_at`),
+  CONSTRAINT `conversations_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `conversations_chk_1` CHECK (json_valid(`metadata`))
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `developer_profiles`
+--
+
+DROP TABLE IF EXISTS `developer_profiles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `developer_profiles` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `headline` varchar(255) DEFAULT NULL,
+  `experience` text,
+  `rate_min_byproject` decimal(15,2) DEFAULT NULL,
+  `rate_max_byproject` decimal(15,2) DEFAULT NULL,
+  `availability` enum('available','busy','unavailable') NOT NULL DEFAULT 'available',
+  `experience_years` int NOT NULL DEFAULT '0',
+  `education` varchar(255) DEFAULT NULL,
+  `certifications` text,
+  `portfolio_links` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `rating_average` decimal(3,2) NOT NULL DEFAULT '0.00',
+  `rating_count` int NOT NULL DEFAULT '0',
+  `projects_completed` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `developer_profiles_user_id_unique` (`user_id`),
+  KEY `developer_profiles_availability_rating_average_index` (`availability`,`rating_average`),
+  KEY `developer_profiles_rating_average_rating_count_index` (`rating_average`,`rating_count`),
+  KEY `developer_profiles_rate_min_byproject_rate_max_byproject_index` (`rate_min_byproject`,`rate_max_byproject`),
+  CONSTRAINT `developer_profiles_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `developer_profiles_chk_1` CHECK (json_valid(`portfolio_links`))
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `connection` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `failed_jobs_queue_failed_at_index` (`queue`,`failed_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `jobs`
+--
+
+DROP TABLE IF EXISTS `jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempts` tinyint unsigned NOT NULL,
+  `reserved_at` bigint unsigned DEFAULT NULL,
+  `available_at` bigint unsigned NOT NULL,
+  `created_at` bigint unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_reserved_at_index` (`queue`,`reserved_at`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `messages`
+--
+
+DROP TABLE IF EXISTS `messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `messages` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `conversation_id` bigint unsigned NOT NULL,
+  `sender_id` bigint unsigned NOT NULL,
+  `type` enum('text','file','image','system','proposal') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
+  `body` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `sent_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `messages_sender_id_foreign` (`sender_id`),
+  KEY `messages_conversation_id_sent_at_index` (`conversation_id`,`sent_at`),
+  CONSTRAINT `messages_conversation_id_foreign` FOREIGN KEY (`conversation_id`) REFERENCES `conversations` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `messages_sender_id_foreign` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `messages_chk_1` CHECK (json_valid(`payload`))
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `offers`
+--
+
+DROP TABLE IF EXISTS `offers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `offers` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `proposed_price` decimal(15,2) NOT NULL,
+  `proposed_deadline` date NOT NULL,
+  `cover_letter` text,
+  `milestones` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `status` enum('pending','accepted','rejected','withdrawn') NOT NULL DEFAULT 'pending',
+  `conversation_id` varchar(255) DEFAULT NULL,
+  `accepted_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `offers_project_id_user_id_unique` (`project_id`,`user_id`),
+  KEY `offers_status_created_at_index` (`status`,`created_at`),
+  KEY `offers_user_id_status_index` (`user_id`,`status`),
+  KEY `offers_project_id_status_created_at_index` (`project_id`,`status`,`created_at`),
+  KEY `offers_accepted_at_index` (`accepted_at`),
+  CONSTRAINT `offers_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `offers_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `offers_chk_1` CHECK (json_valid(`milestones`))
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+DROP TABLE IF EXISTS `password_reset_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_tokens` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `password_reset_tokens_email_index` (`email`),
+  KEY `password_reset_tokens_created_at_index` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `payments`
+--
+
+DROP TABLE IF EXISTS `payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `project_agreement_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `amount` decimal(15,2) NOT NULL,
+  `type` enum('deposit','milestone','final','refund') NOT NULL DEFAULT 'deposit',
+  `payment_method` varchar(255) DEFAULT NULL,
+  `consumer_payment_proof` varchar(255) DEFAULT NULL,
+  `status` enum('pending','confirmed','transferred','failed','refunded') NOT NULL DEFAULT 'pending',
+  `admin_confirmed` tinyint(1) NOT NULL DEFAULT '0',
+  `admin_confirmed_at` timestamp NULL DEFAULT NULL,
+  `admin_transferred` tinyint(1) NOT NULL DEFAULT '0',
+  `admin_transferred_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `admin_transfer_proof` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `payments_status_created_at_index` (`status`,`created_at`),
+  KEY `payments_admin_confirmed_admin_transferred_index` (`admin_confirmed`,`admin_transferred`),
+  KEY `payments_project_agreement_id_status_index` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+DROP TABLE IF EXISTS `personal_access_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `personal_access_tokens` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `tokenable_type` VARCHAR(255) NOT NULL COMMENT 'Tokenable model type',
-  `tokenable_id` BIGINT UNSIGNED NOT NULL COMMENT 'Tokenable model ID',
-  `name` TEXT NOT NULL COMMENT 'Token name',
-  `token` VARCHAR(64) NOT NULL UNIQUE COMMENT 'Token value',
-  `abilities` TEXT NULL DEFAULT NULL COMMENT 'Token abilities (JSON)',
-  `last_used_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last used timestamp',
-  `expires_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Token expiration',
-  `created_at` TIMESTAMP NULL DEFAULT NULL,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL,
-  
-  INDEX `idx_tokenable` (`tokenable_type`, `tokenable_id`),
-  INDEX `idx_expires_at` (`expires_at`)
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint unsigned NOT NULL,
+  `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
+  KEY `personal_access_tokens_expires_at_index` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ============================================================================
--- END OF SCHEMA
--- ============================================================================
+--
+
+
+--
+-- Table structure for table `portfolios`
+--
+
+DROP TABLE IF EXISTS `portfolios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `portfolios` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `project_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `technologies` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `completed_at` date DEFAULT NULL,
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `portfolios_user_id_is_featured_index` (`user_id`,`is_featured`),
+  CONSTRAINT `portfolios_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `portfolios_chk_1` CHECK (json_valid(`technologies`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `project_agreements`
+--
+
+DROP TABLE IF EXISTS `project_agreements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_agreements` (
+  `id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `project_id` bigint unsigned DEFAULT NULL,
+  `project_title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Judul project',
+  `consumer_id` bigint unsigned NOT NULL,
+  `developer_id` bigint unsigned NOT NULL,
+  `client_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `final_price` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `price_details` json DEFAULT NULL COMMENT 'Breakdown harga',
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `status` enum('pending','accepted','active','completed','terminated','disputed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `terms` longtext COLLATE utf8mb4_unicode_ci,
+  `scope_projects` longtext COLLATE utf8mb4_unicode_ci,
+  `projects_mvp` json DEFAULT NULL,
+  `milestones` longtext COLLATE utf8mb4_unicode_ci,
+  `deliverables` json DEFAULT NULL,
+  `signed_at` timestamp NULL DEFAULT NULL,
+  `conversation_id` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_agreements_consumer_id_foreign` (`consumer_id`),
+  KEY `project_agreements_developer_id_foreign` (`developer_id`),
+  KEY `project_agreements_status_index` (`status`),
+  KEY `project_agreements_project_id_foreign` (`project_id`),
+  CONSTRAINT `project_agreements_consumer_id_foreign` FOREIGN KEY (`consumer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `project_agreements_developer_id_foreign` FOREIGN KEY (`developer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `project_agreements_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `project_disputes`
+--
+
+DROP TABLE IF EXISTS `project_disputes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_disputes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `project_agreement_id` char(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `raised_by` bigint unsigned NOT NULL,
+  `status` enum('open','under_review','resolved','closed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
+  `issue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `resolution` text COLLATE utf8mb4_unicode_ci,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `project_disputes_raised_by_foreign` (`raised_by`),
+  KEY `project_disputes_project_agreement_id_foreign` (`project_agreement_id`),
+  CONSTRAINT `project_disputes_project_agreement_id_foreign` FOREIGN KEY (`project_agreement_id`) REFERENCES `project_agreements` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `project_disputes_raised_by_foreign` FOREIGN KEY (`raised_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `project_skills`
+--
+
+DROP TABLE IF EXISTS `project_skills`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `project_skills` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` bigint unsigned NOT NULL,
+  `skill_id` bigint unsigned NOT NULL,
+  `required_level` tinyint NOT NULL DEFAULT '2' COMMENT '1=Beginner, 2=Intermediate, 3=Advanced, 4=Expert',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_skills_project_id_skill_id_unique` (`project_id`,`skill_id`),
+  KEY `project_skills_skill_id_required_level_index` (`skill_id`,`required_level`),
+  KEY `project_skills_project_id_index` (`project_id`),
+  CONSTRAINT `project_skills_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `project_skills_skill_id_foreign` FOREIGN KEY (`skill_id`) REFERENCES `skills` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `projects`
+--
+
+DROP TABLE IF EXISTS `projects`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `projects` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `consumer_id` bigint unsigned NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `budget` decimal(15,2) NOT NULL,
+  `deadline` date NOT NULL,
+  `status` enum('draft','open','in_progress','completed','cancelled') NOT NULL DEFAULT 'open',
+  `views_count` int NOT NULL DEFAULT '0',
+  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+  `requirements` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `projects_status_created_at_index` (`status`,`created_at`),
+  KEY `projects_consumer_id_status_index` (`consumer_id`,`status`),
+  KEY `projects_budget_deadline_index` (`budget`,`deadline`),
+  KEY `projects_is_featured_status_index` (`is_featured`,`status`),
+  KEY `projects_deadline_status_index` (`deadline`,`status`),
+  CONSTRAINT `projects_consumer_id_foreign` FOREIGN KEY (`consumer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `projects_chk_1` CHECK (json_valid(`requirements`))
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `reviews`
+--
+
+DROP TABLE IF EXISTS `reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `reviews` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` bigint unsigned NOT NULL,
+  `consumer_id` bigint unsigned NOT NULL,
+  `developer_id` bigint unsigned NOT NULL,
+  `rating` tinyint NOT NULL,
+  `comment` text,
+  `rating_breakdown` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `is_public` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `reviews_project_id_consumer_id_unique` (`project_id`,`consumer_id`),
+  KEY `reviews_developer_id_rating_index` (`developer_id`,`rating`),
+  KEY `reviews_consumer_id_index` (`consumer_id`),
+  KEY `reviews_rating_created_at_index` (`rating`,`created_at`),
+  KEY `reviews_developer_id_created_at_index` (`developer_id`,`created_at`),
+  CONSTRAINT `reviews_consumer_id_foreign` FOREIGN KEY (`consumer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `reviews_developer_id_foreign` FOREIGN KEY (`developer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `reviews_project_id_foreign` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `reviews_chk_1` CHECK (json_valid(`rating_breakdown`))
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `trg_reviews_after_insert` AFTER INSERT ON `reviews` FOR EACH ROW BEGIN
+                UPDATE developer_profiles AS dp
+                SET dp.rating_count   = dp.rating_count + 1,
+                    dp.rating_average = (
+                        SELECT COALESCE(AVG(r2.rating), 0)
+                        FROM reviews r2
+                        WHERE r2.developer_id = NEW.developer_id
+                    )
+                WHERE dp.user_id = NEW.developer_id;
+            END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `trg_reviews_after_update` AFTER UPDATE ON `reviews` FOR EACH ROW BEGIN
+                /* rating berubah atau developer-nya berubah */
+                IF NEW.rating <> OLD.rating OR NEW.developer_id <> OLD.developer_id THEN
+                    /* kurangi stat lama jika developer lama beda */
+                    IF OLD.developer_id <> NEW.developer_id THEN
+                        UPDATE developer_profiles AS dp
+                        SET dp.rating_count   = dp.rating_count - 1,
+                            dp.rating_average = (
+                                SELECT COALESCE(AVG(r2.rating), 0)
+                                FROM reviews r2
+                                WHERE r2.developer_id = OLD.developer_id
+                            )
+                        WHERE dp.user_id = OLD.developer_id;
+                    END IF;
+
+                    /* tambah stat baru */
+                    UPDATE developer_profiles AS dp
+                    SET dp.rating_count   = dp.rating_count + 1,
+                        dp.rating_average = (
+                            SELECT COALESCE(AVG(r2.rating), 0)
+                            FROM reviews r2
+                            WHERE r2.developer_id = NEW.developer_id
+                        )
+                    WHERE dp.user_id = NEW.developer_id;
+                END IF;
+            END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_unicode_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `trg_reviews_after_delete` AFTER DELETE ON `reviews` FOR EACH ROW BEGIN
+                UPDATE developer_profiles AS dp
+                SET dp.rating_count   = dp.rating_count - 1,
+                    dp.rating_average = (
+                        SELECT COALESCE(AVG(r2.rating), 0)
+                        FROM reviews r2
+                        WHERE r2.developer_id = OLD.developer_id
+                    )
+                WHERE dp.user_id = OLD.developer_id;
+            END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `skill_user`
+--
+
+DROP TABLE IF EXISTS `skill_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `skill_user` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `skill_id` bigint unsigned NOT NULL,
+  `proficiency_level` tinyint NOT NULL DEFAULT '1' COMMENT '1=Beginner, 2=Intermediate, 3=Advanced, 4=Expert',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `skill_user_user_id_skill_id_unique` (`user_id`,`skill_id`),
+  KEY `skill_user_skill_id_proficiency_level_index` (`skill_id`,`proficiency_level`),
+  KEY `skill_user_user_id_proficiency_level_index` (`user_id`,`proficiency_level`),
+  CONSTRAINT `skill_user_skill_id_foreign` FOREIGN KEY (`skill_id`) REFERENCES `skills` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `skill_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `skills`
+--
+
+DROP TABLE IF EXISTS `skills`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `skills` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `skills_name_unique` (`name`),
+  UNIQUE KEY `skills_slug_unique` (`slug`),
+  KEY `skills_category_is_active_index` (`category`,`is_active`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `user_notifications`
+--
+
+DROP TABLE IF EXISTS `user_notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_notifications` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `read_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_notifications_user_id_is_read_index` (`user_id`,`is_read`),
+  KEY `user_notifications_user_id_created_at_index` (`user_id`,`created_at`),
+  CONSTRAINT `user_notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `user_notifications_chk_1` CHECK (json_valid(`data`))
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` enum('consumer','developer','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'consumer',
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bio` text COLLATE utf8mb4_unicode_ci,
+  `location` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dark_mode` tinyint(1) NOT NULL DEFAULT '0',
+  `messenger_color` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#5aa07f',
+  `active_status` tinyint(1) NOT NULL DEFAULT '1',
+  `provider` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`),
+  KEY `users_role_active_status_index` (`role`,`active_status`),
+  KEY `users_email_verified_at_index` (`email_verified_at`),
+  KEY `users_created_at_index` (`created_at`),
+  KEY `users_provider_provider_id_index` (`provider`,`provider_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-11-27 15:19:37
+

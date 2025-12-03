@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot:title>{{ __('Dashboard Anda - Inofa') }}</x-slot:title>
+    <x-slot:title>{{ __('My Dashboard - Inofa') }}</x-slot:title>
     <section class="min-h-screen flex">
 
         <!-- ===== SIDEBAR ===== -->
@@ -23,12 +23,12 @@
 
                     <div>
                         <a href="{{ route('search.developers.show', auth()->user()->id) }}" target="_blank"
-                            class="inline-flex items-center justify-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-xl bg-primary-500 text-neutral-0
-                                hover:bg-primary-600 hover:scale-[1.02] active:scale-[0.98]
+                            class="inline-flex items-center justify-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-primary-500 bg-primary-500 text-neutral-0
+                                hover:bg-neutral-0 hover:text-primary-500 hover:scale-[1.02] active:scale-[0.98]
                                 [box-shadow:inset_0_2px_4px_0_rgba(0,0,0,0.06),0_4px_12px_rgba(16,138,0,0.25)]
                                 transition-all duration-200 group whitespace-nowrap">
 
-                            <svg class="w-4 md:w-5 h-4 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 20 20">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
                                     d="M1.72 10.29c-.07-.19-.07-.4 0-.59C2.4 8.07 3.54 6.67 5.02 5.68c1.47-.99 3.2-1.51 4.98-1.51s3.51.52 4.98 1.51c1.48.99 2.62 2.39 3.3 4.02.07.19.07.4 0 .59-.68 1.63-1.82 3.03-3.3 4.02-1.47.99-3.2 1.51-4.98 1.51s-3.51-.52-4.98-1.51C3.54 13.32 2.4 11.92 1.72 10.29z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
@@ -207,64 +207,189 @@
                 </div>
 
                 <!-- ===== MY ACTIVE PROJECTS ===== -->
-                <div class="p-8 bg-neutral-10/50">
+                <div class="p-8 bg-neutral-10/50" x-data="{
+                    sortBy: 'default',
+                    sortOpen: false,
+                    agreements: {{ $activeAgreements->toJson() }},
+                    get sortedAgreements() {
+                        let sorted = [...this.agreements];
+                        switch(this.sortBy) {
+                            case 'payment_high':
+                                return sorted.sort((a, b) => b.final_price - a.final_price);
+                            case 'payment_low':
+                                return sorted.sort((a, b) => a.final_price - b.final_price);
+                            case 'progress_high':
+                                return sorted.sort((a, b) => b.progress - a.progress);
+                            case 'progress_low':
+                                return sorted.sort((a, b) => a.progress - b.progress);
+                            case 'az':
+                                return sorted.sort((a, b) => a.project_title.localeCompare(b.project_title));
+                            default:
+                                return sorted;
+                        }
+                    },
+                    getSortLabel() {
+                        const labels = {
+                            'default': 'Default',
+                            'payment_high': 'Highest Paid',
+                            'payment_low': 'Lowest Paid',
+                            'progress_high': 'Highest Progress',
+                            'progress_low': 'Lowest Progress',
+                            'az': 'A to Z'
+                        };
+                        return labels[this.sortBy] || 'Sort By';
+                    }
+                }" @click.away="sortOpen = false">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h2 class="text-h-5 font-bold text-neutral-900">My Active Projects</h2>
                             <p class="text-b-1 text-neutral-600">Track your ongoing work and deadlines</p>
                         </div>
-                        <a href="{{ route('developer.agreements.index') }}"
-                            class="text-primary-500 text-b-1 font-medium hover:underline flex items-center gap-1">
-                            View All
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7" />
-                            </svg>
-                        </a>
+                        
+                        <!-- Sort By Dropdown -->
+                        <div class="relative">
+                            <button @click="sortOpen = !sortOpen"
+                                class="text-primary-500 text-b-1 font-medium hover:bg-primary-50 px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                                </svg>
+                                <span x-text="getSortLabel()">Sort By</span>
+                                <svg class="w-4 h-4 transition-transform" :class="{'rotate-180': sortOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div x-show="sortOpen" 
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95"
+                                class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-10"
+                                style="display: none;">
+                                <button @click="sortBy = 'default'; sortOpen = false" 
+                                    class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
+                                    :class="{'bg-primary-50 text-primary-600 font-medium': sortBy === 'default'}">
+                                    Default
+                                </button>
+                                <button @click="sortBy = 'payment_high'; sortOpen = false" 
+                                    class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
+                                    :class="{'bg-primary-50 text-primary-600 font-medium': sortBy === 'payment_high'}">
+                                    Highest Paid
+                                </button>
+                                <button @click="sortBy = 'payment_low'; sortOpen = false" 
+                                    class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
+                                    :class="{'bg-primary-50 text-primary-600 font-medium': sortBy === 'payment_low'}">
+                                    Lowest Paid
+                                </button>
+                                <button @click="sortBy = 'progress_high'; sortOpen = false" 
+                                    class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
+                                    :class="{'bg-primary-50 text-primary-600 font-medium': sortBy === 'progress_high'}">
+                                    Highest Progress
+                                </button>
+                                <button @click="sortBy = 'progress_low'; sortOpen = false" 
+                                    class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
+                                    :class="{'bg-primary-50 text-primary-600 font-medium': sortBy === 'progress_low'}">
+                                    Lowest Progress
+                                </button>
+                                <button @click="sortBy = 'az'; sortOpen = false" 
+                                    class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
+                                    :class="{'bg-primary-50 text-primary-600 font-medium': sortBy === 'az'}">
+                                    A to Z
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="space-y-4">
-                        @forelse($activeAgreements as $agreement)
+                        <template x-for="agreement in sortedAgreements" :key="agreement.id">
                             <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
                                 <div class="flex items-start justify-between gap-6">
 
                                     <!-- Left Content -->
                                     <div class="flex-1">
                                         <div class="flex items-start gap-3 mb-3">
-                                            @php
-                                                $avatarSrc = $agreement->consumer->getRawOriginal('avatar')
-                                                    ? (filter_var($agreement->consumer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
-                                                        ? $agreement->consumer->getRawOriginal('avatar')
-                                                        : asset('storage/' . $agreement->consumer->getRawOriginal('avatar')))
-                                                    : 'https://ui-avatars.com/api/?name=' . urlencode($agreement->consumer->name);
-                                            @endphp
-                                            <img src="{{ $avatarSrc }}"
-                                                alt="{{ $agreement->consumer->name }}"
+                                            <img :src="agreement.consumer.avatar && agreement.consumer.avatar.startsWith('http') 
+                                                    ? agreement.consumer.avatar 
+                                                    : agreement.consumer.avatar 
+                                                        ? '/storage/' + agreement.consumer.avatar 
+                                                        : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(agreement.consumer.name)"
+                                                :alt="agreement.consumer.name"
                                                 class="w-10 h-10 rounded-full object-cover">
-                                            <div>
-                                                <h3 class="text-b-1 font-semibold text-neutral-900">
-                                                    @if($agreement->project)
-                                                        {{ $agreement->project->title }}
-                                                    @else
-                                                        {{ $agreement->project_title }}
-                                                    @endif
-                                                </h3>
-                                                <p class="text-b-3 text-neutral-600">Client:
-                                                    {{ $agreement->consumer->name }}</p>
+                                            <div class="flex-1">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary-500" fill="currentColor" viewBox="0 0 256 256">
+                                                        <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56Zm0,144H40V104H216v96Z"></path>
+                                                    </svg>
+                                                    <h3 class="text-b-1 font-semibold text-neutral-900" x-text="agreement.project_title"></h3>
+                                                </div>
+                                                <p class="text-b-3 text-neutral-600 flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-500" fill="currentColor" viewBox="0 0 256 256">
+                                                        <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+                                                    </svg>
+                                                    Client: <span x-text="agreement.consumer.name"></span>
+                                                </p>
                                             </div>
                                         </div>
 
-                                        <!-- Progress Bar -->
-                                        <div class="mb-3">
-                                            <div class="flex items-center justify-between mb-1">
-                                                <span class="text-b-3 text-neutral-600">Progress:
-                                                    {{ ($agreement->project && $agreement->project->progress) ? $agreement->project->progress : 0 }}%</span>
-                                                <span class="text-b-3 text-neutral-600">Next:
-                                                    {{ $agreement->milestones[0]['name'] ?? 'TBD' }}</span>
+                                        <!-- Progress Bar with Input -->
+                                        <div class="mb-3" x-data="{ 
+                                            progress: agreement.progress,
+                                            updating: false,
+                                            async updateProgress(agreementId, value) {
+                                                this.updating = true;
+                                                try {
+                                                    const response = await fetch(`/developer/agreements/${agreementId}/progress`, {
+                                                        method: 'PATCH',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                            'Accept': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({ progress: value })
+                                                    });
+                                                    const data = await response.json();
+                                                    if (data.success) {
+                                                        this.progress = data.progress;
+                                                        agreement.progress = data.progress;
+                                                        this.$dispatch('notify', { message: 'Progress updated!', type: 'success' });
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Error:', error);
+                                                    this.$dispatch('notify', { message: 'Failed to update progress', type: 'error' });
+                                                } finally {
+                                                    this.updating = false;
+                                                }
+                                            }
+                                        }">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-b-3 text-neutral-600 flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-primary-500" fill="currentColor" viewBox="0 0 256 256">
+                                                        <path d="M176,104H152a8,8,0,0,1,0-16h24a8,8,0,0,1,0,16Zm-24,24h24a8,8,0,0,0,0-16H152a8,8,0,0,0,0,16Zm80-72V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM104,176V80a8,8,0,0,0-8-8H40V200H96A8,8,0,0,0,104,176Zm112,24V72H120V176a24,24,0,0,1-24,24H40v0H216Z"></path>
+                                                    </svg>
+                                                    Progress
+                                                </span>
+                                                <div class="flex items-center gap-2">
+                                                    <input type="number" 
+                                                        x-model="progress"
+                                                        @change="updateProgress(agreement.id, $el.value)"
+                                                        min="0" 
+                                                        max="100" 
+                                                        :disabled="updating"
+                                                        class="w-16 px-2 py-1 border border-neutral-300 rounded-lg text-b-3 text-center focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
+                                                        :class="{ 'animate-pulse': updating }">
+                                                    <span class="text-b-3 text-neutral-600">%</span>
+                                                    <svg x-show="updating" class="w-4 h-4 text-primary-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                </div>
                                             </div>
                                             <div class="w-full bg-neutral-200 rounded-full h-2">
-                                                <div class="bg-primary-500 h-2 rounded-full transition-all"
-                                                    style="width: {{ ($agreement->project && $agreement->project->progress) ? $agreement->project->progress : 0 }}%"></div>
+                                                <div class="bg-gradient-to-r from-primary-500 to-green-500 h-2 rounded-full transition-all duration-500"
+                                                    :style="`width: ${progress}%`"></div>
                                             </div>
                                         </div>
 
@@ -276,10 +401,10 @@
                                                     Progress</span>
                                             </span>
                                             <span class="flex items-center gap-1">
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="12" r="8" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-500" fill="currentColor" viewBox="0 0 256 256">
+                                                    <path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-96-88v64a8,8,0,0,1-16,0V132.94l-4.42,2.22a8,8,0,0,1-7.16-14.32l16-8A8,8,0,0,1,112,120Zm59.16,30.45L152,176h16a8,8,0,0,1,0,16H136a8,8,0,0,1-6.4-12.8l28.78-38.37A8,8,0,1,0,145.07,132a8,8,0,1,1-13.85-8A24,24,0,0,1,176,136,23.76,23.76,0,0,1,171.16,150.45Z"></path>
                                                 </svg>
-                                                Mar {{ $agreement->end_date->format('d, Y') }}
+                                                <span x-text="new Date(agreement.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })"></span>
                                             </span>
                                         </div>
                                     </div>
@@ -287,51 +412,46 @@
                                     <!-- Right Content -->
                                     <div class="flex flex-col items-end gap-3">
                                         <div class="text-right">
-                                            <p class="text-h-5 font-bold text-neutral-900">
-                                                ${{ number_format($agreement->final_price, 0) }}</p>
+                                            <p class="text-h-5 font-bold text-neutral-900 flex items-center gap-1">
+                                                Rp<span x-text="agreement.final_price.toLocaleString('id-ID')"></span>
+                                            </p>
                                             <p class="text-b-3 text-neutral-600">Payment</p>
-                                            <p
-                                                class="text-b-3 text-neutral-600 flex items-center justify-end gap-1 mt-2">
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="12" r="8" />
+                                            <p class="text-b-3 text-neutral-600 flex items-center justify-end gap-1 mt-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 256 256">
+                                                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path>
                                                 </svg>
-                                                {{ $agreement->end_date->format('M d, Y') }}
+                                                <span x-text="new Date(agreement.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })"></span>
                                             </p>
                                             <p class="text-b-4 text-neutral-500">Deadline</p>
                                         </div>
 
                                         <div class="flex gap-2">
-                                            <a href="{{ route('landing', ['id' => $agreement->consumer->id]) }}"
-                                                class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="12" r="8" />
+                                            <a :href="`/user/${agreement.consumer.id}`"
+                                                class="px-8 py-2 border border-primary-500 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition flex items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 256 256">
+                                                    <path d="M216,48H40A16,16,0,0,0,24,64V224a15.85,15.85,0,0,0,9.24,14.5A16.13,16.13,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78.69.69,0,0,0,.13-.11L82.5,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM40,224h0ZM216,192H82.5a16,16,0,0,0-10.3,3.75l-.12.11L40,224V64H216ZM88,112a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm0,32a8,8,0,0,1,8-8h64a8,8,0,1,1,0,16H96A8,8,0,0,1,88,144Z"></path>
                                                 </svg>
                                                 Chat
-                                            </a>
-                                            <a href="{{ route('developer.agreements.show', $agreement) }}"
-                                                class="px-4 py-2 border-2 border-primary-500 text-primary-500 text-b-3 font-medium rounded-lg hover:bg-primary-50 transition flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="12" r="8" />
-                                                </svg>
-                                                View
                                             </a>
                                         </div>
                                     </div>
 
                                 </div>
                             </div>
-                        @empty
+                        </template>
+                        
+                        <template x-if="sortedAgreements.length === 0">
                             <div class="bg-white rounded-2xl border border-neutral-200 p-12 text-center">
                                 <div
                                     class="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
-                                    <svg class="w-8 h-8 text-neutral-400" fill="currentColor" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-neutral-400" fill="currentColor" viewBox="0 0 256 256">
+                                        <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56Zm0,144H40V104H216v96Z"></path>
                                     </svg>
                                 </div>
                                 <p class="text-b-1 text-neutral-600 mb-2">No active projects yet</p>
                                 <p class="text-b-3 text-neutral-500">Send offers to get hired!</p>
                             </div>
-                        @endforelse
+                        </template>
                     </div>
 
                     <!-- View All Projects Button -->
@@ -363,4 +483,42 @@
         </div>
 
     </section>
+
+    <!-- Toast Notification -->
+    <div x-data="{ 
+        show: false, 
+        message: '', 
+        type: 'success',
+        init() {
+            this.$watch('show', value => {
+                if (value) {
+                    setTimeout(() => { this.show = false }, 3000);
+                }
+            })
+        }
+    }" 
+    @notify.window="show = true; message = $event.detail.message; type = $event.detail.type"
+    x-show="show"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 transform translate-y-2"
+    x-transition:enter-end="opacity-100 transform translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 transform translate-y-0"
+    x-transition:leave-end="opacity-0 transform translate-y-2"
+    class="fixed bottom-4 right-4 z-50"
+    style="display: none;">
+        <div class="rounded-lg shadow-lg p-4 flex items-center gap-3 min-w-[300px]"
+            :class="{
+                'bg-green-500 text-white': type === 'success',
+                'bg-red-500 text-white': type === 'error'
+            }">
+            <svg x-show="type === 'success'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+            </svg>
+            <svg x-show="type === 'error'" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+            </svg>
+            <span x-text="message" class="font-medium"></span>
+        </div>
+    </div>
 </x-app-layout>

@@ -141,17 +141,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/developer/information', [RegistrationFlowController::class, 'storeDeveloperInformation'])->name('developer.information.store');
 });
 
-// Search for Developers (public access - as guest or authenticated)
-Route::get('/search/developers', [SearchDevelopers::class, 'index'])
-    ->name('search.developers');
-Route::get('/search/developers/{id}', [SearchDevelopers::class, 'show'])
-    ->name('search.developers.show');
+// Search for Developers (requires authentication)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/search/developers', [SearchDevelopers::class, 'index'])
+        ->name('search.developers');
+    Route::get('/search/developers/{id}', [SearchDevelopers::class, 'show'])
+        ->name('search.developers.show');
 
-// Search for Projects (public access - for developers)
-Route::get('/search/projects', [SearchProjects::class, 'index'])
-    ->name('search.projects');
-Route::get('/search/projects/{id}', [SearchProjects::class, 'show'])
-    ->name('search.projects.show');
+    // Search for Projects (for developers)
+    Route::get('/search/projects', [SearchProjects::class, 'index'])
+        ->name('search.projects');
+    Route::get('/search/projects/{id}', [SearchProjects::class, 'show'])
+        ->name('search.projects.show');
+});
 
 require __DIR__ . '/auth.php';
 
@@ -192,6 +194,8 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
         ->name('agreements.index');
     Route::get('/agreements/{agreement}', [DevAgreement::class, 'show'])
         ->name('agreements.show');
+    Route::patch('/agreements/{agreement}/progress', [DevAgreement::class, 'updateProgress'])
+        ->name('agreements.updateProgress');
 
     /* ---------- Proposals (pending / accepted) ---------- */
     Route::get('/proposals', [DevAgreement::class, 'proposals'])

@@ -55,8 +55,15 @@
                                 {{-- Avatar Preview --}}
                                 <div id="avatar-preview"
                                     class="w-24 h-24 rounded-full border-4 border-neutral-200 overflow-hidden bg-neutral-100 flex items-center justify-center">
-                                    @if (auth()->user()->avatar)
-                                        <img src="{{ Storage::url(auth()->user()->avatar) }}" alt="Current avatar"
+                                    @php
+                                        $avatarSrc = auth()->user()->getRawOriginal('avatar')
+                                            ? (filter_var(auth()->user()->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                ? auth()->user()->getRawOriginal('avatar')
+                                                : asset('storage/' . auth()->user()->getRawOriginal('avatar')))
+                                            : null;
+                                    @endphp
+                                    @if ($avatarSrc)
+                                        <img src="{{ $avatarSrc }}" alt="Current avatar"
                                             class="w-full h-full object-cover" id="preview-image">
                                     @else
                                         <svg class="w-12 h-12 text-neutral-400" fill="none" viewBox="0 0 24 24"

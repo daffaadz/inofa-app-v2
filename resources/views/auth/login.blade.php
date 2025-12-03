@@ -1,10 +1,10 @@
 <x-guest-layout>
     {{-- PAGE WRAPPER --}}
-    <div class="min-h-screen grid md:grid-cols-2">
+    <div class="min-h-screen grid md:grid-cols-2 px-2 md:px-0">
 
         {{-- LEFT PANEL : ILLUSTRATION --}}
         <div
-            class="hidden md:flex relative items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 p-6">
+            class="hidden md:flex relative items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 p-6 md:max-h-screen md:sticky md:top-0">
 
             {{-- Logo --}}
             <div class="absolute left-24 top-12 mb-10">
@@ -34,18 +34,32 @@
         </div>
 
         {{-- RIGHT PANEL : FORM --}}
-        <div class="flex items-center justify-center p-6">
+        <div class="flex items-center justify-center p-4 sm:p-6">
             <div class="w-full max-w-lg">
 
+                {{-- Mobile Logo --}}
+                <div class="md:hidden mb-8">
+                    <a href="{{ url('/') }}" class="flex items-center gap-3">
+                        <img src="{{ asset('assets/vector/logo.svg') }}" alt="Inofa" class="h-8 w-auto">
+                        <span class="text-neutral-800 text-h-5 font-sans">Inofa</span>
+                    </a>
+                </div>
+
                 {{-- Heading --}}
-                <h1 class="font-sans text-h-4 text-neutral-800 mb-2">
+                <h1 class="font-sans text-h-5 sm:text-h-4 text-neutral-800 mb-2">
                     Sign in to your account
                 </h1>
 
+                {{-- Mobile Register Link --}}
+                <p class="md:hidden font-sans text-b-2 text-neutral-600 mb-6">
+                    Don't have an account? <a href="{{ route('register') }}"
+                        class="text-primary-500 underline hover:no-underline">Create account</a>
+                </p>
+
                 {{-- Google sign-in --}}
                 <a href="{{ route('social.redirect', ['driver' => 'google']) }}"
-                    class="mt-6 flex items-center justify-center gap-3
-                      w-full px-4 py-4 rounded-xl border border-neutral-300
+                    class="mt-4 sm:mt-6 flex items-center justify-center gap-3
+                      w-full px-4 py-3 sm:py-4 rounded-xl border border-neutral-300
                       font-sans text-b-2 text-neutral-0 bg-blue-500 hover:bg-blue-400">
                     {{-- minimal Google icon --}}
                     <svg class="h-4 w-4" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -90,20 +104,18 @@
                     <div>
                         <x-input-label for="email" value="Email" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="email" type="email" name="email" :value="old('email')"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
-                                     font-sans text-b-1 placeholder-neutral-400
+                            class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
+                                     font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                                      focus:ring-1 focus:ring-primary-500" />
-                        @error('email')
-                            <p class="mt-1 font-sans text-b-2 text-red-500">Please enter a valid email.</p>
-                        @enderror
+                        <x-input-error :messages="$errors->get('email')" class="mt-1" />
                     </div>
 
                     {{-- Password + hints --}}
                     <div>
                         <x-input-label for="password" value="Password" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="password" type="password" name="password"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
-                                     font-sans text-b-1 placeholder-neutral-400
+                            class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
+                                     font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                                      focus:ring-1 focus:ring-primary-500" />
                         <x-input-error :messages="$errors->get('password')" class="mt-1" />
                     </div>
@@ -116,13 +128,13 @@
                     </p>
 
                     {{-- CTA --}}
-                    <div class="flex justify-between items-center pt-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-2">
                         <a href="{{ route('password.request') }}"
-                            class="text-primary-500 font-sans text-b-1 underline hover:no-underline"> Forgot
+                            class="text-primary-500 font-sans text-b-2 sm:text-b-1 underline hover:no-underline text-center sm:text-left"> Forgot
                             password?</a>
 
                         <button type="submit"
-                            class="w-fit px-8 py-2 rounded-lg bg-primary-500
+                            class="w-full sm:w-fit px-8 py-2 rounded-lg bg-primary-500
                                font-sans text-b-2 text-white font-semibold
                                hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500">
                             Log in

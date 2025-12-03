@@ -23,7 +23,7 @@ return new class extends Migration
             $table->longText('terms')->nullable();
             $table->longText('scope_projects')->nullable();
             $table->json('projects_mvp')->nullable();
-            $table->longText('milestones')->nullable();
+            $table->integer('progress')->default(0)->comment('Progress percentage (0-100)');
             $table->json('deliverables')->nullable();
             $table->timestamp('signed_at')->nullable();
             $table->foreignId('conversation_id')->nullable();

@@ -6,11 +6,13 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Conversation;
+use App\Models\ProjectAgreement;
+use App\Policies\ProjectAgreementPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        // Add policies here if needed
+        ProjectAgreement::class => ProjectAgreementPolicy::class,
     ];
 
     public function boot(): void

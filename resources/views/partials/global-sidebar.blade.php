@@ -8,11 +8,13 @@
         class="p-4 mx-4 my-8 bg-gradient-to-br from-primary-500/5 to-secondary-500/10 rounded-2xl border border-primary-200">
         <div class="flex items-center gap-3 mb-2">
             @php
-                $src = Str::startsWith(Auth::user()->avatar, 'http')
-                    ? Auth::user()->avatar
-                    : asset('storage/' . Auth::user()->avatar);
+                $avatarSrc = Auth::user()->getRawOriginal('avatar')
+                    ? (filter_var(Auth::user()->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                        ? Auth::user()->getRawOriginal('avatar')
+                        : asset('storage/' . Auth::user()->getRawOriginal('avatar')))
+                    : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name);
             @endphp
-            <img src="{{ Auth::user()->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}"
+            <img src="{{ $avatarSrc }}"
                 alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-primary-300">
                 
             <div class="flex-1 min-w-0">

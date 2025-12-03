@@ -51,27 +51,53 @@ class DashboardController extends Controller
     private function consumerDashboard()
     {
         $user = Auth::user();
+        $statusFilter = request('status');
 
-        $projects = Project::where('consumer_id', $user->id)
+        // Base query for projects
+        $projectsQuery = Project::where('consumer_id', $user->id)
             ->whereNotIn('status', ['in_progress', 'completed'])
             ->with('skills')
             ->withCount(['agreements as offers_count' => function ($query) {
                 $query->where('status', 'pending');
-            }])
-            ->latest()
-            ->get();
+            }]);
 
-        $agreements = ProjectAgreement::where('consumer_id', $user->id)
+        // Base query for agreements
+        $agreementsQuery = ProjectAgreement::where('consumer_id', $user->id)
             ->where('status', '!=', 'pending')
-            ->with(['developer', 'project'])
-            ->latest()
+            ->with(['developer.developerProfile', 'project']);
+
+        // Apply status filter
+        if ($statusFilter && $statusFilter !== 'all') {
+            if ($statusFilter === 'active_contract') {
+                $agreementsQuery->where('status', 'active');
+                $projectsQuery->whereRaw('1 = 0'); // Hide projects
+            } elseif ($statusFilter === 'bidding') {
+                $projectsQuery->where('status', 'open');
+                $agreementsQuery->whereRaw('1 = 0'); // Hide agreements
+            } elseif ($statusFilter === 'waiting_payment') {
+                $agreementsQuery->where('status', 'accepted');
+                $projectsQuery->whereRaw('1 = 0'); // Hide projects
+            } elseif ($statusFilter === 'completed') {
+                $agreementsQuery->where('status', 'completed');
+                $projectsQuery->whereRaw('1 = 0'); // Hide projects
+            }
+        }
+
+        $projects = $projectsQuery->latest()->get();
+        $agreements = $agreementsQuery->latest()->get();
+
+        // Calculate totals from all data (not filtered)
+        $allProjects = Project::where('consumer_id', $user->id)
+            ->whereNotIn('status', ['in_progress', 'completed'])
+            ->count();
+        
+        $allAgreements = ProjectAgreement::where('consumer_id', $user->id)
+            ->where('status', '!=', 'pending')
             ->get();
 
-        $totalProjects = $projects->count() + $agreements->count();
-
-        $inProgressCount = $agreements->where('status', 'active')->count();
-
-        $completedCount = $agreements->where('status', 'completed')->count();
+        $totalProjects = $allProjects + $allAgreements->count();
+        $inProgressCount = $allAgreements->where('status', 'active')->count();
+        $completedCount = $allAgreements->where('status', 'completed')->count();
 
         $totalSpent = Payment::whereHas('agreement', function ($query) use ($user) {
             $query->where('consumer_id', $user->id);
@@ -86,6 +112,7 @@ class DashboardController extends Controller
             'inProgressCount',
             'completedCount',
             'totalSpent',
+            'statusFilter',
             'user'
         ));
     }

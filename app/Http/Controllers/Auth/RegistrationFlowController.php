@@ -86,22 +86,27 @@ class RegistrationFlowController extends Controller
 
         $user = auth()->user();
 
-        // Create developer profile
-        $profile = $user->developerProfile()->create([
-            'headline' => $request->headline,
-            'experience' => $request->experience,
-            'rate_min_byproject' => $request->rate_min_byproject,
-            'rate_max_byproject' => $request->rate_max_byproject,
-            'availability' => $request->availability ?? 'available',
-            'experience_years' => $request->experience_years ?? 0,
-            'education' => $request->education,
-            'certifications' => $request->certifications,
-            'portfolio_links' => $request->portfolio_links,
-        ]);
+        // Create or update developer profile
+        $profile = $user->developerProfile()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'headline' => $request->headline,
+                'experience' => $request->experience,
+                'rate_min_byproject' => $request->rate_min_byproject,
+                'rate_max_byproject' => $request->rate_max_byproject,
+                'availability' => $request->availability ?? 'available',
+                'experience_years' => $request->experience_years ?? 0,
+                'education' => $request->education,
+                'certifications' => $request->certifications,
+                'portfolio_links' => $request->portfolio_links,
+            ]
+        );
 
-        // Attach existing skills
+        // Sync existing skills (replace old with new)
         if ($request->has('skills') && is_array($request->skills)) {
-            $user->skills()->attach($request->skills);
+            $skillIds = $request->skills;
+        } else {
+            $skillIds = [];
         }
 
         // Create and attach custom skills
@@ -117,9 +122,9 @@ class RegistrationFlowController extends Controller
                 $existingSkill = Skill::whereRaw('LOWER(name) = ?', [strtolower($skillName)])->first();
 
                 if ($existingSkill) {
-                    // If skill exists, just attach it
-                    if (!$user->skills->contains($existingSkill->id)) {
-                        $user->skills()->attach($existingSkill->id);
+                    // If skill exists, add it to the array
+                    if (!in_array($existingSkill->id, $skillIds)) {
+                        $skillIds[] = $existingSkill->id;
                     }
                 } else {
                     // Create new skill
@@ -130,11 +135,14 @@ class RegistrationFlowController extends Controller
                         'is_active' => true,
                     ]);
 
-                    // Attach to user
-                    $user->skills()->attach($newSkill->id);
+                    // Add to skills array
+                    $skillIds[] = $newSkill->id;
                 }
             }
         }
+
+        // Sync all skills at once (this will replace old skills with new ones)
+        $user->skills()->sync($skillIds);
 
         return redirect()->route('redirect-after-login');
     }

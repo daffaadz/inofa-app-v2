@@ -1,10 +1,10 @@
 <div class="favorite-list-item mr-3">
     @if ($user)
         @php
-            $avatarSrc = $user->avatar
-                ? (Str::startsWith($user->avatar, 'http')
-                    ? $user->avatar
-                    : asset('storage/' . $user->avatar))
+            $avatarSrc = $user->getRawOriginal('avatar')
+                ? (filter_var($user->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                    ? $user->getRawOriginal('avatar')
+                    : asset('storage/' . $user->getRawOriginal('avatar')))
                 : 'https://ui-avatars.com/api/?name=' . urlencode($user->name);
         @endphp
 

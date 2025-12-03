@@ -158,7 +158,14 @@
                                             <!-- Developer -->
                                             @if($proposal->developer)
                                                 <div class="flex items-center gap-3">
-                                                    <img src="{{ $proposal->developer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($proposal->developer->name) }}"
+                                                    @php
+                                                        $avatarSrc = $proposal->developer->getRawOriginal('avatar')
+                                                            ? (filter_var($proposal->developer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                                ? $proposal->developer->getRawOriginal('avatar')
+                                                                : asset('storage/' . $proposal->developer->getRawOriginal('avatar')))
+                                                            : 'https://ui-avatars.com/api/?name=' . urlencode($proposal->developer->name);
+                                                    @endphp
+                                                    <img src="{{ $avatarSrc }}"
                                                         class="w-12 h-12 rounded-full object-cover ring-2 ring-white shadow-sm">
                                                     <div>
                                                         <p class="text-b-1 font-bold text-neutral-900">

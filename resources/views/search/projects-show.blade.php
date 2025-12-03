@@ -262,10 +262,10 @@
                         @if($project->consumer)
                             <div class="flex items-start gap-3 mb-4">
                                 @php
-                                    $avatarSrc = $project->consumer->avatar
-                                        ? (Str::startsWith($project->consumer->avatar, 'http')
-                                            ? $project->consumer->avatar
-                                            : asset('storage/' . $project->consumer->avatar))
+                                    $avatarSrc = $project->consumer->getRawOriginal('avatar')
+                                        ? (filter_var($project->consumer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                            ? $project->consumer->getRawOriginal('avatar')
+                                            : asset('storage/' . $project->consumer->getRawOriginal('avatar')))
                                         : 'https://ui-avatars.com/api/?name=' . urlencode($project->consumer->name);
                                 @endphp
                                 <img src="{{ $avatarSrc }}" 

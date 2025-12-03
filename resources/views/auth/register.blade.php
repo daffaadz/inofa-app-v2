@@ -1,10 +1,10 @@
 <x-guest-layout>
     {{-- PAGE WRAPPER --}}
-    <div class="min-h-screen grid md:grid-cols-2">
+    <div class="min-h-screen grid md:grid-cols-2 py-16 px-2 md:px-0 md:py-0">
 
         {{-- LEFT PANEL : ILLUSTRATION --}}
         <div
-            class="hidden md:flex sticky top-0 items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 max-h-screen p-6">
+            class="hidden md:flex md:sticky md:top-0 items-center justify-center bg-gradient-to-br from-primary-200 via-primary-100 to-primary-200 md:max-h-screen p-6">
 
             {{-- Logo --}}
             <div class="absolute left-24 top-12 mb-10">
@@ -14,13 +14,13 @@
                 </a>
             </div>
 
-            <div class="max-w-xl text-center">
+            <div class="max-w-xl text-start">
                 <h2 class="font-sans text-h-2 leading-[3.5rem] text-start text-neutral-800 mb-4 tracking-tight">
                     Join Indonesia's<br>
                     Trusted Platform for<br>
                     Tech Talent.
                 </h2>
-                <ul class="mt-6 space-y-3 font-sans text-h-7 text-neutral-800 text-left">
+                <ul class="my-6 space-y-3 font-sans text-h-7 text-neutral-800 text-left">
                     <li class="flex items-start gap-3">
                         <span class="text-nautral-800 mt-1">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -55,6 +55,9 @@
                         Build your professional portfolio
                     </li>
                 </ul>
+                <h6 class="font-sans text-h-7">Already have an Inofa account? <a href="{{ route('login') }}"
+                        class="text-primary-500 underline hover:no-underline !transition-all duration-200">Log in</a>
+                </h6>
             </div>
 
             {{-- FOOTER --}}
@@ -68,18 +71,32 @@
         </div>
 
         {{-- RIGHT PANEL : FORM --}}
-        <div class="flex items-center justify-center p-6">
+        <div class="flex items-center justify-center p-4 sm:p-6">
             <div class="w-full max-w-lg">
 
+                {{-- Mobile Logo --}}
+                <div class="md:hidden mb-6">
+                    <a href="{{ url('/') }}" class="flex items-center gap-3">
+                        <img src="{{ asset('assets/vector/logo.svg') }}" alt="Inofa" class="h-8 w-auto">
+                        <span class="text-neutral-800 text-h-5 font-sans">Inofa</span>
+                    </a>
+                </div>
+
                 {{-- Heading --}}
-                <h1 class="font-sans text-h-4 text-neutral-800 mb-2">
+                <h1 class="font-sans text-h-5 sm:text-h-4 text-neutral-800 mb-2">
                     Create your Inofa account
                 </h1>
 
+                {{-- Mobile Login Link --}}
+                <p class="md:hidden font-sans text-b-2 text-neutral-600 mb-4">
+                    Already have an account? <a href="{{ route('login') }}"
+                        class="text-primary-500 underline hover:no-underline">Log in</a>
+                </p>
+
                 {{-- Google sign-up --}}
                 <a href="{{ route('social.redirect', ['driver' => 'google']) }}"
-                    class="mt-6 flex items-center justify-center gap-3
-                      w-full px-4 py-4 rounded-xl border border-neutral-300
+                    class="mt-4 sm:mt-6 flex items-center justify-center gap-3
+                      w-full px-4 py-3 sm:py-4 rounded-xl border border-neutral-300
                       font-sans text-b-2 text-neutral-0 bg-blue-500 hover:bg-blue-400">
                     {{-- minimal Google icon --}}
                     <svg class="h-4 w-4" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -124,8 +141,8 @@
                     <div>
                         <x-input-label for="name" value="Full name" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="name" type="text" name="name" :value="old('name')"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
-                                     font-sans text-b-1 placeholder-neutral-400
+                            class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
+                                     font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                                      focus:ring-2 focus:ring-primary-500" />
                         <x-input-error :messages="$errors->get('name')" class="mt-1" />
                     </div>
@@ -134,8 +151,8 @@
                     <div>
                         <x-input-label for="email" value="Email" class="font-sans text-b-3 text-neutral-700" />
                         <x-text-input id="email" type="email" name="email" :value="old('email')"
-                            class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
-                                     font-sans text-b-1 placeholder-neutral-400
+                            class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
+                                     font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                                      focus:ring-2 focus:ring-primary-500" />
                         <x-input-error :messages="$errors->get('email')" class="mt-1" />
                     </div>
@@ -147,8 +164,8 @@
                             <x-input-label for="password" value="Password"
                                 class="font-sans text-b-3 text-neutral-700" />
                             <x-text-input id="password" type="password" name="password" x-model="pwd"
-                                class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
-                             font-sans text-b-1 placeholder-neutral-400
+                                class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
+                             font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                              focus:ring-2 focus:ring-primary-500" />
                         </div>
 
@@ -158,14 +175,14 @@
                                 class="font-sans text-b-3 text-neutral-700" />
                             <x-text-input id="password_confirmation" type="password" name="password_confirmation"
                                 x-model="pwdC"
-                                class="mt-1 block w-full px-4 py-2 rounded-lg border border-neutral-300
-                             font-sans text-b-1 placeholder-neutral-400
+                                class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
+                             font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                              focus:ring-2 focus:ring-primary-500" />
                         </div>
 
                         {{-- Hint list (muncul hanya jika ada input tapi belum valid) --}}
                         <ul x-show="pwd && !(/[A-Z]/.test(pwd) && /\d/.test(pwd) && pwd.length >= 8)" x-transition
-                            class="mt-2 space-y-1 font-sans text-b-2 text-neutral-600">
+                            class="mt-2 space-y-1 font-sans text-b-3 text-neutral-600">
                             <li class="flex items-center gap-2">
                                 <svg class="h-4 w-auto text-primary-500/65" viewBox="0 0 24 24" fill="none">
                                     <path
@@ -200,7 +217,7 @@
 
                     {{-- Role radios --}}
                     <div class="space-y-3">
-                        <label class="flex items-start gap-4 cursor-pointer border border-neutral-400 rounded-lg p-4">
+                        <label class="flex items-start gap-3 sm:gap-4 cursor-pointer border border-neutral-400 rounded-lg p-3 sm:p-4">
                             <input type="radio" name="role" value="consumer" required
                                 class="mt-1 w-4 h-4 text-primary-500 border border-neutral-300 focus:ring-primary-500">
                             <div>
@@ -210,7 +227,7 @@
                             </div>
                         </label>
 
-                        <label class="flex items-start gap-6 cursor-pointer border border-neutral-400 rounded-lg p-4">
+                        <label class="flex items-start gap-3 sm:gap-6 cursor-pointer border border-neutral-400 rounded-lg p-3 sm:p-4">
                             <input type="radio" name="role" value="developer" required
                                 class="mt-1 w-4 h-4 text-primary-500 border border-neutral-300 focus:ring-primary-500">
                             <div>

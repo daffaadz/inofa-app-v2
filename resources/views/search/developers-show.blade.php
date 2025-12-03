@@ -9,11 +9,13 @@
                     <!-- Avatar -->
                     <div class="flex-shrink-0">
                         @php
-                            $src = Str::startsWith($developer->avatar, 'http')
-                                ? $developer->avatar
-                                : asset('storage/' . $developer->avatar);
+                            $avatarSrc = $developer->getRawOriginal('avatar')
+                                ? (filter_var($developer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                    ? $developer->getRawOriginal('avatar')
+                                    : asset('storage/' . $developer->getRawOriginal('avatar')))
+                                : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) . '&size=120';
                         @endphp
-                        <img src="{{ $developer->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) . '&size=120' }}"
+                        <img src="{{ $avatarSrc }}"
                             alt="{{ $developer->name }}"
                             class="w-40 h-40 rounded-lg object-cover border-4 border-primary-400">
                     </div>
@@ -417,7 +419,14 @@
                         <div class="bg-white border-l-4 border-primary-500 rounded-xl p-6 shadow-sm">
                             <div class="flex items-start gap-4">
                                 <!-- Avatar -->
-                                <img src="{{ $review->consumer->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($review->consumer->name) . '&size=48' }}"
+                                @php
+                                    $avatarSrc = $review->consumer->getRawOriginal('avatar')
+                                        ? (filter_var($review->consumer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                            ? $review->consumer->getRawOriginal('avatar')
+                                            : asset('storage/' . $review->consumer->getRawOriginal('avatar')))
+                                        : 'https://ui-avatars.com/api/?name=' . urlencode($review->consumer->name) . '&size=48';
+                                @endphp
+                                <img src="{{ $avatarSrc }}"
                                     alt="{{ $review->consumer->name }}" class="w-12 h-12 rounded-full flex-shrink-0">
 
                                 <div class="flex-grow">

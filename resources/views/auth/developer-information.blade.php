@@ -1,6 +1,6 @@
 <x-guest-layout>
     {{-- PAGE WRAPPER --}}
-    <div class="min-h-screen grid md:grid-cols-2">
+    <div class="min-h-screen grid md:grid-cols-2 py-6 px-4 md:px-0 md:py-0">
 
         {{-- LEFT PANEL : ILLUSTRATION --}}
         <div
@@ -95,7 +95,7 @@
                             </div>
 
                             {{-- Rate Range --}}
-                            <div class="flex flex-row justify-between w-full items-center">
+                            <div class="flex flex-row justify-between gap-2 md:gap-0 w-full items-center">
                                 <div>
                                     <label for="rate_min_byproject" class="font-sans text-b-3 text-neutral-700">
                                         Minimum Rate (per project)

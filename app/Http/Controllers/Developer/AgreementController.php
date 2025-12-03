@@ -41,4 +41,28 @@ class AgreementController extends Controller
         $agreement->load(['project', 'consumer', 'payments']);
         return view('developer.agreements.show', compact('agreement'));
     }
+
+    public function updateProgress(ProjectAgreement $agreement)
+    {
+        $this->authorize('update', $agreement);
+        
+        $validated = request()->validate([
+            'progress' => 'required|integer|min:0|max:100'
+        ]);
+
+        $agreement->update([
+            'progress' => $validated['progress']
+        ]);
+
+        // Return JSON response for AJAX requests
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress updated successfully!',
+                'progress' => $agreement->progress
+            ]);
+        }
+
+        return back()->with('success', 'Progress updated successfully!');
+    }
 }

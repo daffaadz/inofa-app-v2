@@ -205,12 +205,14 @@
                                             <!-- Avatar -->
                                             <div class="flex-shrink-0">
                                                 @php
-                                                    $src = Str::startsWith($developer->avatar, 'http')
-                                                        ? $developer->avatar
-                                                        : asset('storage/' . $developer->avatar);
+                                                    $avatarSrc = $developer->getRawOriginal('avatar')
+                                                        ? (filter_var($developer->getRawOriginal('avatar'), FILTER_VALIDATE_URL)
+                                                            ? $developer->getRawOriginal('avatar')
+                                                            : asset('storage/' . $developer->getRawOriginal('avatar')))
+                                                        : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name);
                                                 @endphp
                                                 <img class="h-20 w-20 rounded-lg object-cover"
-                                                    src="{{ $developer->avatar ? $src : 'https://ui-avatars.com/api/?name=' . urlencode($developer->name) }}"
+                                                    src="{{ $avatarSrc }}"
                                                     alt="{{ $developer->name }}">
                                             </div>
 
