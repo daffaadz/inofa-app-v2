@@ -151,4 +151,52 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+    public function transfer($id)
+    {
+        try {
+            $payment = Payment::findOrFail($id);
+            
+            // Check if payment is confirmed
+            if ($payment->status !== 'confirmed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only confirmed payments can be transferred.'
+                ], 400);
+            }
+
+            // Check if already transferred
+            if ($payment->status === 'transferred') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payment has already been transferred.'
+                ], 400);
+            }
+
+            // Update payment status to transferred
+            $payment->update([
+                'status' => 'transferred',
+                'transferred_at' => now(),
+            ]);
+
+            // Dispatch event untuk broadcast dan notifikasi
+            event(new PaymentStatusUpdated($payment));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment has been transferred successfully to the developer.',
+                'data' => [
+                    'status' => 'transferred',
+                    'payment_id' => $payment->id,
+                    'transferred_at' => $payment->transferred_at
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to transfer payment: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

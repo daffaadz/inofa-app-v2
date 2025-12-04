@@ -34,6 +34,7 @@ Route::middleware(['web', 'auth', 'role:admin'])
         Route::post('/payments/{id}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
         Route::post('/payments/{id}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
         Route::post('/payments/{id}/review', [PaymentController::class, 'review'])->name('payments.review');
+        Route::post('/payments/{id}/transfer', [PaymentController::class, 'transfer'])->name('payments.transfer');
 
         /* ---------------- COMPLAINTS ---------------- */
         Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints.index');
@@ -196,6 +197,8 @@ Route::middleware(['auth', 'role:developer'])->prefix('developer')->as('develope
         ->name('agreements.show');
     Route::patch('/agreements/{agreement}/progress', [DevAgreement::class, 'updateProgress'])
         ->name('agreements.updateProgress');
+    Route::post('/agreements/{agreement}/terminate', [DevAgreement::class, 'terminate'])
+        ->name('agreements.terminate');
 
     /* ---------- Proposals (pending / accepted) ---------- */
     Route::get('/proposals', [DevAgreement::class, 'proposals'])
@@ -229,9 +232,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->as('admin.')->group(
 
 // CUSTOMER ROUTING
 use App\Http\Controllers\Customer\ProjectController as CustProject;
+use App\Http\Controllers\Customer\AgreementController as CustAgreement;
 use App\Http\Controllers\Customer\AgreementDetailController as AgreementDetail;
 use App\Http\Controllers\Customer\CheckoutController as PaymentCheckout;
 use App\Http\Controllers\Customer\ProposalsController;
+use App\Http\Controllers\Customer\ReviewController;
 
 Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function () {
     Route::resource('project', CustProject::class);
@@ -240,6 +245,13 @@ Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.'
     Route::get('project/create/skills',      [CustProject::class, 'createSkills'])->name('project.createSkills');
     Route::get('project/create/budget',      [CustProject::class, 'createBudget'])->name('project.createBudget');
     Route::get('project/create/requirements',  [CustProject::class, 'createRequirements'])->name('project.createRequirements');
+
+    /* ---------- Agreement Management ---------- */
+    Route::post('/agreements/{agreement}/complete', [CustAgreement::class, 'complete'])->name('agreements.complete');
+    Route::post('/agreements/{agreement}/stop', [CustAgreement::class, 'stop'])->name('agreements.stop');
+
+    /* ---------- Review Management ---------- */
+    Route::post('/agreements/{agreement}/review', [ReviewController::class, 'store'])->name('agreements.review');
 
     /* ---------- Agreement Detail & Payment Detail ---------- */
     Route::get('/agreements/{agreement}', [AgreementDetail::class, 'show'])

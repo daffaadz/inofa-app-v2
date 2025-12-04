@@ -65,4 +65,27 @@ class AgreementController extends Controller
 
         return back()->with('success', 'Progress updated successfully!');
     }
+
+    /**
+     * Terminate project - developer confirms the termination request
+     */
+    public function terminate($id)
+    {
+        try {
+            $agreement = ProjectAgreement::where('id', $id)
+                ->where('developer_id', Auth::id())
+                ->where('status', 'active')
+                ->firstOrFail();
+
+            $agreement->status = ProjectAgreement::STATUS_TERMINATED;
+            $agreement->save();
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Project has been terminated successfully.');
+
+        } catch (\Exception $e) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Failed to terminate project. Please try again.');
+        }
+    }
 }

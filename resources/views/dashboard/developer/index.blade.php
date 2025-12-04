@@ -242,8 +242,8 @@
                 }" @click.away="sortOpen = false">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h2 class="text-h-5 font-bold text-neutral-900">My Active Projects</h2>
-                            <p class="text-b-1 text-neutral-600">Track your ongoing work and deadlines</p>
+                            <h2 class="text-h-5 font-bold text-neutral-900">My Active and Complete Projects</h2>
+                            <p class="text-b-1 text-neutral-600">Track your ongoing work, deadlines, and completed projects</p>
                         </div>
                         
                         <!-- Sort By Dropdown -->
@@ -334,8 +334,8 @@
                                             </div>
                                         </div>
 
-                                        <!-- Progress Bar with Input -->
-                                        <div class="mb-3" x-data="{ 
+                                        <!-- Progress Bar with Input (Only for Active Projects) -->
+                                        <div x-show="agreement.status === 'active'" class="mb-3" x-data="{ 
                                             progress: agreement.progress,
                                             updating: false,
                                             async updateProgress(agreementId, value) {
@@ -397,8 +397,12 @@
                                         <div class="flex items-center gap-4 text-b-3 text-neutral-600">
                                             <span class="flex items-center gap-1">
                                                 <span
-                                                    class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-b-4 font-medium">In
-                                                    Progress</span>
+                                                    class="px-3 py-1 rounded-full text-b-4 font-medium"
+                                                    :class="{
+                                                        'bg-blue-100 text-blue-600': agreement.status === 'active',
+                                                        'bg-green-100 text-green-600': agreement.status === 'completed'
+                                                    }"
+                                                    x-text="agreement.status === 'active' ? 'In Progress' : 'Completed'"></span>
                                             </span>
                                             <span class="flex items-center gap-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-500" fill="currentColor" viewBox="0 0 256 256">
@@ -406,6 +410,29 @@
                                                 </svg>
                                                 <span x-text="new Date(agreement.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })"></span>
                                             </span>
+                                        </div>
+
+                                        <!-- Review Section (Only for Completed Projects) -->
+                                        <div x-show="agreement.status === 'completed' && agreement.review" class="mt-4 p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl border border-yellow-200">
+                                            <div class="flex items-start gap-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 256 256">
+                                                    <path d="M234.5,114.38l-45.1,39.36,13.51,58.6a16,16,0,0,1-23.84,17.34l-51.11-31-51,31a16,16,0,0,1-23.84-17.34L66.61,153.8,21.5,114.38a16,16,0,0,1,9.11-28.06l59.46-5.15,23.21-55.36a16,16,0,0,1,29.44,0h0L166,81.17l59.44,5.15a16,16,0,0,1,9.11,28.06Z"></path>
+                                                </svg>
+                                                <div class="flex-1">
+                                                    <div class="flex items-center gap-2 mb-2">
+                                                        <p class="text-b-2 font-semibold text-neutral-900">Client Review</p>
+                                                        <div class="flex items-center gap-1">
+                                                            <template x-for="i in 5" :key="i">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" :class="i <= (agreement.review?.rating || 0) ? 'text-yellow-500' : 'text-gray-300'" fill="currentColor" viewBox="0 0 256 256">
+                                                                    <path d="M234.5,114.38l-45.1,39.36,13.51,58.6a16,16,0,0,1-23.84,17.34l-51.11-31-51,31a16,16,0,0,1-23.84-17.34L66.61,153.8,21.5,114.38a16,16,0,0,1,9.11-28.06l59.46-5.15,23.21-55.36a16,16,0,0,1,29.44,0h0L166,81.17l59.44,5.15a16,16,0,0,1,9.11,28.06Z"></path>
+                                                                </svg>
+                                                            </template>
+                                                            <span class="text-b-3 text-neutral-700 ml-1" x-text="`(${agreement.review?.rating || 0}/5)`"></span>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-b-3 text-neutral-700" x-text="agreement.review?.comment || 'No comment provided'"></p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 

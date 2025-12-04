@@ -64,7 +64,7 @@ class DashboardController extends Controller
         // Base query for agreements
         $agreementsQuery = ProjectAgreement::where('consumer_id', $user->id)
             ->where('status', '!=', 'pending')
-            ->with(['developer.developerProfile', 'project']);
+            ->with(['developer.developerProfile', 'project', 'review']);
 
         // Apply status filter
         if ($statusFilter && $statusFilter !== 'all') {
@@ -102,7 +102,7 @@ class DashboardController extends Controller
         $totalSpent = Payment::whereHas('agreement', function ($query) use ($user) {
             $query->where('consumer_id', $user->id);
         })
-            ->whereIn('status', ['confirmed', 'transferred'])
+            ->whereIn('status', ['confirmed', 'completed', 'transferred'])
             ->sum('amount');
 
         return view('dashboard.consumer.index', compact(
@@ -140,10 +140,12 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        // 3. Active agreements (with project and consumer)
+        // 3. Active and Completed agreements (with project, consumer, and review)
         $activeAgreements = ProjectAgreement::where('developer_id', $user->id)
-            ->where('status', 'active')
-            ->with(['project', 'consumer'])
+            ->whereIn('status', ['active', 'completed'])
+            ->with(['project', 'consumer', 'review'])
+            ->orderByRaw("FIELD(status, 'active', 'completed')")
+            ->latest()
             ->get();
 
         // 4. Total earnings (transferred payments only)
@@ -151,7 +153,6 @@ class DashboardController extends Controller
             $query->where('developer_id', $user->id);
         })
             ->where('status', 'transferred')
-            ->where('admin_transferred', true)
             ->sum('amount');
 
         // 4.1 Monthly earnings calculation
@@ -163,16 +164,14 @@ class DashboardController extends Controller
             $query->where('developer_id', $user->id);
         })
             ->where('status', 'transferred')
-            ->where('admin_transferred', true)
-            ->where('admin_transferred_at', '>=', $currentMonthStart)
+            ->where('created_at', '>=', $currentMonthStart)
             ->sum('amount');
 
         $lastMonthEarnings = Payment::whereHas('agreement', function ($query) use ($user) {
             $query->where('developer_id', $user->id);
         })
             ->where('status', 'transferred')
-            ->where('admin_transferred', true)
-            ->whereBetween('admin_transferred_at', [$lastMonthStart, $lastMonthEnd])
+            ->whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
             ->sum('amount');
 
         $earningsIncrease = $currentMonthEarnings - $lastMonthEarnings;
@@ -239,7 +238,7 @@ class DashboardController extends Controller
         $activeProjects   = Project::where('status', 'in_progress')->count();
         $completedProjects= Project::where('status', 'completed')->count();
 
-        $totalRevenue     = Payment::whereIn('status', ['confirmed', 'transferred'])
+        $totalRevenue     = Payment::whereIn('status', ['confirmed', 'completed', 'transferred'])
                             ->sum('amount');
 
         $pendingPaymentsGlobal = Payment::where('admin_confirmed', false)
@@ -253,7 +252,7 @@ class DashboardController extends Controller
         // Global stats untuk summary cards
         $stats = [
             'pending_payments'    => Payment::where('status', 'pending')->count(),
-            'confirmed_payments'  => Payment::whereIn('status', ['confirmed', 'transferred'])->count(),
+            'confirmed_payments'  => Payment::whereIn('status', ['confirmed', 'completed', 'transferred'])->count(),
             'complaints'          => \App\Models\Complaint::count(),
             'total_users'         => User::where('role', '!=', 'admin')->count(),
         ];

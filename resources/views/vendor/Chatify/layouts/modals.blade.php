@@ -170,3 +170,49 @@
         </div>
     </div>
 </div>
+
+{{-- ---------------------- Termination Confirmation Modal ---------------------- --}}
+<div class="app-modal fixed inset-0 hidden bg-black/50 overflow-y-auto"
+    data-name="termination" style="z-index: 9999; display: none;">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-xl relative">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-h-5 text-neutral-900 font-bold">Confirm Project Termination</h3>
+                </div>
+            </div>
+
+            <form id="termination-form" method="POST">
+                @csrf
+
+                <div class="space-y-4">
+                    <p class="text-b-2 text-neutral-700">
+                        Are you sure you want to terminate this project? This action cannot be undone and the project status will be changed to <span class="font-semibold text-red-600">Terminated</span>.
+                    </p>
+
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p class="text-b-3 text-red-800">
+                            <strong>Warning:</strong> By confirming, you agree to stop all work on this project immediately.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-end mt-6 pt-6 border-t border-neutral-200">
+                    <button type="button"
+                        class="cancel-termination-btn px-6 py-2.5 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 rounded-xl transition text-b-2 font-semibold">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl transition text-b-2 font-semibold shadow-sm">
+                        Yes, Terminate Project
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

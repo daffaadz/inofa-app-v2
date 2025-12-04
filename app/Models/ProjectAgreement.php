@@ -100,6 +100,11 @@ class ProjectAgreement extends Model
         return $this->belongsTo(Conversation::class, 'conversation_id');
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class, 'project_id', 'project_id');
+    }
+
     /**
      * Scopes
      */
@@ -144,7 +149,7 @@ class ProjectAgreement extends Model
     public function getTotalPaidAttribute()
     {
         return $this->payments()
-            ->whereIn('status', ['confirmed', 'transferred'])
+            ->whereIn('status', ['confirmed', 'completed', 'transferred'])
             ->sum('amount');
     }
 

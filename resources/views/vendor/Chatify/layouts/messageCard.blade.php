@@ -82,6 +82,40 @@ $timeAndSeen =
                 <div class="mx-2 flex {{ $isSender ? 'justify-end text-white' : 'justify-start text-gray-600' }}">
                     {!! $timeAndSeen !!}
                 </div>
+            @elseif (isset($metadata['type']) && $metadata['type'] == 'termination_request')
+                {{-- Termination Request Message --}}
+                <div
+                    class="px-4 py-3 rounded-2xl {{ $isSender ? 'bg-red-500 text-white rounded-br-sm' : 'bg-white text-neutral-900 rounded-bl-sm shadow-sm border-2 border-red-200' }}">
+                    @if ($message)
+                        <div class="text-b-2 break-words whitespace-normal {{ !$isSender && isset($metadata['requires_action']) && $metadata['requires_action'] ? 'mb-3' : '' }} {{ $isSender ? 'text-white' : 'text-neutral-700' }}">
+                            {!! nl2br($message) !!}
+                        </div>
+                    @endif
+                    
+                    @if (!$isSender && isset($metadata['requires_action']) && $metadata['requires_action'])
+                        @php
+                            // Check if current user is developer
+                            $isDeveloper = Auth::user()->role === 'developer';
+                            $showButton = !isset($metadata['show_to_role']) || $metadata['show_to_role'] === Auth::user()->role;
+                        @endphp
+                        
+                        @if ($isDeveloper && $showButton)
+                            <button type="button"
+                                onclick="event.stopPropagation(); event.preventDefault(); window.showTerminationModal('{{ $metadata['agreement_id'] ?? '' }}'); return false;"
+                                class="termination-confirm-btn inline-flex items-center gap-2 bg-red-500 hover:bg-white border border-red-500 hover:text-red-500 text-white rounded-xl px-4 py-2.5 text-b-2 font-semibold transition shadow-sm"
+                                data-agreement-id="{{ $metadata['agreement_id'] ?? '' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                {{ $metadata['button_text'] ?? 'Confirm Stop Project' }}
+                            </button>
+                        @endif
+                    @endif
+                </div>
+                <div class="mx-2 flex {{ $isSender ? 'justify-end text-white' : 'justify-start text-gray-600' }}">
+                    {!! $timeAndSeen !!}
+                </div>
             @else
                 {{-- Text Message --}}
                 @if (@$attachment->type != 'image' || $message)

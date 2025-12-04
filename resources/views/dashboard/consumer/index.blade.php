@@ -296,6 +296,31 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM136,176H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm64,0H168a8,8,0,0,1,0-16h32a8,8,0,0,1,0,16ZM32,88V64H224V88Z"></path></svg>
                                             Go to Payment
                                         </a>
+                                    @elseif ($agreement->status === 'active')
+                                        <div class="flex items-center gap-2">
+                                            <button @click="$dispatch('open-stop-modal-{{ $agreement->id }}')"
+                                                class="px-4 py-2 bg-red-500 text-white text-b-3 border border-red-500 font-medium rounded-lg hover:bg-white hover:text-red-500 transition-all duration-300 flex flex-row items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm24-88a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,128Z"></path></svg>
+                                                Stop Project
+                                            </button>
+                                            <button @click="$dispatch('open-complete-modal-{{ $agreement->id }}')"
+                                                class="px-4 py-2 bg-green-500 text-white text-b-3 border border-green-500 font-medium rounded-lg hover:bg-white hover:text-green-500 transition-all duration-300 flex flex-row items-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
+                                                Complete Project
+                                            </button>
+                                        </div>
+                                    @elseif ($agreement->status === 'completed')
+                                        @php
+                                            // Check if consumer already reviewed this project
+                                            $hasReviewed = $agreement->review && $agreement->review->consumer_id == auth()->id();
+                                        @endphp
+                                        <button 
+                                            @click="$dispatch('open-review-modal-{{ $agreement->id }}')"
+                                            @if($hasReviewed) disabled @endif
+                                            class="px-4 py-2 {{ $hasReviewed ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-white hover:text-yellow-500 text-white' }} text-b-3 border {{ $hasReviewed ? 'border-gray-300' : 'border-yellow-500' }} font-medium rounded-lg transition-all duration-300 flex flex-row items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"></path></svg>
+                                            {{ $hasReviewed ? 'Reviewed' : 'Review Developer' }}
+                                        </button>
                                     @else
                                         <a href="{{ route('user', ['id' => $agreement->developer_id]) }}"
                                             class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300 flex flex-row items-center gap-2">
@@ -383,6 +408,239 @@
                         @endforeach
 
                     </div>
+
+                    <!-- MODALS FOR COMPLETE & STOP PROJECT -->
+                    @foreach ($agreements as $agreement)
+                        @if ($agreement->status === 'active')
+                            <!-- Complete Project Modal -->
+                            <div x-data="{ open: false }"
+                                @open-complete-modal-{{ $agreement->id }}.window="open = true"
+                                x-show="open"
+                                x-cloak
+                                class="fixed inset-0 z-50 overflow-y-auto"
+                                style="display: none;">
+                                <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                                    <!-- Background overlay -->
+                                    <div x-show="open"
+                                        x-transition:enter="ease-out duration-300"
+                                        x-transition:enter-start="opacity-0"
+                                        x-transition:enter-end="opacity-100"
+                                        x-transition:leave="ease-in duration-200"
+                                        x-transition:leave-start="opacity-100"
+                                        x-transition:leave-end="opacity-0"
+                                        class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                                        @click="open = false"></div>
+
+                                    <!-- Modal panel -->
+                                    <div x-show="open"
+                                        x-transition:enter="ease-out duration-300"
+                                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                        x-transition:leave="ease-in duration-200"
+                                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                        <div>
+                                            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                                                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="mt-3 text-center sm:mt-5">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                    Complete Project
+                                                </h3>
+                                                <div class="mt-2">
+                                                    <p class="text-sm text-gray-500">
+                                                        Are you sure you want to mark this project as completed? This action will finalize the project agreement.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                            <form action="{{ route('consumer.agreements.complete', $agreement->id) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm">
+                                                    Yes, Complete
+                                                </button>
+                                            </form>
+                                            <button type="button"
+                                                @click="open = false"
+                                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:text-sm">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stop Project Modal -->
+                            <div x-data="{ open: false }"
+                                @open-stop-modal-{{ $agreement->id }}.window="open = true"
+                                x-show="open"
+                                x-cloak
+                                class="fixed inset-0 z-50 overflow-y-auto"
+                                style="display: none;">
+                                <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                                    <!-- Background overlay -->
+                                    <div x-show="open"
+                                        x-transition:enter="ease-out duration-300"
+                                        x-transition:enter-start="opacity-0"
+                                        x-transition:enter-end="opacity-100"
+                                        x-transition:leave="ease-in duration-200"
+                                        x-transition:leave-start="opacity-100"
+                                        x-transition:leave-end="opacity-0"
+                                        class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                                        @click="open = false"></div>
+
+                                    <!-- Modal panel -->
+                                    <div x-show="open"
+                                        x-transition:enter="ease-out duration-300"
+                                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                        x-transition:leave="ease-in duration-200"
+                                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                        <div>
+                                            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                                                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="mt-3 text-center sm:mt-5">
+                                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                    Stop Project
+                                                </h3>
+                                                <div class="mt-2">
+                                                    <p class="text-sm text-gray-500">
+                                                        Are you sure you want to stop this project? A confirmation message will be sent to the developer to agree on terminating the project.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                            <form action="{{ route('consumer.agreements.stop', $agreement->id) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                                                    Yes, Stop Project
+                                                </button>
+                                            </form>
+                                            <button type="button"
+                                                @click="open = false"
+                                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:text-sm">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if ($agreement->status === 'completed')
+                            <!-- Review Modal -->
+                            <div x-data="{ open: false, rating: 0, comment: '' }"
+                                @open-review-modal-{{ $agreement->id }}.window="open = true"
+                                x-show="open"
+                                x-cloak
+                                class="fixed inset-0 z-50 overflow-y-auto"
+                                style="display: none;">
+                                <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                                    <!-- Background overlay -->
+                                    <div x-show="open"
+                                        x-transition:enter="ease-out duration-300"
+                                        x-transition:enter-start="opacity-0"
+                                        x-transition:enter-end="opacity-100"
+                                        x-transition:leave="ease-in duration-200"
+                                        x-transition:leave-start="opacity-100"
+                                        x-transition:leave-end="opacity-0"
+                                        class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                                        @click="open = false"></div>
+
+                                    <!-- Modal panel -->
+                                    <div x-show="open"
+                                        x-transition:enter="ease-out duration-300"
+                                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                        x-transition:leave="ease-in duration-200"
+                                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                        class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                                        <form action="{{ route('consumer.agreements.review', $agreement->id) }}" method="POST">
+                                            @csrf
+                                            <div>
+                                                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                                                    <svg class="h-6 w-6 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                                                    </svg>
+                                                </div>
+                                                <div class="mt-3 text-center sm:mt-5">
+                                                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                        Review Developer
+                                                    </h3>
+                                                    <div class="mt-2">
+                                                        <p class="text-sm text-gray-500 mb-4">
+                                                            Bagaimana pengalaman Anda bekerja dengan {{ $agreement->developer->name ?? 'developer ini' }}?
+                                                        </p>
+
+                                                        <!-- Rating Stars -->
+                                                        <div class="mb-4">
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                                                            <div class="flex justify-center gap-2">
+                                                                <template x-for="star in 5" :key="star">
+                                                                    <button type="button"
+                                                                        @click="rating = star"
+                                                                        class="focus:outline-none transition-transform hover:scale-110">
+                                                                        <svg class="w-10 h-10" 
+                                                                            :class="star <= rating ? 'text-yellow-400' : 'text-gray-300'"
+                                                                            fill="currentColor" viewBox="0 0 24 24">
+                                                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                </template>
+                                                            </div>
+                                                            <input type="hidden" name="rating" x-model="rating" required>
+                                                            <p class="text-xs text-gray-500 mt-2" x-show="rating > 0" x-text="rating + ' dari 5 bintang'"></p>
+                                                        </div>
+
+                                                        <!-- Comment -->
+                                                        <div class="mb-4 text-left">
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">Review Anda</label>
+                                                            <textarea 
+                                                                name="comment" 
+                                                                x-model="comment"
+                                                                rows="4" 
+                                                                required
+                                                                minlength="10"
+                                                                maxlength="1000"
+                                                                placeholder="Ceritakan pengalaman Anda bekerja dengan developer ini..."
+                                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"></textarea>
+                                                            <p class="text-xs text-gray-500 mt-1">Minimal 10 karakter</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                                <button type="submit"
+                                                    :disabled="rating === 0 || comment.length < 10"
+                                                    :class="rating === 0 || comment.length < 10 ? 'bg-gray-300 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-700'"
+                                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:text-sm">
+                                                    Kirim Review
+                                                </button>
+                                                <button type="button"
+                                                    @click="open = false; rating = 0; comment = ''"
+                                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:text-sm">
+                                                    Batal
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
 
                     <!-- EMPTY STATE -->
                     @if ($projects->isEmpty() && $agreements->isEmpty())

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Skill;
 use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
@@ -30,7 +31,11 @@ class SearchController extends Controller
          * ---------------------------------------- */
         $query = User::where('role', 'developer')
             ->leftJoin('developer_profiles', 'users.id', '=', 'developer_profiles.user_id')
-            ->select('users.*', 'developer_profiles.rating_average', 'developer_profiles.projects_completed')
+            ->select(
+                'users.*', 
+                'developer_profiles.rating_average',
+                DB::raw('(SELECT COUNT(*) FROM project_agreements WHERE project_agreements.developer_id = users.id AND project_agreements.status = "completed") as projects_completed')
+            )
             ->with([
             'developerProfile',
             'skills' => function ($q) {
@@ -103,7 +108,7 @@ class SearchController extends Controller
                 break;
 
             case 'projects_completed':
-                $query->orderByDesc('developer_profiles.projects_completed');
+                $query->orderByDesc('projects_completed');
                 break;
 
             case 'newest':
@@ -113,7 +118,7 @@ class SearchController extends Controller
             case 'recommended':
             default:
                 // Sort by: rating * projects_completed (best match)
-                $query->orderByRaw('(COALESCE(developer_profiles.rating_average, 0) * COALESCE(developer_profiles.projects_completed, 0)) DESC');
+                $query->orderByRaw('(COALESCE(developer_profiles.rating_average, 0) * COALESCE((SELECT COUNT(*) FROM project_agreements WHERE project_agreements.developer_id = users.id AND project_agreements.status = "completed"), 0)) DESC');
                 break;
         }
 
@@ -172,7 +177,9 @@ class SearchController extends Controller
         // Calculate statistics
         $totalReviews = $reviews->count();
         $averageRating = $reviews->avg('rating');
-        $projectsCompleted = $developer->developerProfile->projects_completed ?? 0;
+        $projectsCompleted = \App\Models\ProjectAgreement::where('developer_id', $developer->id)
+            ->where('status', 'completed')
+            ->count();
 
         // Group skills by category
         $skills = $developer->skills;

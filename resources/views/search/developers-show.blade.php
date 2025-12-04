@@ -87,7 +87,7 @@
 
                         <!-- Action Buttons -->
                         <div class="flex flex-wrap gap-3">
-                            <button
+                            <a href="{{ route('chat', ['id' => $developer->id]) }}"
                                 class="inline-flex gap-2 items-center px-6 py-3 bg-primary-500 text-white text-b-2 font-medium rounded-lg hover:bg-primary-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-auto" fill="currentColor"
                                     viewBox="0 0 256 256">
@@ -96,8 +96,8 @@
                                     </path>
                                 </svg>
                                 Send Message
-                            </button>
-                            <button
+                            </a>
+                            <a href="mailto:{{ $developer->email }}"
                                 class="inline-flex items-center px-6 py-2.5 bg-white text-primary-500 text-b-2 font-medium rounded-lg border-2 border-primary-500 hover:bg-primary-50 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-auto mr-2" fill="currentColor"
                                     viewBox="0 0 256 256">
@@ -106,7 +106,7 @@
                                     </path>
                                 </svg>
                                 Contact
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -472,14 +472,14 @@
                         Have an exciting project in mind? Let's collaborate and bring your vision to life. High-quality,
                         100% satisfaction guaranteed.
                     </p>
-                    <button
+                    <a href="{{ route('chat', ['id' => $developer->id]) }}"
                         class="inline-flex items-center px-8 py-3 bg-white text-primary-500 text-b-1 font-semibold rounded-lg hover:bg-neutral-10 transition-colors">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
                         Start a Project Consultation
-                    </button>
+                    </a>
                 </div>
             </section>
         </div>
