@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        {{-- Summary Cards - Moved to Top --}}
+        {{-- Summary Cards - Moved to To p --}}
         <div class="mb-6">
             @include('admin.components.summary-cards', ['stats' => $stats])
         </div>
@@ -39,24 +39,18 @@
                 @include('admin.components.tabs')
             </div>
 
-            {{-- Search & Filters --}}
-            <div class="p-6 bg-gray-50/50">
-                <div class="space-y-4">
-                    @include('admin.components.searchbar', ['tab' => request('tab','payments')])
-                    @include('admin.components.filters')
-                </div>
-            </div>
-
             {{-- TABLES --}}
             <div class="p-6">
 
                 {{-- VALIDASI PEMBAYARAN --}}
                 <div x-show="tab === 'payments'" x-transition>
+                    @include('admin.components.filters-payments')
                     @include('admin.components.table-payments', ['items' => $payments])
                 </div>
 
                 {{-- KELUHAN PENGGUNA --}}
                 <div x-show="tab === 'complaints'" x-transition>
+                    @include('admin.components.filters-complaints')
                     @include('admin.components.table-complaints', ['items' => $complaints])
                 </div>
 

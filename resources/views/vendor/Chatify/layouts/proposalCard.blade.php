@@ -2,7 +2,8 @@
     // Fallback agreement status - Try multiple sources
     $agreementId = $metadata['agreement_id'] ?? $project_agreement_id ?? null;
     $agreement = $agreementId ? \App\Models\ProjectAgreement::find($agreementId) : null;
-    $status = $metadata['status'] ?? ($agreement ? $agreement->status : 'pending');
+    // Always prioritize database status over metadata status for accuracy
+    $status = $agreement ? $agreement->status : ($metadata['status'] ?? 'pending');
     
     // Debug: Log if agreementId is null
     if (!$agreementId) {
@@ -84,7 +85,38 @@
         {{-- Action Buttons or Status --}}
         <div class="px-4 pb-3">
             <div class="proposal-action-area">
-                @if (!$isSender && $status == 'pending')
+                @if (in_array($status, ['active', 'completed', 'terminated', 'disputed']))
+                    {{-- For active, completed, terminated, or disputed status - Only show status, no buttons --}}
+                    @if($status == 'active')
+                        <div class="flex items-center gap-2 px-4 py-2.5 bg-green-100 text-green-800 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+                            </svg>
+                            <span class="text-b-3 font-medium">✓ Project Aktif</span>
+                        </div>
+                    @elseif($status == 'completed')
+                        <div class="flex items-center gap-2 px-4 py-2.5 bg-blue-100 text-blue-800 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
+                            </svg>
+                            <span class="text-b-3 font-medium">✓ Project Selesai</span>
+                        </div>
+                    @elseif($status == 'terminated')
+                        <div class="flex items-center gap-2 px-4 py-2.5 bg-red-100 text-red-800 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"></path>
+                            </svg>
+                            <span class="text-b-3 font-medium">Project Dihentikan</span>
+                        </div>
+                    @elseif($status == 'disputed')
+                        <div class="flex items-center gap-2 px-4 py-2.5 bg-orange-100 text-orange-800 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"></path>
+                            </svg>
+                            <span class="text-b-3 font-medium">Project Dalam Sengketa</span>
+                        </div>
+                    @endif
+                @elseif (!$isSender && $status == 'pending')
                     {{-- Client sees Reject and Details buttons --}}
                     <div class="flex gap-3">
                         <button type="button" 
@@ -106,13 +138,24 @@
                         </button>
                         @endif
                     </div>
-                @elseif ($status == 'pending')
-                    {{-- Developer sees waiting status --}}
-                    <div class="flex items-center gap-2 px-4 py-2.5 bg-yellow-100 text-yellow-800 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
-                            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path>
-                        </svg>
-                        <span class="text-b-3 font-medium">Waiting respond from client</span>
+                @elseif ($isSender && $status == 'pending')
+                    {{-- Developer sees waiting status and edit button --}}
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 px-4 py-2.5 bg-yellow-100 text-yellow-800 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path>
+                            </svg>
+                            <span class="text-b-3 font-medium">Waiting respond from client</span>
+                        </div>
+                        @if($agreementId)
+                        <a href="{{ route('proposals.edit', ['agreement' => $agreementId]) }}" 
+                            class="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-b-2 font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-lg hover:bg-primary-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
+                            </svg>
+                            Edit Proposal
+                        </a>
+                        @endif
                     </div>
                 @elseif($status == 'accepted')
                     @if (!$isSender)
@@ -135,15 +178,7 @@
                             <span class="text-b-3 font-medium">Menunggu Pembayaran dari Client</span>
                         </div>
                     @endif
-                @elseif($status == 'active' || $status == 'completed')
-                    {{-- Payment completed status --}}
-                    <div class="flex items-center gap-2 px-4 py-2.5 bg-green-100 text-green-800 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
-                            <path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"></path>
-                        </svg>
-                        <span class="text-b-3 font-medium">✓ Pembayaran Selesai - Project Aktif</span>
-                    </div>
-                @elseif($status == 'rejected' || $status == 'terminated')
+                @elseif($status == 'rejected')
                     <div class="flex items-center gap-2 px-4 py-2.5 bg-red-100 text-red-800 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-auto h-4" fill="currentColor" viewBox="0 0 256 256">
                             <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"></path>

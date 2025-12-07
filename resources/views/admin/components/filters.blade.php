@@ -1,4 +1,3 @@
-@if($tab !== 'complaints')
 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mt-4">
 
     {{-- Header --}}
@@ -22,25 +21,24 @@
                        focus:ring-4 focus:ring-primary-100 focus:border-primary-500 focus:outline-none
                        transition-all cursor-pointer hover:border-gray-300">
                 @if($tab === 'payments')
-                    <option value="">All</option>
+                    <option value="">All Status</option>
                     <option value="pending" @selected(request('status')==='pending')>Pending</option>
                     <option value="confirmed" @selected(request('status')==='confirmed')>Confirmed</option>
                     <option value="transferred" @selected(request('status')==='transferred')>Transferred</option>
                     <option value="failed" @selected(request('status')==='failed')>Failed</option>
                     <option value="refunded" @selected(request('status')==='refunded')>Refunded</option>
                 @elseif($tab === 'complaints')
-                    <option value="">All</option>
-                    <option value="open" @selected(request('status')==='open')>Open</option>
-                    <option value="under_review" @selected(request('status')==='under_review')>Under Review</option>
-                    <option value="resolved" @selected(request('status')==='resolved')>Resolved</option>
-                    <option value="closed" @selected(request('status')==='closed')>Closed</option>
-                @else
-                    <option value="">All</option>
-                    <option value="pending" @selected(request('status')==='pending')>Pending</option>
+                    <option value="">All Status</option>
                     <option value="in_progress" @selected(request('status')==='in_progress')>In Progress</option>
-                    <option value="approved" @selected(request('status')==='approved')>Approved</option>
-                    <option value="confirmed" @selected(request('status')==='confirmed')>Confirmed</option>
                     <option value="resolved" @selected(request('status')==='resolved')>Resolved</option>
+                    <option value="rejected" @selected(request('status')==='rejected')>Rejected</option>
+                @else
+                    <option value="">All Status</option>
+                    <option value="pending" @selected(request('status')==='pending')>Pending</option>
+                    <option value="accepted" @selected(request('status')==='accepted')>Accepted</option>
+                    <option value="active" @selected(request('status')==='active')>Active</option>
+                    <option value="completed" @selected(request('status')==='completed')>Completed</option>
+                    <option value="cancelled" @selected(request('status')==='cancelled')>Cancelled</option>
                     <option value="rejected" @selected(request('status')==='rejected')>Rejected</option>
                 @endif
             </select>
@@ -101,7 +99,7 @@
             </div>
         @endif
 
-        {{-- DISPUTE FILTERS --}}
+        {{-- RAISER ROLE FILTER FOR COMPLAINTS --}}
         @if($tab === 'complaints')
             <div class="flex flex-col">
                 <label class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Raised By Role</label>
@@ -123,12 +121,22 @@
                 class="px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl text-sm
                        focus:ring-4 focus:ring-primary-100 focus:border-primary-500 focus:outline-none
                        transition-all cursor-pointer hover:border-gray-300">
-                <option value="newest" @selected(request('sort','newest')==='newest')>Newest</option>
-                <option value="oldest" @selected(request('sort')==='oldest')>Oldest</option>
-
-                @if($tab === 'projects')
+                @if($tab === 'payments')
+                    <option value="newest" @selected(request('sort','newest')==='newest')>Newest Payment</option>
+                    <option value="oldest" @selected(request('sort')==='oldest')>Oldest Payment</option>
+                    <option value="highest_amount" @selected(request('sort')==='highest_amount')>Highest Amount</option>
+                    <option value="lowest_amount" @selected(request('sort')==='lowest_amount')>Lowest Amount</option>
+                @elseif($tab === 'complaints')
+                    <option value="newest" @selected(request('sort','newest')==='newest')>Newest Complaint</option>
+                    <option value="oldest" @selected(request('sort')==='oldest')>Oldest Complaint</option>
+                @elseif($tab === 'projects')
+                    <option value="newest" @selected(request('sort','newest')==='newest')>Newest Project</option>
+                    <option value="oldest" @selected(request('sort')==='oldest')>Oldest Project</option>
                     <option value="highest" @selected(request('sort')==='highest')>Highest Budget</option>
                     <option value="lowest" @selected(request('sort')==='lowest')>Lowest Budget</option>
+                @else
+                    <option value="newest" @selected(request('sort','newest')==='newest')>Newest</option>
+                    <option value="oldest" @selected(request('sort')==='oldest')>Oldest</option>
                 @endif
             </select>
         </div>
@@ -145,7 +153,7 @@
                Reset
             </a>
 
-            <button
+            <button type="submit"
                 class="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl text-sm font-medium
                        hover:shadow-lg hover:scale-105 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,17 +161,6 @@
                 </svg>
                 Apply Filters
             </button>
-
-            <a href="{{ route('admin.export', ['tab' => $tab]) }}?{{ http_build_query(request()->query()) }}"
-               class="flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-medium
-                      hover:bg-emerald-700 hover:shadow-lg transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-               Export
-            </a>
-
         </div>
     </form>
 </div>
-@endif

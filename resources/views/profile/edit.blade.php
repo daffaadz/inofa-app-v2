@@ -53,6 +53,15 @@
                                         </svg>
                                         <span class="hidden sm:inline">Portfolio</span>
                                     </button>
+
+                                    <button onclick="switchTab('payment')" id="tab-payment"
+                                        class="tab-btn px-3 md:px-4 py-2 text-b-3 md:text-b-1 font-medium rounded-xl border border-neutral-500 text-neutral-500 hover:text-neutral-700 flex items-center gap-1 md:gap-2">
+                                        <svg class="w-3 md:w-4 h-3 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                        </svg>
+                                        <span class="hidden sm:inline">Payment</span>
+                                    </button>
                                 @endif
 
                                 <button onclick="switchTab('security')" id="tab-security"
@@ -112,6 +121,11 @@
                                 <!-- Portfolio Tab -->
                                 <div id="content-portfolio" class="tab-content hidden">
                                     @include('profile.partials.portfolio-form')
+                                </div>
+
+                                <!-- Payment Details Tab -->
+                                <div id="content-payment" class="tab-content hidden">
+                                    @include('profile.partials.payment-details-form')
                                 </div>
 
                                 <!-- Skills Tab -->
@@ -210,6 +224,8 @@
                     showToast('Profile updated successfully!', 'success');
                 @elseif (session('status') === 'password-updated')
                     showToast('Password updated successfully!', 'success');
+                @elseif (session('status') === 'payment-details-updated')
+                    showToast('Payment details updated successfully!', 'success');
                 @endif
             @endif
 

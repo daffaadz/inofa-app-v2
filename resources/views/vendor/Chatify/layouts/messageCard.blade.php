@@ -43,18 +43,63 @@ $timeAndSeen =
                 ])
             @elseif (isset($metadata['type']) && $metadata['type'] == 'agreement_request')
                 {{-- Agreement Request Message --}}
+                @php
+                    // Check if agreement already exists for this conversation/project
+                    $hasAgreement = false;
+                    $agreementCreated = false;
+                    
+                    if (isset($metadata['to_id']) && isset($metadata['project_id'])) {
+                        // Get current conversation participants
+                        $currentUserId = Auth::id();
+                        $toUserId = $metadata['to_id'];
+                        
+                        // Check if any agreement exists between these users for this project
+                        $existingAgreement = \App\Models\ProjectAgreement::where('project_id', $metadata['project_id'])
+                            ->where(function($query) use ($currentUserId, $toUserId) {
+                                $query->where(function($q) use ($currentUserId, $toUserId) {
+                                    $q->where('developer_id', $currentUserId)
+                                      ->where('consumer_id', $toUserId);
+                                })->orWhere(function($q) use ($currentUserId, $toUserId) {
+                                    $q->where('developer_id', $toUserId)
+                                      ->where('consumer_id', $currentUserId);
+                                });
+                            })
+                            ->first();
+                        
+                        if ($existingAgreement) {
+                            $hasAgreement = true;
+                            $agreementCreated = true;
+                        }
+                    }
+                @endphp
+                
                 <div
                     class="px-4 py-3 rounded-2xl {{ $isSender ? 'bg-primary-500 text-white rounded-br-sm' : 'bg-white text-neutral-900 rounded-bl-sm shadow-sm border border-neutral-200' }}">
                     
                     @if (isset($metadata['to_id']))
-                        <a href="{{ route('proposals.create', ['to_id' => $metadata['to_id'], 'project_id' => $metadata['project_id'] ?? null]) }}"
-                            class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl px-4 py-2.5 text-b-2 font-semibold transition shadow-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            {{ $metadata['button_text'] ?? 'Buat Agreement' }}
-                        </a>
+                        @if ($agreementCreated)
+                            {{-- Show disabled button with message if agreement already created --}}
+                            <button type="button"
+                                disabled
+                                class="inline-flex items-center gap-2 bg-neutral-300 text-neutral-500 rounded-xl px-4 py-2.5 text-b-2 font-semibold cursor-not-allowed opacity-60">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Agreement Sudah Dibuat
+                            </button>
+                        @else
+                            {{-- Show active button if no agreement yet --}}
+                            <button type="button"
+                                onclick="showAgreementRequestModal('{{ route('proposals.create', ['to_id' => $metadata['to_id'], 'project_id' => $metadata['project_id'] ?? null]) }}')"
+                                class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl px-4 py-2.5 text-b-2 font-semibold transition shadow-sm agreement-request-btn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                {{ $metadata['button_text'] ?? 'Buat Agreement' }}
+                            </button>
+                        @endif
                     @endif
                 </div>
                 <div class="mx-2 flex {{ $isSender ? 'justify-end text-white' : 'justify-start text-gray-600' }}">
@@ -118,7 +163,7 @@ $timeAndSeen =
                 </div>
             @else
                 {{-- Text Message --}}
-                @if (@$attachment->type != 'image' || $message)
+                @if ((@$attachment->type != 'image' && @$attachment->type != 'file') || $message)
                     <div
                         class="px-4 py-3 rounded-2xl {{ $isSender ? 'bg-primary-500 text-white rounded-br-sm' : 'bg-white text-neutral-900 rounded-bl-sm shadow-sm' }}">
                         <div class="text-b-2 break-words whitespace-normal">
@@ -130,6 +175,65 @@ $timeAndSeen =
                     </div>
                     <div class="mx-2 flex {{ $isSender ? 'justify-end text-white' : 'justify-start text-gray-600' }}">
                         {!! $timeAndSeen !!}
+                    </div>
+                @endif
+
+                {{-- File Attachment (non-image) --}}
+                @if (@$attachment->type == 'file')
+                    <div class="inline-block max-w-sm">
+                        <div class="px-4 py-3 rounded-2xl {{ $isSender ? 'bg-primary-500 text-white rounded-br-sm' : 'bg-white text-neutral-900 rounded-bl-sm shadow-sm' }}">
+                            <a href="{{ route(config('chatify.attachments.download_route_name'), ['fileName' => $attachment->file]) }}" 
+                               class="flex items-center gap-3 hover:opacity-80 transition {{ $isSender ? 'text-white' : 'text-neutral-900' }}" 
+                               download>
+                                {{-- File Icon --}}
+                                <div class="flex-shrink-0 p-2.5 rounded-lg {{ $isSender ? 'bg-white/20' : 'bg-primary-50' }}">
+                                    @php
+                                        $fileExtension = pathinfo($attachment->old_name ?? $attachment->file, PATHINFO_EXTENSION);
+                                        $iconClass = 'fas fa-file';
+                                        $iconColor = $isSender ? 'text-white' : 'text-primary-500';
+                                        
+                                        if (in_array(strtolower($fileExtension), ['pdf'])) {
+                                            $iconClass = 'fas fa-file-pdf';
+                                            $iconColor = $isSender ? 'text-white' : 'text-red-500';
+                                        } elseif (in_array(strtolower($fileExtension), ['doc', 'docx'])) {
+                                            $iconClass = 'fas fa-file-word';
+                                            $iconColor = $isSender ? 'text-white' : 'text-blue-600';
+                                        } elseif (in_array(strtolower($fileExtension), ['xls', 'xlsx', 'csv'])) {
+                                            $iconClass = 'fas fa-file-excel';
+                                            $iconColor = $isSender ? 'text-white' : 'text-green-600';
+                                        } elseif (in_array(strtolower($fileExtension), ['ppt', 'pptx'])) {
+                                            $iconClass = 'fas fa-file-powerpoint';
+                                            $iconColor = $isSender ? 'text-white' : 'text-orange-600';
+                                        } elseif (in_array(strtolower($fileExtension), ['zip', 'rar', '7z', 'tar', 'gz'])) {
+                                            $iconClass = 'fas fa-file-archive';
+                                            $iconColor = $isSender ? 'text-white' : 'text-yellow-600';
+                                        } elseif (in_array(strtolower($fileExtension), ['txt', 'log'])) {
+                                            $iconClass = 'fas fa-file-alt';
+                                            $iconColor = $isSender ? 'text-white' : 'text-gray-600';
+                                        }
+                                    @endphp
+                                    <i class="{{ $iconClass }} {{ $iconColor }} text-xl"></i>
+                                </div>
+                                
+                                {{-- File Info --}}
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold truncate">
+                                        {{ $attachment->old_name ?? basename($attachment->file) }}
+                                    </p>
+                                    <p class="text-xs {{ $isSender ? 'text-white/70' : 'text-neutral-500' }} mt-0.5">
+                                        {{ strtoupper($fileExtension) }} File
+                                    </p>
+                                </div>
+                                
+                                {{-- Download Icon --}}
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-download text-sm {{ $isSender ? 'text-white/70' : 'text-neutral-400' }}"></i>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="mt-1 px-2 flex {{ $isSender ? 'justify-end' : 'justify-start' }}">
+                            {!! $timeAndSeen !!}
+                        </div>
                     </div>
                 @endif
 

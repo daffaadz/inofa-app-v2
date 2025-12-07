@@ -126,7 +126,7 @@
                     <!-- Rate Min -->
                     <div>
                         <label for="rate_min" class="block text-b-1 font-medium text-neutral-700 mb-2">Minimum Rate
-                            (IDR/hr)</label>
+                            (IDR/project)</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-b-1 text-neutral-500">Rp</span>
                             <input type="text" id="rate_min" name="rate_min"
@@ -142,7 +142,7 @@
                     <!-- Rate Max -->
                     <div>
                         <label for="rate_max" class="block text-b-1 font-medium text-neutral-700 mb-2">Maximum Rate
-                            (IDR/hr)</label>
+                            (IDR/project)</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-b-1 text-neutral-500">Rp</span>
                             <input type="text" id="rate_max" name="rate_max"

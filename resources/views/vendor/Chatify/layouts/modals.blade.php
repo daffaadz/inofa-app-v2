@@ -216,3 +216,46 @@
         </div>
     </div>
 </div>
+
+{{-- ---------------------- Agreement Request Confirmation Modal ---------------------- --}}
+<div class="app-modal fixed inset-0 hidden bg-black/50 overflow-y-auto"
+    data-name="agreement-request" style="z-index: 9999; display: none;">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-xl relative">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-h-5 text-neutral-900 font-bold">Konfirmasi Buat Agreement</h3>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-b-2 text-neutral-700">
+                    Apakah Anda yakin ingin membuat proposal/agreement baru? Halaman ini hanya dapat dibuka <span class="font-semibold text-primary-600">satu kali</span> untuk setiap permintaan.
+                </p>
+
+                <div class="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                    <p class="text-b-3 text-primary-800">
+                        <strong>Penting:</strong> Pastikan Anda telah memahami detail project sebelum melanjutkan. Setelah Anda klik konfirmasi, Anda akan diarahkan ke halaman pembuatan proposal.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 justify-end mt-6 pt-6 border-t border-neutral-200">
+                <button type="button"
+                    class="cancel-agreement-request-btn px-6 py-2.5 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 rounded-xl transition text-b-2 font-semibold">
+                    Batal
+                </button>
+                <button type="button"
+                    class="confirm-agreement-request-btn px-6 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl transition text-b-2 font-semibold shadow-sm">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

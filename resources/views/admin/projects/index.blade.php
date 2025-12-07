@@ -50,14 +50,36 @@
                          viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 11h18v10H3z"/></svg>
                 </div>
                 <div>
-                    <p class="text-gray-500 text-xs">Total Budget</p>
-                    <p class="font-semibold text-xl">Rp {{ number_format($stats['budget']) }}</p>
+                    <p class="text-gray-500 text-xs">All Time Payment</p>
+                    <p class="font-semibold text-xl">Rp {{ number_format($stats['allTimePayment']) }}</p>
                 </div>
             </div>
         </div>
 
         {{-- SEARCH + FILTER --}}
         <div class="mt-6">
+            {{-- Search Bar --}}
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 mb-4">
+                <form method="GET" action="{{ route('admin.projects.index') }}" class="flex items-center gap-4">
+                    <div class="flex-1">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search by project name, client, or developer..."
+                            class="w-full px-4 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm
+                                   focus:ring-4 focus:ring-primary-100 focus:border-primary-500 focus:outline-none
+                                   transition-all hover:border-gray-300">
+                    </div>
+                    <button type="submit"
+                        class="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl text-sm font-medium
+                               hover:shadow-lg hover:scale-105 transition-all duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        Search
+                    </button>
+                </form>
+            </div>
+            
+            {{-- Advanced Filters --}}
             @include('admin.components.filters', ['tab' => 'projects'])
         </div>
 
@@ -122,10 +144,7 @@
 
                             {{-- BUDGET --}}
                             <td class="py-3 px-2 text-green-600 font-medium">
-                                @php
-                                    $confirmedTotal = $project->payments()->where('status', 'confirmed')->sum('amount');
-                                @endphp
-                                Rp {{ number_format($confirmedTotal) }}
+                                Rp {{ number_format($project->final_price ?? 0) }}
                             </td>
 
                             {{-- TIMELINE --}}

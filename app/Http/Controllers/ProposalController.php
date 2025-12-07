@@ -184,6 +184,136 @@ class ProposalController extends Controller
     }
 
     /**
+     * Edit proposal (Developer only)
+     */
+    public function edit($agreementId)
+    {
+        $agreement = ProjectAgreement::with(['consumer', 'project'])
+            ->findOrFail($agreementId);
+        
+        // Check authorization - only developer who created it can edit
+        if ($agreement->developer_id !== Auth::id()) {
+            abort(403, 'You are not authorized to edit this proposal');
+        }
+
+        // Only pending proposals can be edited
+        if ($agreement->status !== ProjectAgreement::STATUS_PENDING) {
+            return redirect()->back()->with('error', 'Only pending proposals can be edited');
+        }
+
+        $client = $agreement->consumer;
+        $project = $agreement->project;
+        $toUserId = $agreement->consumer_id;
+        $projectId = $agreement->project_id;
+
+        return view('proposals.edit', compact('agreement', 'client', 'project', 'toUserId', 'projectId'));
+    }
+
+    /**
+     * Update proposal
+     */
+    public function update(Request $request, $agreementId)
+    {
+        $validator = Validator::make($request->all(), [
+            'project_title' => 'required|string|max:255',
+            'client_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'scope_projects' => 'required|string',
+            'terms' => 'required|string',
+            'final_price' => 'required|numeric|min:0',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'deliverables' => 'required|array|min:1',
+            'deliverables.*' => 'required|string',
+            'price_details' => 'nullable|array',
+            'price_details.*.item' => 'required|string',
+            'price_details.*.price' => 'required|numeric|min:0',
+            'mvp_features' => 'nullable|array',
+            'mvp_features.*.name' => 'required|string',
+            'mvp_features.*.description' => 'nullable|string',
+            'mvp_features.*.priority' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $agreement = ProjectAgreement::findOrFail($agreementId);
+
+            // Check authorization
+            if ($agreement->developer_id !== Auth::id()) {
+                throw new \Exception('You are not authorized to edit this proposal');
+            }
+
+            // Only pending proposals can be edited
+            if ($agreement->status !== ProjectAgreement::STATUS_PENDING) {
+                throw new \Exception('Only pending proposals can be edited');
+            }
+
+            // Update Project Agreement
+            $agreement->update([
+                'project_title' => $request->project_title,
+                'client_name' => $request->client_name,
+                'final_price' => $request->final_price,
+                'price_details' => $request->price_details,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'description' => $request->description,
+                'terms' => $request->terms,
+                'scope_projects' => $request->scope_projects,
+                'projects_mvp' => $request->mvp_features,
+                'deliverables' => $request->deliverables,
+            ]);
+
+            // Update chat message metadata
+            $message = ChMessage::where('project_agreement_id', $agreementId)->first();
+            if ($message) {
+                $metadata = $message->metadata ?? [];
+                $metadata['project_title'] = $request->project_title;
+                $metadata['client_name'] = $request->client_name;
+                $metadata['final_price'] = $request->final_price;
+                $metadata['start_date'] = $request->start_date;
+                $metadata['end_date'] = $request->end_date;
+                $metadata['deliverables'] = $request->deliverables;
+                $metadata['description'] = $request->description;
+                $metadata['scope_projects'] = $request->scope_projects;
+                $metadata['price_details'] = $request->price_details;
+                $metadata['mvp_features'] = $request->mvp_features;
+                
+                $message->metadata = $metadata;
+                $message->save();
+            }
+
+            // Send notification to client
+            \App\Models\UserNotification::create([
+                'user_id' => $agreement->consumer_id,
+                'type' => 'proposal_updated',
+                'title' => 'Proposal Updated',
+                'message' => Auth::user()->name . ' has updated the proposal',
+                'data' => json_encode([
+                    'agreement_id' => $agreement->id,
+                    'from_user_id' => Auth::id(),
+                ]),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('user', ['id' => $agreement->consumer_id])
+                ->with('success', 'Proposal updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
      * Quick apply - Send automatic message to project owner
      */
     public function quickApply(Request $request, $projectId)
@@ -201,15 +331,16 @@ class ProposalController extends Controller
             // Get project
             $project = \App\Models\Project::findOrFail($projectId);
             
-            // Check if already applied
-            $existingApplication = ProjectAgreement::where('project_id', $projectId)
-                ->where('developer_id', Auth::id())
+            // Check if already contacted via message
+            $existingMessage = ChMessage::where('from_id', Auth::id())
+                ->where('to_id', $project->consumer_id)
+                ->where('body', 'LIKE', "%I'm interested in discussing your project titled '{$project->title}'%")
                 ->first();
             
-            if ($existingApplication) {
+            if ($existingMessage) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'You have already applied to this project'
+                    'message' => 'You have already sent an interest message for this project'
                 ], 400);
             }
 
@@ -227,22 +358,6 @@ class ProposalController extends Controller
                 'seen' => 0,
             ]);
 
-            // Create project agreement as "interested"
-            $agreement = ProjectAgreement::create([
-                'project_id' => $project->id,
-                'project_title' => $project->title,
-                'consumer_id' => $project->consumer_id,
-                'developer_id' => Auth::id(),
-                'client_name' => $project->consumer->name,
-                'final_price' => 0,
-                'start_date' => now(),
-                'end_date' => now()->addDays(30),
-                'status' => ProjectAgreement::STATUS_PENDING,
-                'description' => 'Quick apply - awaiting proposal details',
-                'terms' => 'To be discussed',
-                'scope_projects' => 'To be discussed',
-            ]);
-
             // Real-time notification via Pusher
             if (config('chatify.pusher.enabled')) {
                 Chatify::push("private-chatify.{$project->consumer_id}", 'messaging', [
@@ -255,12 +370,11 @@ class ProposalController extends Controller
             // Database notification
             \App\Models\UserNotification::create([
                 'user_id' => $project->consumer_id,
-                'type' => 'project_application',
-                'title' => 'New Project Application',
+                'type' => 'project_interest',
+                'title' => 'Someone Interested in Your Project',
                 'message' => Auth::user()->name . ' is interested in your project: ' . $project->title,
                 'data' => json_encode([
                     'project_id' => $project->id,
-                    'agreement_id' => $agreement->id,
                     'from_user_id' => Auth::id(),
                 ]),
             ]);
@@ -269,7 +383,7 @@ class ProposalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Application sent successfully! Your interest message has been delivered to the project owner.',
+                'message' => 'Interest message sent successfully! The project owner has been notified.',
                 'redirect_url' => route('user', ['id' => $project->consumer_id])
             ]);
 

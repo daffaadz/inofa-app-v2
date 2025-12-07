@@ -31,6 +31,8 @@ class DeveloperProfile extends Model
         'projects_completed',
         'profile_view_count',
         'last_viewed_at',
+        'bank_name',
+        'account_number',
     ];
 
     protected $casts = [
@@ -39,6 +41,7 @@ class DeveloperProfile extends Model
         'rating_average'     => 'float',
         'portfolio_links'    => 'array',
         'education'          => 'array',
+        'certifications'     => 'array',
         'last_viewed_at'     => 'datetime',
     ];
 

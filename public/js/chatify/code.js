@@ -173,16 +173,48 @@ function sendTempMessageCard(message, id) {
 // upload image preview card.
 function attachmentTemplate(fileType, fileName, imgURL = null) {
   if (fileType != "image") {
-    return (
-      `
- <div class="attachment-preview">
-     <span class="fas fa-times cancel"></span>
-     <p style="padding:0px 30px;"><span class="fas fa-file"></span> ` +
-      escapeHtml(fileName) +
-      `</p>
- </div>
-`
-    );
+    // Get file extension
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    let iconClass = 'fas fa-file';
+    let iconColor = '#6B7280'; // gray-500
+    
+    // Set icon based on file type
+    if (fileExtension === 'pdf') {
+      iconClass = 'fas fa-file-pdf';
+      iconColor = '#DC2626'; // red-600
+    } else if (['doc', 'docx'].includes(fileExtension)) {
+      iconClass = 'fas fa-file-word';
+      iconColor = '#2563EB'; // blue-600
+    } else if (['xls', 'xlsx', 'csv'].includes(fileExtension)) {
+      iconClass = 'fas fa-file-excel';
+      iconColor = '#059669'; // green-600
+    } else if (['ppt', 'pptx'].includes(fileExtension)) {
+      iconClass = 'fas fa-file-powerpoint';
+      iconColor = '#EA580C'; // orange-600
+    } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(fileExtension)) {
+      iconClass = 'fas fa-file-archive';
+      iconColor = '#CA8A04'; // yellow-600
+    } else if (['txt', 'log'].includes(fileExtension)) {
+      iconClass = 'fas fa-file-alt';
+      iconColor = '#6B7280'; // gray-500
+    }
+    
+    return `
+      <div class="attachment-preview">
+        <span class="fas fa-times cancel"></span>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 15px 30px;">
+          <i class="${iconClass}" style="font-size: 32px; color: ${iconColor};"></i>
+          <div style="flex: 1; min-width: 0;">
+            <p style="margin: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${escapeHtml(fileName)}
+            </p>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #6B7280;">
+              ${fileExtension.toUpperCase()} File
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
   } else {
     return (
       `

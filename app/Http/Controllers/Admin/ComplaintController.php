@@ -12,11 +12,52 @@ use Illuminate\Support\Facades\Auth;
 class ComplaintController extends Controller
 {
     // List semua complaint
-    public function index()
+    public function index(Request $request)
     {
-        $complaints = Complaint::with('user')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Complaint::with('user');
+
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('user_name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function($q2) use ($search) {
+                      $q2->where('name', 'LIKE', "%{$search}%")
+                         ->orWhere('email', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Date range filter
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Raiser role filter (filter by user role)
+        if ($request->filled('raiser_role')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('role', $request->raiser_role);
+            });
+        }
+
+        // Sort filter
+        $sort = $request->get('sort', 'newest');
+        if ($sort === 'oldest') {
+            $query->oldest();
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $complaints = $query->paginate(15)->withQueryString();
 
         return view('admin.complaint.index', compact('complaints'));
     }

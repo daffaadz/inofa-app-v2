@@ -107,6 +107,17 @@
                             class="mt-1 block w-full px-3 sm:px-4 py-2 rounded-lg border border-neutral-300
                                      font-sans text-b-2 sm:text-b-1 placeholder-neutral-400
                                      focus:ring-1 focus:ring-primary-500" />
+                        @if($errors->get('email'))
+                            @foreach($errors->get('email') as $error)
+                                @if(str_contains($error, 'suspended'))
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            showSuspendedModal();
+                                        });
+                                    </script>
+                                @endif
+                            @endforeach
+                        @endif
                         <x-input-error :messages="$errors->get('email')" class="mt-1" />
                     </div>
 
@@ -145,5 +156,87 @@
         </div>
 
     </div>
+
+    {{-- Suspended Account Modal --}}
+    <div id="suspendedModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 p-4" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 rounded-t-2xl">
+                    <div class="flex items-center gap-3 text-white">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <h3 class="text-xl font-bold">Account Suspended</h3>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="p-6">
+                    <div class="mb-6">
+                        <div class="flex items-start gap-3 mb-4">
+                            <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900 mb-2">Your account has been suspended</h4>
+                                <p class="text-sm text-gray-600">
+                                    You cannot access your account at this time. This action was taken by our administration team.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <h5 class="font-semibold text-sm text-gray-900 mb-2">What should I do?</h5>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 mt-0.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                    <span>Contact our support team for more information</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 mt-0.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                    <span>Review our terms of service</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 mt-0.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                    <span>Wait for administrator to review your account</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <button onclick="closeSuspendedModal()"
+                        class="w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+                        I Understand
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSuspendedModal() {
+            document.getElementById('suspendedModal').style.display = 'block';
+        }
+
+        function closeSuspendedModal() {
+            document.getElementById('suspendedModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('suspendedModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuspendedModal();
+            }
+        });
+    </script>
 
 </x-guest-layout>

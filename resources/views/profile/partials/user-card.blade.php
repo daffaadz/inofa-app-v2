@@ -99,8 +99,20 @@
                     @php
                         $rateMin = Auth::user()->developerProfile?->rate_min_byproject ?? 500000;
                         $rateMax = Auth::user()->developerProfile?->rate_max_byproject ?? 1000000;
+                        
+                        // Function to format rate in K/M format
+                        function formatRate($amount) {
+                            if ($amount >= 1000000) {
+                                $formatted = $amount / 1000000;
+                                return number_format($formatted, $formatted == floor($formatted) ? 0 : 1) . 'M';
+                            } elseif ($amount >= 1000) {
+                                $formatted = $amount / 1000;
+                                return number_format($formatted, $formatted == floor($formatted) ? 0 : 1) . 'K';
+                            }
+                            return number_format($amount, 0);
+                        }
                     @endphp
-                    Rp {{ number_format($rateMin, 0, ',', '.') }} - Rp {{ number_format($rateMax, 0, ',', '.') }}/hr
+                    Rp {{ formatRate($rateMin) }} - Rp {{ formatRate($rateMax) }}/project
                 </span>
             </div>
             <div class="flex justify-between items-center">

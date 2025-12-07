@@ -394,7 +394,7 @@
                                     </div>
 
                                     <div class="flex items-center gap-2">
-                                        <a href="{{ route('consumer.project.show', $project->id) }}"
+                                        <a href="{{ route('search.projects.show', $project->id) }}"
                                             class="px-4 py-2 hover:bg-primary-500 hover:text-white text-b-3 border border-primary-500 font-medium rounded-lg bg-white text-primary-500 transition-all duration-300">
                                             View Project
                                         </a>

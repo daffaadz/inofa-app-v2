@@ -34,7 +34,7 @@ class ComplaintController extends Controller
                 'user_name' => Auth::user()->name,
                 'description' => $request->description,
                 'terms_accepted' => true,
-                'status' => 'pending',
+                'status' => 'in_progress',
             ]);
 
             return Response::json([

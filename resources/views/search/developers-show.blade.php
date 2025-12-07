@@ -87,7 +87,7 @@
 
                         <!-- Action Buttons -->
                         <div class="flex flex-wrap gap-3">
-                            <a href="{{ route('chat', ['id' => $developer->id]) }}"
+                            <a href="{{ route('user', ['id' => $developer->id]) }}"
                                 class="inline-flex gap-2 items-center px-6 py-3 bg-primary-500 text-white text-b-2 font-medium rounded-lg hover:bg-primary-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-auto" fill="currentColor"
                                     viewBox="0 0 256 256">
@@ -219,7 +219,7 @@
 
                 <!-- Certifications -->
                 @if (!empty($certifications) && is_array($certifications) && count($certifications) > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
                         @foreach ($certifications as $cert)
                             <div class="flex items-center gap-2 text-b-2 text-neutral-700">
                                 <svg class="w-5 h-5 text-primary-500 flex-shrink-0" fill="none"
@@ -227,7 +227,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span>{{ $cert }}</span>
+                                <span>
+                                    @if(is_array($cert))
+                                        {{ $cert['name'] ?? $cert['title'] ?? 'Certification' }}
+                                        @if(isset($cert['year']))
+                                            <span class="text-neutral-500">({{ $cert['year'] }})</span>
+                                        @endif
+                                    @else
+                                        {{ $cert }}
+                                    @endif
+                                </span>
                             </div>
                         @endforeach
                     </div>
@@ -472,7 +481,7 @@
                         Have an exciting project in mind? Let's collaborate and bring your vision to life. High-quality,
                         100% satisfaction guaranteed.
                     </p>
-                    <a href="{{ route('chat', ['id' => $developer->id]) }}"
+                    <a href="{{ route('user', ['id' => $developer->id]) }}"
                         class="inline-flex items-center px-8 py-3 bg-white text-primary-500 text-b-1 font-semibold rounded-lg hover:bg-neutral-10 transition-colors">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

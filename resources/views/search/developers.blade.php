@@ -19,7 +19,8 @@
                     <input type="search" name="q" id="q" value="{{ $keyword ?? '' }}"
                         form="developer-search-form"
                         class="w-3/4 pl-12 pr-4 py-3 border border-neutral-300 rounded-lg text-b-1 placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                        placeholder="Search by name or skills...">
+                        placeholder="Search by name or skills..."
+                        onkeypress="if(event.key === 'Enter') { event.preventDefault(); submitSearchForm(); }">
                 </div>
             </div>
         </div>
@@ -262,7 +263,7 @@
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                                         </svg>
-                                                        {{ $developer->developerProfile->projects_completed ?? 0 }}
+                                                        {{ $developer->projects_completed ?? 0 }}
                                                         jobs
                                                         completed
                                                     </div>

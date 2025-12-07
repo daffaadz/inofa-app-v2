@@ -16,7 +16,8 @@
                     </div>
                     <input type="search" name="q" id="q" value="{{ $keyword ?? '' }}" form="project-search-form"
                         class="w-full pl-12 pr-4 py-3 border border-neutral-300 rounded-lg text-b-1 placeholder:text-neutral-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                        placeholder="Search for jobs...">
+                        placeholder="Search for jobs..."
+                        onkeypress="if(event.key === 'Enter') { event.preventDefault(); submitProjectSearchForm(); }">
                 </div>
             </div>
         </div>

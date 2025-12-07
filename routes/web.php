@@ -115,11 +115,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/profile/education', [ProfileController::class, 'storeEducation'])->name('education.store');
         Route::delete('/profile/education/{index}', [ProfileController::class, 'destroyEducation'])->name('education.destroy');
 
+        // Certification routes
+        Route::post('/profile/certifications', [ProfileController::class, 'storeCertification'])->name('certifications.store');
+        Route::delete('/profile/certifications/{index}', [ProfileController::class, 'destroyCertification'])->name('certifications.destroy');
+
         // Portfolio routes
         Route::post('/profile/portfolios', [PortfolioController::class, 'store'])->name('portfolios.store');
         Route::patch('/profile/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolios.update');
         Route::delete('/profile/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolios.destroy');
         Route::post('/profile/portfolios/{portfolio}/toggle-featured', [PortfolioController::class, 'toggleFeatured'])->name('portfolios.toggle-featured');
+
+        // Payment details route
+        Route::patch('/profile/payment-details', [ProfileController::class, 'updatePaymentDetails'])->name('profile.payment-details.update');
     });
 });
 
@@ -169,6 +176,10 @@ Route::middleware(['auth'])->group(function () {
             ->name('proposals.create');
         Route::post('/proposals', [ProposalController::class, 'store'])
             ->name('proposals.store');
+        Route::get('/proposals/{agreement}/edit', [ProposalController::class, 'edit'])
+            ->name('proposals.edit');
+        Route::put('/proposals/{agreement}', [ProposalController::class, 'update'])
+            ->name('proposals.update');
         Route::post('/projects/{project}/quick-apply', [ProposalController::class, 'quickApply'])
             ->name('projects.quick-apply');
     });

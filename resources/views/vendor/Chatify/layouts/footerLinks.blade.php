@@ -72,6 +72,52 @@ window.closeTerminationModal = function() {
     }
 };
 
+// Agreement Request Modal function
+window.showAgreementRequestModal = function(url) {
+    console.log('showAgreementRequestModal called with URL:', url);
+    
+    if (!url) {
+        console.error('URL is missing');
+        alert('Error: URL is missing');
+        return false;
+    }
+    
+    // Store the URL for later use
+    window.agreementRequestUrl = url;
+    
+    // Show the modal
+    const modal = document.querySelector('[data-name="agreement-request"]');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.remove('hidden');
+        modal.offsetHeight;
+        console.log('Agreement request modal opened');
+    } else {
+        console.error('Agreement request modal not found');
+        alert('Error: Modal not found');
+        return false;
+    }
+    
+    return false;
+};
+
+// Close agreement request modal
+window.closeAgreementRequestModal = function() {
+    const modal = document.querySelector('[data-name="agreement-request"]');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+        console.log('Agreement request modal closed');
+    }
+};
+
+// Confirm and navigate to agreement creation
+window.confirmAgreementRequest = function() {
+    if (window.agreementRequestUrl) {
+        window.location.href = window.agreementRequestUrl;
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded - Setting up modal close handlers');
     
@@ -86,11 +132,35 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Cancel button not found on page load');
     }
     
+    // Agreement request modal handlers
+    const cancelAgreementBtn = document.querySelector('.cancel-agreement-request-btn');
+    if (cancelAgreementBtn) {
+        cancelAgreementBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Cancel agreement request button clicked');
+            window.closeAgreementRequestModal();
+        });
+    }
+    
+    const confirmAgreementBtn = document.querySelector('.confirm-agreement-request-btn');
+    if (confirmAgreementBtn) {
+        confirmAgreementBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Confirm agreement request button clicked');
+            window.confirmAgreementRequest();
+        });
+    }
+    
     // Also close modal when clicking outside (on the backdrop)
     document.addEventListener('click', function(e) {
-        const modal = document.querySelector('[data-name="termination"]');
-        if (modal && e.target === modal) {
+        const terminationModal = document.querySelector('[data-name="termination"]');
+        if (terminationModal && e.target === terminationModal) {
             window.closeTerminationModal();
+        }
+        
+        const agreementModal = document.querySelector('[data-name="agreement-request"]');
+        if (agreementModal && e.target === agreementModal) {
+            window.closeAgreementRequestModal();
         }
     });
 });

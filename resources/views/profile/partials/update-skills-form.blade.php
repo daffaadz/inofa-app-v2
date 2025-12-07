@@ -641,17 +641,375 @@
                 <h3 class="text-h-6 text-neutral-1000">Certifications & Awards</h3>
             </div>
 
-            <!-- Empty State -->
-            <div
-                class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-neutral-200 rounded-lg">
-                <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Add Certification Form -->
+            <form id="add-certification-form" class="mb-4" enctype="multipart/form-data">
+                @csrf
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <input type="text" 
+                            id="cert_title" 
+                            name="title" 
+                            placeholder="Certification Title (e.g., AWS Certified Developer)"
+                            class="w-full px-4 py-2.5 text-b-1 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                            required>
+                    </div>
+                    
+                    <div>
+                        <input type="text" 
+                            id="cert_issuer" 
+                            name="issuer" 
+                            placeholder="Issuing Organization (e.g., Amazon Web Services)"
+                            class="w-full px-4 py-2.5 text-b-1 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                            required>
+                    </div>
+
+                    <div>
+                        <input type="number" 
+                            id="cert_year" 
+                            name="year" 
+                            placeholder="Year Obtained"
+                            min="1950"
+                            max="2100"
+                            class="w-full px-4 py-2.5 text-b-1 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                            required>
+                    </div>
+
+                    <div>
+                        <label for="cert_file" class="block w-full px-4 py-2.5 text-b-1 border border-neutral-200 rounded-lg cursor-pointer hover:bg-neutral-50 transition text-center">
+                            <span id="file-label" class="text-neutral-500 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+                                    <path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"></path>
+                                </svg>
+                                Upload Certificate (PDF/Image)
+                            </span>
+                            <input type="file" 
+                                id="cert_file" 
+                                name="file" 
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                class="hidden"
+                                required>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- File Preview -->
+                <div id="file-preview" class="hidden mb-3 p-3 bg-neutral-50 border border-neutral-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <div id="preview-icon" class="w-12 h-12 flex items-center justify-center bg-white rounded border border-neutral-300">
+                            <!-- Icon will be inserted here -->
+                        </div>
+                        <div class="flex-1">
+                            <p id="preview-name" class="text-b-2 font-medium text-neutral-800"></p>
+                            <p id="preview-size" class="text-b-3 text-neutral-500"></p>
+                        </div>
+                        <button type="button" id="remove-file" class="text-neutral-400 hover:text-red-500 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" id="add-certification-btn"
+                    class="w-full px-6 py-2.5 bg-primary-500 text-white text-b-1 font-medium rounded-lg hover:bg-primary-600 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                </div>
-                <p class="text-b-1 text-neutral-500 mb-1">Add Certification</p>
-                <p class="text-b-3 text-neutral-400">Showcase your professional credentials (Coming soon)</p>
+                    <span id="add-certification-text">Add Certification</span>
+                </button>
+                <p id="certification-error" class="mt-1 text-b-3 text-red-500 hidden"></p>
+            </form>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const addCertificationForm = document.getElementById('add-certification-form');
+                    const addCertificationBtn = document.getElementById('add-certification-btn');
+                    const addCertificationText = document.getElementById('add-certification-text');
+                    const certificationError = document.getElementById('certification-error');
+                    const certificationContainer = document.getElementById('certification-container');
+                    const toastContainer = document.getElementById('toast-container');
+                    const certFileInput = document.getElementById('cert_file');
+                    const fileLabel = document.getElementById('file-label');
+                    const filePreview = document.getElementById('file-preview');
+                    const previewIcon = document.getElementById('preview-icon');
+                    const previewName = document.getElementById('preview-name');
+                    const previewSize = document.getElementById('preview-size');
+                    const removeFileBtn = document.getElementById('remove-file');
+
+                    // Show Toast Notification
+                    function showToast(message, type = 'success') {
+                        const toast = document.createElement('div');
+                        const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+                        
+                        toast.className = `${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-x-full`;
+                        toast.innerHTML = `
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                ${type === 'success' 
+                                    ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>' 
+                                    : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>'}
+                            </svg>
+                            <span class="text-b-2 font-medium">${message}</span>
+                        `;
+                        
+                        toastContainer.appendChild(toast);
+                        setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+                        setTimeout(() => {
+                            toast.classList.add('translate-x-full');
+                            setTimeout(() => toast.remove(), 300);
+                        }, 3000);
+                    }
+
+                    // Format file size
+                    function formatFileSize(bytes) {
+                        if (bytes === 0) return '0 Bytes';
+                        const k = 1024;
+                        const sizes = ['Bytes', 'KB', 'MB'];
+                        const i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+                    }
+
+                    // File input change handler
+                    certFileInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            // Validate file size (5MB)
+                            if (file.size > 5 * 1024 * 1024) {
+                                showToast('File size must not exceed 5MB', 'error');
+                                certFileInput.value = '';
+                                return;
+                            }
+
+                            // Show preview
+                            previewName.textContent = file.name;
+                            previewSize.textContent = formatFileSize(file.size);
+                            
+                            // Set icon based on file type
+                            const fileType = file.type;
+                            if (fileType === 'application/pdf') {
+                                previewIcon.innerHTML = `
+                                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                `;
+                            } else if (fileType.startsWith('image/')) {
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    previewIcon.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover rounded" alt="Preview">`;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+
+                            filePreview.classList.remove('hidden');
+                            fileLabel.innerHTML = `
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+                                    <path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"></path>
+                                </svg>
+                                File Selected
+                            `;
+                        }
+                    });
+
+                    // Remove file button
+                    removeFileBtn.addEventListener('click', function() {
+                        certFileInput.value = '';
+                        filePreview.classList.add('hidden');
+                        fileLabel.innerHTML = `
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"></path>
+                            </svg>
+                            Upload Certificate (PDF/Image)
+                        `;
+                    });
+
+                    // Add certification to DOM
+                    function addCertificationToDOM(certification) {
+                        const certCard = document.createElement('div');
+                        certCard.className = 'p-4 bg-neutral-50 rounded-lg border border-neutral-200 flex justify-between items-start';
+                        
+                        const fileIcon = certification.file_type === 'pdf' 
+                            ? `<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>`
+                            : `<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>`;
+
+                        certCard.innerHTML = `
+                            <div class="flex gap-3 flex-1">
+                                <div class="w-10 h-10 flex items-center justify-center bg-white rounded border border-neutral-300">
+                                    ${fileIcon}
+                                </div>
+                                <div>
+                                    <h4 class="text-b-1 font-semibold text-neutral-1000">${certification.title}</h4>
+                                    <p class="text-b-2 text-neutral-700">${certification.issuer}</p>
+                                    <p class="text-b-3 text-neutral-500 mt-1">${certification.year}</p>
+                                    <a href="${certification.file_url}" target="_blank" class="text-b-3 text-primary-500 hover:text-primary-600 underline mt-1 inline-block">View Certificate</a>
+                                </div>
+                            </div>
+                            <button type="button" class="delete-certification-btn text-neutral-400 hover:text-red-500 transition" data-index="${certification.index}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        `;
+                        
+                        // Remove empty state if exists
+                        const emptyState = certificationContainer.querySelector('p.text-neutral-500, .flex.flex-col');
+                        if (emptyState) emptyState.remove();
+                        
+                        certificationContainer.appendChild(certCard);
+                        
+                        // Add delete handler
+                        const deleteBtn = certCard.querySelector('.delete-certification-btn');
+                        deleteBtn.addEventListener('click', () => handleDeleteCertification(certification.index, certCard));
+                    }
+
+                    // Handle form submission
+                    addCertificationForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        
+                        const formData = new FormData(addCertificationForm);
+                        
+                        // Disable button
+                        addCertificationBtn.disabled = true;
+                        addCertificationText.textContent = 'Uploading...';
+                        certificationError.classList.add('hidden');
+                        
+                        try {
+                            const response = await fetch('{{ route("certifications.store") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Accept': 'application/json'
+                                },
+                                body: formData
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (response.ok) {
+                                addCertificationToDOM(data.certification);
+                                showToast('Certification added successfully!', 'success');
+                                addCertificationForm.reset();
+                                filePreview.classList.add('hidden');
+                                fileLabel.innerHTML = `
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+                                        <path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"></path>
+                                    </svg>
+                                    Upload Certificate (PDF/Image)
+                                `;
+                            } else {
+                                certificationError.textContent = data.message || 'Failed to add certification';
+                                certificationError.classList.remove('hidden');
+                                showToast(data.message || 'Failed to add certification', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Error adding certification:', error);
+                            certificationError.textContent = 'An error occurred. Please try again.';
+                            certificationError.classList.remove('hidden');
+                            showToast('An error occurred. Please try again.', 'error');
+                        } finally {
+                            addCertificationBtn.disabled = false;
+                            addCertificationText.textContent = 'Add Certification';
+                        }
+                    });
+
+                    // Handle certification deletion
+                    async function handleDeleteCertification(index, certCard) {
+                        if (!confirm('Are you sure you want to delete this certification?')) {
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(`/profile/certifications/${index}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Accept': 'application/json'
+                                }
+                            });
+                            
+                            if (response.ok) {
+                                certCard.remove();
+                                showToast('Certification removed successfully!', 'success');
+                                
+                                // Show empty state if no certifications left
+                                if (certificationContainer.children.length === 0) {
+                                    certificationContainer.innerHTML = `
+                                        <div class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-neutral-200 rounded-lg">
+                                            <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
+                                                <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-b-1 text-neutral-500 mb-1">No certifications added yet</p>
+                                            <p class="text-b-3 text-neutral-400">Add your first certification above</p>
+                                        </div>
+                                    `;
+                                }
+                            } else {
+                                showToast('Failed to remove certification', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Error removing certification:', error);
+                            showToast('An error occurred. Please try again.', 'error');
+                        }
+                    }
+
+                    // Attach delete handlers to existing certifications
+                    document.querySelectorAll('.delete-certification-btn').forEach(btn => {
+                        const index = btn.getAttribute('data-index');
+                        const card = btn.closest('.p-4');
+                        btn.addEventListener('click', () => handleDeleteCertification(index, card));
+                    });
+                });
+            </script>
+
+            <!-- Certifications List -->
+            <div id="certification-container" class="space-y-3">
+                @php
+                    $certificationList = Auth::user()->developerProfile?->certifications ?? [];
+                    if (is_string($certificationList)) {
+                        $certificationList = json_decode($certificationList, true) ?? [];
+                    }
+                @endphp
+                @forelse($certificationList as $index => $cert)
+                    <div class="p-4 bg-neutral-50 rounded-lg border border-neutral-200 flex justify-between items-start">
+                        <div class="flex gap-3 flex-1">
+                            <div class="w-10 h-10 flex items-center justify-center bg-white rounded border border-neutral-300">
+                                @if(($cert['file_type'] ?? '') === 'pdf')
+                                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                @else
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                @endif
+                            </div>
+                            <div>
+                                <h4 class="text-b-1 font-semibold text-neutral-1000">{{ $cert['title'] ?? '' }}</h4>
+                                <p class="text-b-2 text-neutral-700">{{ $cert['issuer'] ?? '' }}</p>
+                                <p class="text-b-3 text-neutral-500 mt-1">{{ $cert['year'] ?? '' }}</p>
+                                @if(isset($cert['file_path']))
+                                    <a href="{{ Storage::url($cert['file_path']) }}" target="_blank" class="text-b-3 text-primary-500 hover:text-primary-600 underline mt-1 inline-block">View Certificate</a>
+                                @endif
+                            </div>
+                        </div>
+                        <button type="button" class="delete-certification-btn text-neutral-400 hover:text-red-500 transition" data-index="{{ $index }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                @empty
+                    <div class="flex flex-col items-center justify-center py-12 border-2 border-dashed border-neutral-200 rounded-lg">
+                        <div class="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                        </div>
+                        <p class="text-b-1 text-neutral-500 mb-1">No certifications added yet</p>
+                        <p class="text-b-3 text-neutral-400">Add your first certification above</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>

@@ -257,15 +257,117 @@ class DashboardController extends Controller
             'total_users'         => User::where('role', '!=', 'admin')->count(),
         ];
 
-        // Load all payments
-        $payments = Payment::with(['agreement.project', 'agreement.consumer', 'agreement.developer'])
-            ->latest()
-            ->get();
+        // ========== FILTERS FOR PAYMENTS ==========
+        $paymentsQuery = Payment::with(['agreement.project', 'agreement.consumer', 'agreement.developer']);
+        
+        // Only apply filters when payments tab is active
+        if ($tab === 'payments') {
+            // Search filter for payments
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $paymentsQuery->where(function($q) use ($search) {
+                    $q->whereHas('agreement.project', function($q2) use ($search) {
+                        $q2->where('title', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('agreement.consumer', function($q2) use ($search) {
+                        $q2->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('agreement.developer', function($q2) use ($search) {
+                        $q2->where('name', 'LIKE', "%{$search}%");
+                    });
+                });
+            }
+            
+            // Status filter for payments
+            if ($request->filled('status')) {
+                $paymentsQuery->where('status', $request->status);
+            }
+            
+            // Payment type filter
+            if ($request->filled('payment_type')) {
+                $paymentsQuery->where('type', $request->payment_type);
+            }
+            
+            // Date range filter for payments
+            if ($request->filled('date_from')) {
+                $paymentsQuery->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $paymentsQuery->whereDate('created_at', '<=', $request->date_to);
+            }
+            
+            // Sort for payments
+            $sort = $request->get('sort', 'newest');
+            switch ($sort) {
+                case 'oldest':
+                    $paymentsQuery->oldest();
+                    break;
+                case 'highest_amount':
+                    $paymentsQuery->orderByDesc('amount');
+                    break;
+                case 'lowest_amount':
+                    $paymentsQuery->orderBy('amount');
+                    break;
+                default: // newest
+                    $paymentsQuery->latest();
+                    break;
+            }
+        } else {
+            $paymentsQuery->latest();
+        }
+        
+        $payments = $paymentsQuery->get();
 
-        // Load all complaints
-        $complaints = \App\Models\Complaint::with('user')
-            ->latest()
-            ->get();
+        // ========== FILTERS FOR COMPLAINTS ==========
+        $complaintsQuery = \App\Models\Complaint::with('user');
+        
+        // Only apply filters when complaints tab is active
+        if ($tab === 'complaints') {
+            // Search filter for complaints
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $complaintsQuery->where(function($q) use ($search) {
+                    $q->where('user_name', 'LIKE', "%{$search}%")
+                      ->orWhere('description', 'LIKE', "%{$search}%")
+                      ->orWhereHas('user', function($q2) use ($search) {
+                          $q2->where('name', 'LIKE', "%{$search}%")
+                             ->orWhere('email', 'LIKE', "%{$search}%");
+                      });
+                });
+            }
+            
+            // Status filter for complaints
+            if ($request->filled('status')) {
+                $complaintsQuery->where('status', $request->status);
+            }
+            
+            // Raiser role filter for complaints
+            if ($request->filled('raiser_role')) {
+                $complaintsQuery->whereHas('user', function($q) use ($request) {
+                    $q->where('role', $request->raiser_role);
+                });
+            }
+            
+            // Date range filter for complaints
+            if ($request->filled('date_from')) {
+                $complaintsQuery->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $complaintsQuery->whereDate('created_at', '<=', $request->date_to);
+            }
+            
+            // Sort for complaints
+            $sort = $request->get('sort', 'newest');
+            if ($sort === 'oldest') {
+                $complaintsQuery->oldest();
+            } else {
+                $complaintsQuery->latest();
+            }
+        } else {
+            $complaintsQuery->latest();
+        }
+        
+        $complaints = $complaintsQuery->get();
 
         // Projects (jika diperlukan di masa depan)
         $projects = collect();

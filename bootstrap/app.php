@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'admin.access' => \App\Http\Middleware\AdminAccessControl::class,
+        ]);
+        
+        // Terapkan middleware admin.access ke semua route yang ter-autentikasi
+        $middleware->web(append: [
+            \App\Http\Middleware\AdminAccessControl::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

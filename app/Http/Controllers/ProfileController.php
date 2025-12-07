@@ -346,4 +346,169 @@ class ProfileController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Store a new certification.
+     */
+    public function storeCertification(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Check if user is a developer
+            if ($user->role !== 'developer') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only developers can add certifications.',
+                ], 403);
+            }
+
+            $validated = $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'issuer' => ['required', 'string', 'max:255'],
+                'year' => ['required', 'integer', 'min:1950', 'max:2100'],
+                'file' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'], // Max 5MB
+            ]);
+
+            // Get or create developer profile
+            $developerProfile = $user->developerProfile ?? $user->developerProfile()->create([]);
+            
+            // Upload the file
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('certifications', $fileName, 'public');
+            
+            // Get current certifications array
+            $certifications = $developerProfile->certifications ?? [];
+            if (is_string($certifications)) {
+                $certifications = json_decode($certifications, true) ?? [];
+            }
+            
+            // Add new certification
+            $newCertification = [
+                'title' => $validated['title'],
+                'issuer' => $validated['issuer'],
+                'year' => $validated['year'],
+                'file_path' => $filePath,
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientOriginalExtension(),
+            ];
+            
+            $certifications[] = $newCertification;
+            
+            // Save updated certifications array
+            $developerProfile->certifications = json_encode($certifications);
+            $developerProfile->save();
+
+            // Return with index and URL
+            $newCertification['index'] = count($certifications) - 1;
+            $newCertification['file_url'] = Storage::url($filePath);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Certification added successfully!',
+                'certification' => $newCertification,
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add certification. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete a certification record.
+     */
+    public function destroyCertification(Request $request, int $index): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            // Check if user is a developer
+            if ($user->role !== 'developer') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only developers can delete certifications.',
+                ], 403);
+            }
+
+            $developerProfile = $user->developerProfile;
+
+            if (!$developerProfile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Developer profile not found.',
+                ], 404);
+            }
+
+            // Get current certifications array
+            $certifications = $developerProfile->certifications ?? [];
+            if (is_string($certifications)) {
+                $certifications = json_decode($certifications, true) ?? [];
+            }
+
+            // Check if index exists
+            if (!isset($certifications[$index])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Certification record not found.',
+                ], 404);
+            }
+
+            // Delete the file from storage
+            if (isset($certifications[$index]['file_path'])) {
+                Storage::disk('public')->delete($certifications[$index]['file_path']);
+            }
+
+            // Remove the certification at the specified index
+            array_splice($certifications, $index, 1);
+
+            // Save updated certifications array
+            $developerProfile->certifications = json_encode($certifications);
+            $developerProfile->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Certification removed successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to remove certification. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
+     * Update payment details.
+     */
+    public function updatePaymentDetails(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Check if user is a developer
+        if ($user->role !== 'developer') {
+            return back()->withErrors(['error' => 'Only developers can update payment details.']);
+        }
+
+        $validated = $request->validate([
+            'bank_name' => ['required', 'string', 'max:255'],
+            'account_number' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+        ]);
+
+        // Get or create developer profile
+        $developerProfile = $user->developerProfile ?? $user->developerProfile()->create([]);
+        
+        $developerProfile->bank_name = $validated['bank_name'];
+        $developerProfile->account_number = $validated['account_number'];
+        $developerProfile->save();
+
+        return Redirect::route('profile.edit')->with('status', 'payment-details-updated');
+    }
 }

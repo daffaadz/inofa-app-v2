@@ -201,13 +201,16 @@ class SearchController extends Controller
             ->withCount('offers')
             ->findOrFail($id);
 
-        // Check if current user already applied
+        // Check if current user already sent interest message
         $hasApplied = false;
         $userOffer = null;
 
         if (Auth::check() && Auth::user()->role === 'developer') {
-            $userOffer = $project->agreements()->where('developer_id', Auth::id())->first();
-            $hasApplied = $userOffer !== null;
+            // Check if user has sent an interest message for this project
+            $hasApplied = \App\Models\ChMessage::where('from_id', Auth::id())
+                ->where('to_id', $project->consumer_id)
+                ->where('body', 'LIKE', "%I'm interested in discussing your project titled '{$project->title}'%")
+                ->exists();
         }
 
         // Get similar projects

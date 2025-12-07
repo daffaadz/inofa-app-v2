@@ -122,23 +122,26 @@
 
     <!-- Log Out -->
     <div class="p-4 border-t border-neutral-200">
-        <a href="/"
-           class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 transition group text-left">
+        <form method="POST" action="{{ route('logout') }}" id="logout-form">
+            @csrf
+            <button type="submit"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 transition group text-left cursor-pointer border-0 bg-transparent">
 
-            {{-- Icon --}}
-            <div class="bg-red-100/75 p-3 rounded-xl">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-            </div>
+                {{-- Icon --}}
+                <div class="bg-red-100/75 p-3 rounded-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
 
-            {{-- Label --}}
-            <div class="flex flex-col justify-end items-start">
-                <span class="text-b-1 font-medium">Log Out</span>
-                <span class="text-b-4 text-neutral-500">Return to homepage</span>
-            </div>
-        </a>
+                {{-- Label --}}
+                <div class="flex flex-col justify-end items-start">
+                    <span class="text-b-1 font-medium">Log Out</span>
+                    <span class="text-b-4 text-neutral-500">Return to homepage</span>
+                </div>
+            </button>
+        </form>
     </div>
 
 </aside>

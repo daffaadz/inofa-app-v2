@@ -14,22 +14,18 @@
             }, 3000); // Change image every 2.5 seconds
         }
     }">
-        <div class="max-w-8xl mx-4 md:mx-16 py-8 sm:py-12 md:py-24 overflow-hidden bg-cover bg-center rounded-xl relative">
+        <div
+            class="max-w-8xl mx-4 md:mx-16 py-8 sm:py-12 md:py-24 overflow-hidden bg-cover bg-center rounded-xl relative">
             {{-- Background slideshow images --}}
             <template x-for="(slide, index) in slides" :key="index">
-                <div 
-                    x-show="currentSlide === index"
-                    x-transition:enter="transition ease-in-out duration-1000"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                    x-transition:leave="transition ease-in-out duration-1000"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="absolute inset-0 bg-cover bg-center rounded-xl"
-                    :style="`background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${slide}');`"
-                ></div>
+                <div x-show="currentSlide === index" x-transition:enter="transition ease-in-out duration-1000"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in-out duration-1000" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="absolute inset-0 bg-cover bg-center rounded-xl"
+                    :style="`background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${slide}');`">
+                </div>
             </template>
-            
+
             <div class="mx-auto max-w-3xl text-center relative z-10 px-4">
                 <h1 class="text-h-5 md:text-h-3 lg:text-h-1 font-medium text-white mb-6 md:mb-8">
                     <span class="italic">Bring Your Digital</span> Projects to Life<br class="hidden sm:block">
@@ -37,78 +33,80 @@
                 </h1>
 
                 @auth
-                <div
-                    class="bg-black/10 border-[0.5px] border-white/40 py-4 sm:py-6 md:py-8 rounded-xl backdrop-blur-lg flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
-                    
-                    @if(auth()->user()->role === 'developer')
-                        {{-- Developer: Search for Projects --}}
-                        <form action="{{ route('search.projects') }}" method="GET" class="mx-auto w-full">
-                            <div class="relative">
-                                <input type="text" name="q" placeholder="Search for projects..."
-                                    value="{{ request('q') }}"
-                                    class="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 text-sm sm:text-b-1 rounded-full border-0 focus:ring-2 focus:ring-primary-500">
-                                <button type="submit"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-neutral-1000 text-white p-2 rounded-full hover:bg-neutral-800 transition">
-                                    {{-- Search icon SVG --}}
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </form>
-                    @else
-                        {{-- Customer/Admin: Search for Developers --}}
-                        <form action="{{ route('search.developers') }}" method="GET" class="mx-auto w-full mb-4 sm:mb-6">
-                            <div class="relative">
-                                <input type="text" name="q" placeholder="Search for developers..."
-                                    value="{{ request('q') }}"
-                                    class="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 text-sm sm:text-b-1 rounded-full border-0 focus:ring-2 focus:ring-primary-500">
-                                <button type="submit"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-neutral-1000 text-white p-2 rounded-full hover:bg-neutral-800 transition">
-                                    {{-- Search icon SVG --}}
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </form>
+                    <div
+                        class="bg-black/10 border-[0.5px] border-white/40 py-4 sm:py-6 md:py-8 rounded-xl backdrop-blur-lg flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
 
-                        {{-- Create Project Button (only for customer/admin) --}}
-                        <div class="flex flex-col items-center justify-center gap-3 sm:gap-4 text-white w-full text-sm sm:text-b-2">
-                            <div class="flex items-center gap-4 w-full">
-                                <div class="flex-1 border-t border-neutral-10"></div>
-                                <span class="whitespace-nowrap text-neutral-0">or</span>
-                                <div class="flex-1 border-t border-neutral-10"></div>
+                        @if (auth()->user()->role === 'developer')
+                            {{-- Developer: Search for Projects --}}
+                            <form action="{{ route('search.projects') }}" method="GET" class="mx-auto w-full">
+                                <div class="relative">
+                                    <input type="text" name="q" placeholder="Search for projects..."
+                                        value="{{ request('q') }}"
+                                        class="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 text-sm sm:text-b-1 rounded-full border-0 focus:ring-2 focus:ring-primary-500">
+                                    <button type="submit"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 bg-neutral-1000 text-white p-2 rounded-full hover:bg-neutral-800 transition">
+                                        {{-- Search icon SVG --}}
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        @else
+                            {{-- Customer/Admin: Search for Developers --}}
+                            <form action="{{ route('search.developers') }}" method="GET"
+                                class="mx-auto w-full mb-4 sm:mb-6">
+                                <div class="relative">
+                                    <input type="text" name="q" placeholder="Search for developers..."
+                                        value="{{ request('q') }}"
+                                        class="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 text-sm sm:text-b-1 rounded-full border-0 focus:ring-2 focus:ring-primary-500">
+                                    <button type="submit"
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 bg-neutral-1000 text-white p-2 rounded-full hover:bg-neutral-800 transition">
+                                        {{-- Search icon SVG --}}
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+
+                            {{-- Create Project Button (only for customer/admin) --}}
+                            <div
+                                class="flex flex-col items-center justify-center gap-3 sm:gap-4 text-white w-full text-sm sm:text-b-2">
+                                <div class="flex items-center gap-4 w-full">
+                                    <div class="flex-1 border-t border-neutral-10"></div>
+                                    <span class="whitespace-nowrap text-neutral-0">or</span>
+                                    <div class="flex-1 border-t border-neutral-10"></div>
+                                </div>
+                                <a href="{{ route('consumer.project.create') }}"
+                                    class="px-4 sm:px-6 py-2.5 sm:py-3 bg-transparent w-full border-[1px] border-white rounded-lg hover:bg-white hover:text-neutral-1000 transition font-medium text-center">
+                                    Create a new project request
+                                </a>
                             </div>
-                            <a
-                                href="{{ route('consumer.project.create') }}"
-                                class="px-4 sm:px-6 py-2.5 sm:py-3 bg-transparent w-full border-[1px] border-white rounded-lg hover:bg-white hover:text-neutral-1000 transition font-medium text-center">
-                                Create a new project request
-                            </a>
-                        </div>
-                    @endif
-                </div>
+                        @endif
+                    </div>
                 @else
-                <div
-                    class="bg-black/10 border-[0.5px] border-white/40 py-4 sm:py-6 md:py-8 rounded-xl backdrop-blur-lg flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
-                    {{-- Login prompt for guests --}}
-                    <div class="w-full text-center text-white space-y-2">
-                        <h3 class="text-lg sm:text-xl font-semibold">Get Started with Inofa</h3>
-                        <p class="text-sm sm:text-b-2 text-neutral-100">Sign in to search for developers and create projects</p>
-                        <div class="w-full flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-2 px-4">
-                            <a href="{{ route('login') }}"
-                                class="w-full px-6 py-3 bg-white text-neutral-1000 rounded-xl hover:bg-neutral-100 transition font-medium text-center">
-                                Sign In
-                            </a>
-                            <a href="{{ route('register') }}"
-                                class="w-full px-6 py-3 bg-transparent border-[1px] border-white rounded-xl hover:bg-white hover:text-neutral-1000 transition font-medium text-center">
-                                Register
-                            </a>
+                    <div
+                        class="bg-black/10 border-[0.5px] border-white/40 py-4 sm:py-6 md:py-8 rounded-xl backdrop-blur-lg flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
+                        {{-- Login prompt for guests --}}
+                        <div class="w-full text-center text-white space-y-2">
+                            <h3 class="text-lg sm:text-xl font-semibold">Get Started with Inofa</h3>
+                            <p class="text-sm sm:text-b-2 text-neutral-100">Sign in to search for developers and create
+                                projects</p>
+                            <div class="w-full flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-2 px-4">
+                                <a href="{{ route('login') }}"
+                                    class="w-full px-6 py-3 bg-white text-neutral-1000 rounded-xl hover:bg-neutral-100 transition font-medium text-center">
+                                    Sign In
+                                </a>
+                                <a href="{{ route('register') }}"
+                                    class="w-full px-6 py-3 bg-transparent border-[1px] border-white rounded-xl hover:bg-white hover:text-neutral-1000 transition font-medium text-center">
+                                    Register
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
                 @endauth
             </div>
         </div>
@@ -196,7 +194,7 @@
     <section class="py-8 sm:py-12 md:py-16">
         <div class="mx-4 md:mx-16 max-w-8xl">
             @auth
-                @if(auth()->user()->role === 'developer')
+                @if (auth()->user()->role === 'developer')
                     {{-- For Developers: Show Top Projects --}}
                     <h2 class="text-h-5 md:text-h-3 text-neutral-1000 mb-6 sm:mb-8 md:mb-12">Find Top Projects</h2>
 
@@ -286,7 +284,8 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 {{-- Search Card - Left Side --}}
-                <div class="flex flex-col rounded-t-xl md:rounded-t-none md:rounded-l-xl p-8 justify-center border-t border-x md:border-l md:border-y border-neutral-200">
+                <div
+                    class="flex flex-col rounded-t-xl md:rounded-t-none md:rounded-l-xl p-8 justify-center border-t border-x md:border-l md:border-y border-neutral-200">
                     <div class="space-y-4">
                         <h3 class="text-b-2 text-neutral-500 font-medium">Search</h3>
                         <h4 class="text-h-6 text-neutral-1000 leading-tight">Find the Right Developer for Your Needs
@@ -294,7 +293,7 @@
                         <p class="text-b-2 text-neutral-600">
                             Search by type of software, skills, location, and experience
                         </p>
-                        <a href="#"
+                        <a href="{{ auth()->check() ? route('dashboard') : route('login') }}"
                             class="inline-flex items-center text-primary-500 font-medium text-b-1 hover:text-primary-600 group">
                             Explore
                             <svg class="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" fill="none"
@@ -308,7 +307,8 @@
 
                 {{-- Main Image - Center --}}
                 <div class="lg:mr-8 mb-4 md:mb-0">
-                    <div class="md:rounded-r-xl md:rounded-b-none rounded-b-xl border-r border-y border-neutral-200 overflow-hidden h-full">
+                    <div
+                        class="md:rounded-r-xl md:rounded-b-none rounded-b-xl border-r border-y border-neutral-200 overflow-hidden h-full">
                         <img src="{{ asset('assets/images/placeholder_search.jpg') }}" alt="Developers collaborating"
                             class="w-full h-full object-cover">
                     </div>
@@ -324,7 +324,7 @@
                             <p class="text-b-2 text-neutral-600 mb-3">
                                 Manage tasks and communication in one platform
                             </p>
-                            <a href="#"
+                            <a href="{{ auth()->check() ? route('dashboard') : route('login') }}"
                                 class="inline-flex items-center text-primary-500 font-medium text-b-2 hover:text-primary-600 group">
                                 Explore
                                 <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
@@ -348,7 +348,7 @@
                             <p class="text-b-2 text-neutral-600 mb-3">
                                 Communicate with developers in real time
                             </p>
-                            <a href="#"
+                            <a href="{{ auth()->check() ? route('dashboard') : route('login') }}"
                                 class="inline-flex items-center text-primary-500 font-medium text-b-2 hover:text-primary-600 group">
                                 Explore
                                 <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
@@ -369,40 +369,42 @@
     </section>
 
     {{-- How it works --}}
-    <section class="py-8 sm:py-12 md:py-16" 
-        x-data="{ 
-            mode: '{{ auth()->check() && auth()->user()->role === 'developer' ? 'finding' : 'hiring' }}' 
-        }">
+    <section class="py-8 sm:py-12 md:py-16" x-data="{
+        mode: '{{ auth()->check() && auth()->user()->role === 'developer' ? 'finding' : 'hiring' }}'
+    }">
         <div class="mx-4 md:mx-16 max-w-8xl">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8 md:mb-12">
+            <div
+                class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8 md:mb-12">
                 <h2 class="text-h-5 md:text-h-3 text-neutral-1000">How it works</h2>
                 @auth
-                    @if(auth()->user()->role === 'developer')
+                    @if (auth()->user()->role === 'developer')
                         {{-- Developer: Only show "For finding work" --}}
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <div class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
+                            <div
+                                class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
                                 For finding work
                             </div>
                         </div>
-                    @elseif(auth()->user()->role === 'customer')
+                    @elseif(auth()->user()->role === 'consumer')
                         {{-- Customer: Only show "For Hiring" --}}
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <div class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
+                            <div
+                                class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
                                 For Hiring
                             </div>
                         </div>
                     @else
                         {{-- Admin or other: Show both toggles --}}
                         <div class="flex gap-2 w-full sm:w-auto">
-                            <button
-                                @click="mode = 'hiring'"
-                                :class="mode === 'hiring' ? 'border-primary-500 text-primary-500 bg-primary-50' : 'border-neutral-300 text-neutral-600'"
+                            <button @click="mode = 'hiring'"
+                                :class="mode === 'hiring' ? 'border-primary-500 text-primary-500 bg-primary-50' :
+                                    'border-neutral-300 text-neutral-600'"
                                 class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
                                 For Hiring
                             </button>
-                            <button
-                                @click="mode = 'finding'"
-                                :class="mode === 'finding' ? 'border-primary-500 text-primary-500 bg-primary-50' : 'border-neutral-300 text-neutral-600'"
+                            <button @click="mode = 'finding'"
+                                :class="mode === 'finding' ? 'border-primary-500 text-primary-500 bg-primary-50' :
+                                    'border-neutral-300 text-neutral-600'"
                                 class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
                                 For finding work
                             </button>
@@ -411,15 +413,15 @@
                 @else
                     {{-- Guest: Show both toggles --}}
                     <div class="flex gap-2 w-full sm:w-auto">
-                        <button
-                            @click="mode = 'hiring'"
-                            :class="mode === 'hiring' ? 'border-primary-500 text-primary-500 bg-primary-50' : 'border-neutral-300 text-neutral-600'"
+                        <button @click="mode = 'hiring'"
+                            :class="mode === 'hiring' ? 'border-primary-500 text-primary-500 bg-primary-50' :
+                                'border-neutral-300 text-neutral-600'"
                             class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
                             For Hiring
                         </button>
-                        <button
-                            @click="mode = 'finding'"
-                            :class="mode === 'finding' ? 'border-primary-500 text-primary-500 bg-primary-50' : 'border-neutral-300 text-neutral-600'"
+                        <button @click="mode = 'finding'"
+                            :class="mode === 'finding' ? 'border-primary-500 text-primary-500 bg-primary-50' :
+                                'border-neutral-300 text-neutral-600'"
                             class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
                             For finding work
                         </button>
@@ -431,50 +433,43 @@
                 {{-- Step 1 --}}
                 <div class="text-center">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 overflow-hidden">
-                        <img x-show="mode === 'hiring'" 
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works/1.png') }}" 
-                             alt="Post a job"
-                             class="w-full h-full">
-                        <img x-show="mode === 'finding'" 
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works-2/create-profile.png') }}" 
-                             alt="Create your profile"
-                             class="w-full h-full"
-                             style="display: none;">
+                        <img x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works/1.png') }}" alt="Post a job"
+                            class="w-full h-full">
+                        <img x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works-2/create-profile.png') }}"
+                            alt="Create your profile" class="w-full h-full" style="display: none;">
                     </div>
-                    <div x-show="mode === 'hiring'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Search or Post a job</h3>
+                    <div x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Search or Post a
+                            job</h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
-                            Tell us what you need. Describe your project idea or task to help us find or match you with the
+                            Tell us what you need. Describe your project idea or task to help us find or match you with
+                            the
                             right talent.
                         </p>
                     </div>
-                    <div x-show="mode === 'finding'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         style="display: none;">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Create your profile</h3>
+                    <div x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0" style="display: none;">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Create your profile
+                        </h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
                             Build a standout profile showcasing your skills and experience to attract top clients.
                         </p>
@@ -484,52 +479,45 @@
                 {{-- Step 2 --}}
                 <div class="text-center">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 overflow-hidden">
-                        <img x-show="mode === 'hiring'"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works/2.png') }}" 
-                             alt="Hire talent"
-                             class="w-full h-full">
-                        <img x-show="mode === 'finding'"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works-2/browse-apply.png') }}" 
-                             alt="Browse and apply"
-                             class="w-full h-full"
-                             style="display: none;">
+                        <img x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works/2.png') }}" alt="Hire talent"
+                            class="w-full h-full">
+                        <img x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works-2/browse-apply.png') }}" alt="Browse and apply"
+                            class="w-full h-full" style="display: none;">
                     </div>
-                    <div x-show="mode === 'hiring'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Hire top talent fast</h3>
+                    <div x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Hire top talent
+                            fast</h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
                             Connect, interview, and hire in no time. We give you talented freelancers that best fit your
                             needs.
                         </p>
                     </div>
-                    <div x-show="mode === 'finding'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         style="display: none;">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Browse and apply</h3>
+                    <div x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0" style="display: none;">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Browse and apply
+                        </h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
-                            Explore projects that match your expertise. Apply to work that fits your skills and schedule.
+                            Explore projects that match your expertise. Apply to work that fits your skills and
+                            schedule.
                         </p>
                     </div>
                 </div>
@@ -537,49 +525,41 @@
                 {{-- Step 3 --}}
                 <div class="text-center">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 overflow-hidden">
-                        <img x-show="mode === 'hiring'"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works/3.png') }}" 
-                             alt="Collaborate"
-                             class="w-full h-full">
-                        <img x-show="mode === 'finding'"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works-2/interview-hired.png') }}" 
-                             alt="Interview and get hired"
-                             class="w-full h-full"
-                             style="display: none;">
+                        <img x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works/3.png') }}" alt="Collaborate"
+                            class="w-full h-full">
+                        <img x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works-2/interview-hired.png') }}"
+                            alt="Interview and get hired" class="w-full h-full" style="display: none;">
                     </div>
-                    <div x-show="mode === 'hiring'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Collaborate easily</h3>
+                    <div x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Collaborate easily
+                        </h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
                             Use Inofa's chat, share docs, give work status progress right from the job dashboard.
                         </p>
                     </div>
-                    <div x-show="mode === 'finding'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         style="display: none;">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Interview and get hired</h3>
+                    <div x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0" style="display: none;">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Interview and get
+                            hired</h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
                             Connect with clients, discuss project details, and impress them with your expertise.
                         </p>
@@ -589,50 +569,42 @@
                 {{-- Step 4 --}}
                 <div class="text-center">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 overflow-hidden">
-                        <img x-show="mode === 'hiring'"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works/4.png') }}" 
-                             alt="Payment"
-                             class="w-full h-full">
-                        <img x-show="mode === 'finding'"
-                             x-transition:enter="transition ease-out duration-300"
-                             x-transition:enter-start="opacity-0 transform scale-95"
-                             x-transition:enter-end="opacity-100 transform scale-100"
-                             x-transition:leave="transition ease-in duration-200"
-                             x-transition:leave-start="opacity-100 transform scale-100"
-                             x-transition:leave-end="opacity-0 transform scale-95"
-                             src="{{ asset('assets/images/how-it-works-2/get-paid.png') }}" 
-                             alt="Deliver and get paid"
-                             class="w-full h-full"
-                             style="display: none;">
+                        <img x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works/4.png') }}" alt="Payment"
+                            class="w-full h-full">
+                        <img x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            src="{{ asset('assets/images/how-it-works-2/get-paid.png') }}" alt="Deliver and get paid"
+                            class="w-full h-full" style="display: none;">
                     </div>
-                    <div x-show="mode === 'hiring'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Payment simplified</h3>
+                    <div x-show="mode === 'hiring'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Payment simplified
+                        </h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
                             Manage payments in one place using multiple payment gateways with flexibility of daily or by
                             milestone.
                         </p>
                     </div>
-                    <div x-show="mode === 'finding'"
-                         x-transition:enter="transition ease-out duration-300 delay-75"
-                         x-transition:enter-start="opacity-0 transform translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-200"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         style="display: none;">
-                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Deliver and get paid</h3>
+                    <div x-show="mode === 'finding'" x-transition:enter="transition ease-out duration-300 delay-75"
+                        x-transition:enter-start="opacity-0 transform translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0" style="display: none;">
+                        <h3 class="text-base sm:text-lg md:text-h-7 text-neutral-1000 mb-2 sm:mb-3">Deliver and get
+                            paid</h3>
                         <p class="text-sm sm:text-b-2 text-neutral-600">
                             Complete projects with confidence. Receive payment for approved work hourly or by milestone.
                         </p>
@@ -645,7 +617,8 @@
     {{-- Testimonials --}}
     <section class="py-8 sm:py-12 md:py-16 bg-radial-green-to-white">
         <div class="mx-4 md:mx-16 max-w-8xl">
-            <h2 class="text-xl sm:text-2xl md:text-h-3 text-neutral-1000 mb-6 sm:mb-8 md:mb-12">Real results from clients</h2>
+            <h2 class="text-xl sm:text-2xl md:text-h-3 text-neutral-1000 mb-6 sm:mb-8 md:mb-12">Real results from
+                clients</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 @php
@@ -662,7 +635,8 @@
                 @forelse($reviews as $review)
                     <div class="bg-white/90 shadow-xl backdrop-blur-lg rounded-xl p-6 sm:p-8">
                         <div class="mb-4 sm:mb-6">
-                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-primary-500 mb-3 sm:mb-4" fill="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-primary-500 mb-3 sm:mb-4" fill="currentColor"
+                                viewBox="0 0 24 24">
                                 <path
                                     d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                             </svg>
@@ -685,9 +659,11 @@
                             <div>
                                 <p class="text-xs sm:text-b-2 font-semibold text-neutral-1000">Work done by:
                                     {{ $review->developer->name ?? 'Developer' }}</p>
-                                <p class="text-xs sm:text-b-3 text-neutral-600">For: {{ $review->consumer->name ?? 'Client' }}
+                                <p class="text-xs sm:text-b-3 text-neutral-600">For:
+                                    {{ $review->consumer->name ?? 'Client' }}
                                 </p>
-                                <p class="text-xs sm:text-b-3 text-neutral-500">{{ $review->created_at->format('M d, Y') }}</p>
+                                <p class="text-xs sm:text-b-3 text-neutral-500">
+                                    {{ $review->created_at->format('M d, Y') }}</p>
                             </div>
                             @php
                                 $avatarSrc = $review->consumer->getRawOriginal('avatar')
@@ -696,14 +672,16 @@
                                         : asset('storage/' . $review->consumer->getRawOriginal('avatar')))
                                     : 'https://ui-avatars.com/api/?name=' . urlencode($review->consumer->name);
                             @endphp
-                            <img src="{{ $avatarSrc }}" alt="{{ $review->consumer->name }}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover">
+                            <img src="{{ $avatarSrc }}" alt="{{ $review->consumer->name }}"
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover">
                         </div>
                     </div>
                 @empty
                     {{-- Fallback if no reviews --}}
                     <div class="bg-white/90 backdrop-blur-lg shadow-xl rounded-xl p-6 sm:p-8">
                         <div class="mb-4 sm:mb-6">
-                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-primary-500 mb-3 sm:mb-4" fill="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 text-primary-500 mb-3 sm:mb-4" fill="currentColor"
+                                viewBox="0 0 24 24">
                                 <path
                                     d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                             </svg>
@@ -714,7 +692,8 @@
                         </div>
                         <div class="flex items-center gap-1 mb-3 sm:mb-4">
                             @for ($i = 0; $i < 5; $i++)
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-secondary-500" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-secondary-500" fill="currentColor"
+                                    viewBox="0 0 20 20">
                                     <path
                                         d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
@@ -722,7 +701,8 @@
                         </div>
                         <div class="flex items-center justify-between pt-3 sm:pt-4 border-t border-neutral-200">
                             <div>
-                                <p class="text-xs sm:text-b-2 font-semibold text-neutral-1000">Work done by: Sarah K.</p>
+                                <p class="text-xs sm:text-b-2 font-semibold text-neutral-1000">Work done by: Sarah K.
+                                </p>
                                 <p class="text-xs sm:text-b-3 text-neutral-600">Full Stack Developer</p>
                                 <p class="text-xs sm:text-b-3 text-neutral-500">Apr 1, 2025</p>
                             </div>
@@ -744,13 +724,13 @@
             <h2 class="text-2xl sm:text-3xl md:text-h-2 text-white mb-6 sm:mb-8">Ready to Build Something Amazing?</h2>
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
                 @auth
-                    @if(auth()->user()->role === 'developer')
+                    @if (auth()->user()->role === 'developer')
                         {{-- Developer: Only show Find Projects button --}}
                         <a href="{{ route('search.projects') }}"
                             class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary-500 rounded-lg hover:bg-neutral-100 transition font-semibold text-sm sm:text-b-1 shadow-lg">
                             Find Projects
                         </a>
-                    @elseif(auth()->user()->role === 'customer')
+                    @elseif(auth()->user()->role === 'consumer')
                         {{-- Customer: Only show Hire Talent button --}}
                         <a href="{{ route('search.developers') }}"
                             class="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary-500 rounded-lg hover:bg-neutral-100 transition font-semibold text-sm sm:text-b-1 shadow-lg">
