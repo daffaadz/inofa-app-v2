@@ -14,13 +14,13 @@
                 <!-- HEADER SECTION -->
                 <div
                     class="px-4 md:px-8 py-6 md:py-8 flex flex-col md:flex-row items-start md:items-center justify-between bg-white border-b border-neutral-100 gap-4">
-                    <div>
+                    <div class="flex-1 min-w-0">
                         <h1 class="text-h-4 md:text-h-3 font-bold text-neutral-900">My Projects</h1>
                         <p class="mt-1 text-b-2 md:text-b-1 text-neutral-600">Manage and track all your project
                             collaborations</p>
                     </div>
                     <a href="{{ route('consumer.project.create') }}"
-                        class="inline-flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 border border-primary-500 bg-primary-500 text-white text-b-3 md:text-b-2 font-medium rounded-xl hover:bg-white hover:text-primary-500 transition shadow-sm hover:shadow-md whitespace-nowrap">
+                        class="inline-flex items-center justify-center gap-2 px-4 md:px-5 py-2 md:py-2.5 border border-primary-500 bg-primary-500 text-white text-b-3 md:text-b-2 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition shadow-sm hover:shadow-md whitespace-nowrap w-full md:w-auto">
                         <svg class="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -111,13 +111,13 @@
                     </div>
 
                     <!-- FILTERS -->
-                    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+                    <div class="mb-6 flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-4">
                         <h3 class="text-h-5 font-bold text-neutral-900">Active Works & Postings</h3>
                         
                         <!-- Filter Dropdown -->
-                        <div class="relative">
+                        <div class="relative w-full sm:w-auto">
                             <button @click="filterOpen = !filterOpen"
-                                class="text-primary-500 text-b-1 font-medium hover:bg-primary-50 px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                                class="text-primary-500 text-b-1 font-medium hover:bg-primary-50 py-2 rounded-lg flex items-center justify-center gap-2 transition w-auto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
@@ -135,7 +135,7 @@
                                 x-transition:leave="transition ease-in duration-150"
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-10"
+                                class="absolute left-0 sm:right-0 sm:left-auto mt-2 w-full sm:w-56 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-10"
                                 style="display: none;">
                                 <button @click="statusFilter = 'all'; filterOpen = false; window.location.href='{{ route('dashboard') }}?status=all'" 
                                     class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
@@ -175,12 +175,12 @@
                                 {{-- Indicator Line --}}
                                 <div
                                     class="absolute left-0 top-0 bottom-0 w-2 
-                                    {{ $agreement->status === 'active' ? 'bg-green-500' : ($agreement->status === 'completed' ? 'bg-blue-500' : ($agreement->status === 'accepted' ? 'bg-orange-500' : 'bg-yellow-500')) }}">
+                                    {{ $agreement->status === 'active' ? 'bg-green-500' : ($agreement->status === 'completed' ? 'bg-primary-500' : ($agreement->status === 'accepted' ? 'bg-orange-500' : 'bg-yellow-600')) }}">
                                 </div>
 
-                                <div class="flex justify-between items-start mb-4 pl-2">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-2">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-4 pl-2 gap-4">
+                                    <div class="flex-1 min-w-0 w-full md:w-auto">
+                                        <div class="flex flex-wrap items-center gap-2 mb-2">
                                             <span
                                                 class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full 
                                                 {{ $agreement->status === 'active'
@@ -206,7 +206,7 @@
                                             {{ $agreement->project_title }}
                                         </h3>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-left md:text-right w-full md:w-auto">
                                         <p class="text-h-7 font-bold text-neutral-900">
                                             Rp{{ number_format($agreement->final_price, 0, ',', '.') }}
                                         </p>
@@ -254,7 +254,7 @@
                                     </div>
                                 @endif
 
-                                <div class="pl-2 flex items-center justify-between pt-4 border-t border-neutral-100">
+                                <div class="pl-2 flex flex-col md:flex-row items-center justify-start gap-4 md:justify-between md:gap-0 pt-4 border-t border-neutral-100">
                                     <!-- Developer Info -->
                                     @if ($agreement->developer)
                                         <a href="{{ route('user', ['id' => $agreement->developer->id]) }}"
@@ -292,19 +292,19 @@
 
                                     @if ($agreement->status === 'accepted')
                                         <a href="{{ route('consumer.payments.create', $agreement->id) }}"
-                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300 flex flex-row items-center gap-2">
+                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300 flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM136,176H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm64,0H168a8,8,0,0,1,0-16h32a8,8,0,0,1,0,16ZM32,88V64H224V88Z"></path></svg>
                                             Go to Payment
                                         </a>
                                     @elseif ($agreement->status === 'active')
-                                        <div class="flex items-center gap-2">
+                                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto"> items-stretch sm:items-center gap-2 w-full sm:w-auto">
                                             <button @click="$dispatch('open-stop-modal-{{ $agreement->id }}')"
-                                                class="px-4 py-2 bg-red-500 text-white text-b-3 border border-red-500 font-medium rounded-lg hover:bg-white hover:text-red-500 transition-all duration-300 flex flex-row items-center gap-2">
+                                                class="px-4 py-2 bg-red-500 text-white text-b-3 border border-red-500 font-medium rounded-lg hover:bg-white hover:text-red-500 transition-all duration-300 flex flex-row items-center justify-center gap-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm24-88a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,128Z"></path></svg>
                                                 Stop Project
                                             </button>
                                             <button @click="$dispatch('open-complete-modal-{{ $agreement->id }}')"
-                                                class="px-4 py-2 bg-green-500 text-white text-b-3 border border-green-500 font-medium rounded-lg hover:bg-white hover:text-green-500 transition-all duration-300 flex flex-row items-center gap-2">
+                                                class="px-4 py-2 bg-green-500 text-white text-b-3 border border-green-500 font-medium rounded-lg hover:bg-white hover:text-green-500 transition-all duration-300 flex flex-row items-center justify-center gap-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z"></path></svg>
                                                 Complete Project
                                             </button>
@@ -317,13 +317,13 @@
                                         <button 
                                             @click="$dispatch('open-review-modal-{{ $agreement->id }}')"
                                             @if($hasReviewed) disabled @endif
-                                            class="px-4 py-2 {{ $hasReviewed ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-white hover:text-yellow-500 text-white' }} text-b-3 border {{ $hasReviewed ? 'border-gray-300' : 'border-yellow-500' }} font-medium rounded-lg transition-all duration-300 flex flex-row items-center gap-2">
+                                            class="px-4 py-2 {{ $hasReviewed ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-white hover:text-yellow-500 text-white' }} text-b-3 border {{ $hasReviewed ? 'border-gray-300' : 'border-yellow-500' }} font-medium rounded-lg transition-all duration-300 flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"></path></svg>
                                             {{ $hasReviewed ? 'Reviewed' : 'Review Developer' }}
                                         </button>
                                     @else
                                         <a href="{{ route('user', ['id' => $agreement->developer_id]) }}"
-                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300 flex flex-row items-center gap-2">
+                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300 flex flex-row items-center justify-center gap-2 w-full sm:w-auto">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-auto" fill="currentColor" viewBox="0 0 256 256"><path d="M232,128A104,104,0,0,1,79.12,219.82L45.07,231.17a16,16,0,0,1-20.24-20.24l11.35-34.05A104,104,0,1,1,232,128Z"></path></svg>
                                             Chat Developer
                                         </a>
@@ -336,9 +336,9 @@
                         @foreach ($projects as $project)
                             <div
                                 class="group bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-2">
+                                <div class="flex flex-col md:flex-row justify-between items-start mb-4 gap-4">
+                                    <div class="flex-1 min-w-0 w-full md:w-auto">
+                                        <div class="flex flex-wrap items-center gap-2 mb-2">
                                             <span
                                                 class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-neutral-100 text-neutral-600">
                                                 Open Bidding
@@ -352,7 +352,7 @@
                                             {{ $project->title }}
                                         </h3>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-left md:text-right w-full md:w-auto">
                                         <p class="text-h-7 font-bold text-neutral-900">
                                             Rp{{ number_format($project->budget, 0, ',', '.') }}
                                         </p>
@@ -382,7 +382,7 @@
                                     </div>
                                 @endif
 
-                                <div class="flex items-center justify-between pt-4 border-t border-neutral-100">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 border-t border-neutral-100 gap-3">
                                     <div class="flex items-center gap-2 text-neutral-600">
                                         <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -393,13 +393,13 @@
                                             Proposals</span>
                                     </div>
 
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                                         <a href="{{ route('search.projects.show', $project->id) }}"
-                                            class="px-4 py-2 hover:bg-primary-500 hover:text-white text-b-3 border border-primary-500 font-medium rounded-lg bg-white text-primary-500 transition-all duration-300">
+                                            class="px-4 py-2 hover:bg-primary-500 hover:text-white text-b-3 border border-primary-500 font-medium rounded-lg bg-white text-primary-500 transition-all duration-300 text-center">
                                             View Project
                                         </a>
                                         <a href="{{ route('consumer.proposals.index', ['project' => $project->id]) }}"
-                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300">
+                                            class="px-4 py-2 bg-primary-500 text-white text-b-3 border border-primary-500 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition-all duration-300 text-center">
                                             View Proposals
                                         </a>
                                     </div>

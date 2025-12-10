@@ -381,7 +381,7 @@
                         {{-- Developer: Only show "For finding work" --}}
                         <div class="flex gap-2 w-full sm:w-auto">
                             <div
-                                class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
+                                class="flex-1 sm:flex-none justify-center items-center text-center px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
                                 For finding work
                             </div>
                         </div>
@@ -389,7 +389,7 @@
                         {{-- Customer: Only show "For Hiring" --}}
                         <div class="flex gap-2 w-full sm:w-auto">
                             <div
-                                class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
+                                class="flex-1 sm:flex-none justify-center items-center text-center px-3 sm:px-4 py-2 border-2 border-primary-500 text-primary-500 bg-primary-50 rounded-full text-xs sm:text-b-2 font-medium">
                                 For Hiring
                             </div>
                         </div>
@@ -399,13 +399,13 @@
                             <button @click="mode = 'hiring'"
                                 :class="mode === 'hiring' ? 'border-primary-500 text-primary-500 bg-primary-50' :
                                     'border-neutral-300 text-neutral-600'"
-                                class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
+                                class="flex-1 sm:flex-none justify-center items-center text-center px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
                                 For Hiring
                             </button>
                             <button @click="mode = 'finding'"
                                 :class="mode === 'finding' ? 'border-primary-500 text-primary-500 bg-primary-50' :
                                     'border-neutral-300 text-neutral-600'"
-                                class="flex-1 sm:flex-none px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
+                                class="flex-1 sm:flex-none justify-center items-center text-center px-3 sm:px-4 py-2 border-2 rounded-full text-xs sm:text-b-2 font-medium hover:border-primary-500 hover:text-primary-500 transition-all duration-300">
                                 For finding work
                             </button>
                         </div>

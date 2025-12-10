@@ -17,6 +17,19 @@
 
         {{-- Slot halaman admin --}}
         <main class="flex-1 lg:ml-[18rem] transition-all duration-300">
+            {{-- Mobile Menu Button --}}
+            <div class="lg:hidden fixed top-4 left-4 z-40">
+                <button @click="mobileOpen = !mobileOpen" 
+                        class="p-3 bg-white rounded-xl shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                    <svg x-show="!mobileOpen" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg x-show="mobileOpen" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
             {{ $slot }}
         </main>
     </div>

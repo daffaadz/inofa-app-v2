@@ -1,17 +1,17 @@
 {{-- Search Bar for Payments --}}
-<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 mb-4">
-    <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-4">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-3 sm:p-4 mb-3 sm:mb-4">
+    <form method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
         <input type="hidden" name="tab" value="payments" />
         <div class="flex-1">
             <input type="text" name="search" value="{{ request('search') }}"
                 placeholder="Search by project name, client, or developer..."
-                class="w-full px-4 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm
+                class="w-full px-3 sm:px-4 py-2.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm
                        focus:ring-4 focus:ring-primary-100 focus:border-primary-500 focus:outline-none
                        transition-all hover:border-gray-300">
         </div>
         <button type="submit"
-            class="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl text-sm font-medium
-                   hover:shadow-lg hover:scale-105 transition-all duration-200">
+            class="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-xl text-sm font-medium
+                   hover:shadow-lg hover:scale-105 transition-all duration-200 w-full sm:w-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
@@ -21,7 +21,7 @@
 </div>
 
 {{-- Advanced Filters for Payments --}}
-<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 mb-6">
+<div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
     {{-- Header --}}
     <div class="flex items-center gap-2 mb-6">
         <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

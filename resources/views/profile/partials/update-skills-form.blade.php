@@ -17,7 +17,7 @@
         <!-- Add Skill Form -->
         <form id="add-skill-form" class="mb-4">
             @csrf
-            <div class="flex gap-2">
+            <div class="flex flex-col md:flex-row gap-2">
                 <div class="flex-1 relative">
                     <input type="text" 
                         id="skill_name" 
@@ -41,7 +41,7 @@
                     <option value="4">Expert</option>
                 </select>
                 <button type="submit" id="add-skill-btn"
-                    class="px-6 py-2.5 bg-primary-500 text-white text-b-1 font-medium rounded-lg hover:bg-primary-600 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-6 py-2.5 bg-primary-500 text-white text-b-1 font-medium rounded-lg hover:bg-primary-600 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -398,7 +398,7 @@
             <!-- Add Education Form -->
             <form id="add-education-form" class="mb-4">
                 @csrf
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <input type="text" 
                             id="degree" 
@@ -644,7 +644,7 @@
             <!-- Add Certification Form -->
             <form id="add-certification-form" class="mb-4" enctype="multipart/form-data">
                 @csrf
-                <div class="grid grid-cols-2 gap-3 mb-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                     <div>
                         <input type="text" 
                             id="cert_title" 

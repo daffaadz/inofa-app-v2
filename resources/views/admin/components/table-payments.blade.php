@@ -1,33 +1,33 @@
 
-    <div class="mb-4">
-        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="mb-3 sm:mb-4">
+        <h2 class="text-base sm:text-lg font-bold text-gray-800 flex items-center gap-2">
+            <svg class="w-4 sm:w-5 h-4 sm:h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                       d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
             </svg>
-            Payment Validation
-            <span class="text-sm font-normal text-gray-500">({{ $payments->count() }} records)</span>
+            <span class="text-sm sm:text-base md:text-lg">Payment Validation</span>
+            <span class="text-xs sm:text-sm font-normal text-gray-500">({{ $payments->count() }} records)</span>
         </h2>
     </div>
     
-    <div class="overflow-x-auto rounded-xl border border-gray-200">
+    <div class="overflow-x-auto rounded-xl border border-gray-200 -mx-4 sm:mx-0">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr class="text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    <th class="px-6 py-4">Project</th>
-                    <th class="px-6 py-4">Client</th>
-                    <th class="px-6 py-4">Amount</th>
-                    <th class="px-6 py-4">Date</th>
-                    <th class="px-6 py-4">Status</th>
-                    <th class="px-6 py-4 text-center">Payment Proof</th>
-                    <th class="px-6 py-4 text-center">Actions</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">Project</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">Client</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">Amount</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">Date</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">Status</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap">Payment Proof</th>
+                    <th class="px-3 sm:px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-100">
             @forelse($payments as $payment)
                 <tr class="text-sm hover:bg-primary-50/30 transition-colors">
-                    <td class="px-6 py-4">
-                        <div class="font-medium text-gray-900">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                        <div class="font-medium text-gray-900 max-w-[200px] truncate">
                             @if($payment->agreement)
                                 {{ $payment->agreement->project->title ?? $payment->agreement->project_title ?? '-' }}
                             @else
@@ -35,101 +35,101 @@
                             @endif
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-gray-600">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 text-gray-600 whitespace-nowrap">
                         @if($payment->agreement && $payment->agreement->consumer)
                             {{ $payment->agreement->consumer->name }}
                         @else
                             -
                         @endif
                     </td>
-                    <td class="px-6 py-4">
-                        <span class="font-semibold text-gray-900">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                        <span class="font-semibold text-gray-900 text-xs sm:text-sm">
                             Rp {{ number_format($payment->amount ?? 0, 0, ',', '.') }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-gray-600">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 text-gray-600 whitespace-nowrap text-xs sm:text-sm">
                         {{ optional($payment->created_at)->format('d M Y') }}
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                         @include('admin.components.status-badge', ['status' => $payment->status])
                     </td>
-                    <td class="px-6 py-4 text-center">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 text-center whitespace-nowrap">
                         @if($payment->consumer_payment_proof)
                             <button 
                                 type="button"
                                 onclick="showPaymentProof('{{ asset('storage/' . $payment->consumer_payment_proof) }}')"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium rounded-lg transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="inline-flex items-center gap-1.5 px-2 sm:px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium rounded-lg transition-colors">
+                                <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                View Proof
+                                <span class="hidden sm:inline">View Proof</span>
                             </button>
                         @else
-                            <span class="text-xs text-gray-400 italic">No proof available</span>
+                            <span class="text-xs text-gray-400 italic">No proof</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center justify-center gap-2">
+                    <td class="px-3 sm:px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                        <div class="flex items-center justify-center gap-1 sm:gap-2">
                             @if($payment->status === 'pending')
                                 <button type="button"
                                         onclick="approvePayment({{ $payment->id }}, this)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 
+                                        class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-green-500 to-green-600 
                                                text-white text-xs font-medium hover:from-green-600 hover:to-green-700 
                                                hover:shadow-lg transition-all duration-200"
                                         title="Approve">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    Approve
+                                    <span class="hidden sm:inline">Approve</span>
                                 </button>
                                 
                                 <button type="button"
                                         onclick="rejectPayment({{ $payment->id }}, this)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 
+                                        class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 
                                                text-white text-xs font-medium hover:from-red-600 hover:to-red-700 
                                                hover:shadow-lg transition-all duration-200"
                                         title="Reject">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
-                                    Reject
+                                    <span class="hidden sm:inline">Reject</span>
                                 </button>
                             @elseif($payment->status === 'confirmed')
                                 <button type="button"
                                         onclick="transferPayment({{ $payment->id }}, this)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 
+                                        class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 
                                                text-white text-xs font-medium hover:from-blue-600 hover:to-blue-700 
                                                hover:shadow-lg transition-all duration-200"
                                         title="Transfer">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                                     </svg>
-                                    Transfer
+                                    <span class="hidden sm:inline">Transfer</span>
                                 </button>
                                 
                                 <button type="button"
                                         onclick="reviewPayment({{ $payment->id }}, this)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 
+                                        class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 
                                                text-white text-xs font-medium hover:from-yellow-600 hover:to-orange-600 
                                                hover:shadow-lg transition-all duration-200"
                                         title="Review">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
-                                    Review
+                                    <span class="hidden sm:inline">Review</span>
                                 </button>
                             @else
                                 <button type="button"
                                         onclick="reviewPayment({{ $payment->id }}, this)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 
+                                        class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-500 
                                                text-white text-xs font-medium hover:from-yellow-600 hover:to-orange-600 
                                                hover:shadow-lg transition-all duration-200"
                                         title="Review">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
-                                    Review
+                                    <span class="hidden sm:inline">Review</span>
                                 </button>
                             @endif
                         </div>

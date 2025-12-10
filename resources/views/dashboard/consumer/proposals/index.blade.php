@@ -12,8 +12,8 @@
             <div class="mt-16">
 
                 <!-- HEADER SECTION -->
-                <div class="px-8 py-8 flex flex-row items-center justify-between bg-white border-b border-neutral-100">
-                    <div class="flex items-center gap-4">
+                <div class="px-4 md:px-8 py-6 md:py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white border-b border-neutral-100 gap-4">
+                    <div class="flex items-start sm:items-center gap-4 w-full sm:w-auto">
                         <a href="{{ route('dashboard') }}"
                             class="p-2 hover:bg-neutral-100 rounded-lg transition group">
                             <svg class="w-6 h-6 text-neutral-600 group-hover:text-neutral-900" fill="none"
@@ -59,7 +59,7 @@
                     @else
                         <!-- PROJECT SELECTOR & INFO -->
                         <div class="bg-white rounded-2xl border border-neutral-200 p-6 mb-6">
-                            <div class="flex items-start justify-between gap-8">
+                            <div class="flex flex-col lg:flex-row items-start justify-between gap-8">
                                 <!-- Project Dropdown -->
                                 <div class="flex-1">
                                     <label class="block text-b-3 font-semibold text-neutral-700 mb-2">
@@ -83,7 +83,7 @@
                                         <div class="space-y-2">
                                             <p class="text-b-2 text-neutral-900 font-medium">{{ $selectedProject->title }}</p>
                                             <p class="text-b-3 text-neutral-600 line-clamp-2">{{ $selectedProject->description }}</p>
-                                            <div class="flex items-center gap-6 pt-1">
+                                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pt-1">
                                                 <div class="flex items-center gap-2">
                                                     <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -154,7 +154,7 @@
                                         </div>
 
                                         <!-- Developer Info & Price -->
-                                        <div class="flex items-start justify-between mb-4">
+                                        <div class="flex flex-col sm:flex-row items-start justify-between mb-4 gap-4">
                                             <!-- Developer -->
                                             @if($proposal->developer)
                                                 <div class="flex items-center gap-3">
@@ -184,7 +184,7 @@
                                             @endif
 
                                             <!-- Price -->
-                                            <div class="text-right">
+                                            <div class="text-left sm:text-right w-full sm:w-auto">
                                                 <p class="text-h-6 font-bold text-neutral-900">
                                                     Rp{{ number_format($proposal->final_price, 0, ',', '.') }}
                                                 </p>
@@ -217,20 +217,20 @@
                                         </div>
 
                                         <!-- Timeline & Actions -->
-                                        <div class="flex items-center justify-between pt-4 border-t border-neutral-100">
+                                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 border-t border-neutral-100 gap-3">
                                             <span class="text-b-3 text-neutral-400">
                                                 Submitted {{ $proposal->created_at->diffForHumans() }}
                                             </span>
 
                                             <!-- Action Buttons -->
                                             @if($proposal->developer)
-                                                <div class="flex items-center gap-2">
+                                                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                                                     <a href="{{ route('user', ['id' => $proposal->developer->id]) }}"
-                                                        class="px-4 py-2 bg-white border border-neutral-300 text-neutral-700 text-b-3 font-medium rounded-lg hover:bg-neutral-50 transition">
+                                                        class="px-4 py-2 bg-white border border-neutral-300 text-neutral-700 text-b-3 font-medium rounded-lg hover:bg-neutral-50 transition text-center">
                                                         Send Message
                                                     </a>
                                                     <a href="{{ route('consumer.payments.agreement-detail', $proposal->id) }}"
-                                                        class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition">
+                                                        class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition text-center">
                                                         View Proposal
                                                     </a>
                                                 </div>

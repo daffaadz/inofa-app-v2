@@ -12,9 +12,9 @@
             <div class="mt-16">
 
                 <!-- HEADER SECTION -->
-                <div class="p-8 pb-16 border-b-[0.5px] border-neutral-100 bg-neutral-0">
-                    <div class="flex items-center justify-between">
-                        <div>
+                <div class="p-4 md:p-8 pb-8 md:pb-16 border-b-[0.5px] border-neutral-100 bg-neutral-0">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex-1 min-w-0">
                             <h1 class="text-h-3 font-bold text-neutral-900">My Proposals</h1>
                             <p class="mt-1 text-b-1 text-neutral-600">Track your pending and accepted project proposals
                             </p>
@@ -24,7 +24,7 @@
                             class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary-500 text-neutral-0
                                 hover:bg-primary-600 hover:scale-[1.02] active:scale-[0.98]
                                 [box-shadow:inset_0_2px_4px_0_rgba(0,0,0,0.06),0_4px_12px_rgba(16,138,0,0.25)]
-                                transition-all duration-200">
+                                transition-all duration-200 w-full sm:w-auto">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -101,7 +101,7 @@
                                 @if ($proposal->consumer)
                                     <div
                                         class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
-                                        <div class="flex items-start justify-between gap-6">
+                                        <div class="flex flex-col lg:flex-row items-start justify-between gap-6">
 
                                             <!-- Left Content -->
                                             <div class="flex-1">
@@ -164,7 +164,7 @@
                                                 @endif
 
                                                 <!-- Proposal Details Grid -->
-                                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                                                     <!-- Proposed Price -->
                                                     <div class="bg-primary-50 rounded-lg p-3">
                                                         <p class="text-b-4 text-primary-600 mb-1">Your Proposal</p>
@@ -215,11 +215,11 @@
                                             </div>
 
                                             <!-- Right Actions -->
-                                            <div class="flex flex-col items-end gap-3">
+                                            <div class="flex flex-col items-stretch lg:items-end gap-3 w-full lg:w-auto">
                                                 <!-- View Project Button -->
                                                 @if($proposal->project_id && $proposal->project)
                                                     <a href="{{ route('developer.projects.show', $proposal->project) }}"
-                                                        class="px-4 py-2 border-2 border-primary-500 text-primary-500 text-b-3 font-medium rounded-lg hover:bg-primary-50 transition flex items-center gap-2">
+                                                        class="px-4 py-2 border-2 border-primary-500 text-primary-500 text-b-3 font-medium rounded-lg hover:bg-primary-50 transition flex items-center justify-center gap-2">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                             <path
                                                                 d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
@@ -228,7 +228,7 @@
                                                     </a>
                                                 @else
                                                     <button disabled
-                                                        class="px-4 py-2 border-2 border-neutral-300 text-neutral-400 text-b-3 font-medium rounded-lg cursor-not-allowed flex items-center gap-2">
+                                                        class="px-4 py-2 border-2 border-neutral-300 text-neutral-400 text-b-3 font-medium rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
                                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                             <path
                                                                 d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
@@ -239,7 +239,7 @@
 
                                                 <!-- Chat with Client -->
                                                 <a href="{{ route('user', ['id' => $proposal->consumer->id]) }}"
-                                                    class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition flex items-center gap-2">
+                                                    class="px-4 py-2 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-primary-600 transition flex items-center justify-center gap-2">
                                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                                         <path
                                                             d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />

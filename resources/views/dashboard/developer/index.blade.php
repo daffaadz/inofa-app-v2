@@ -14,19 +14,19 @@
                 <!-- HEADER SECTION -->
                 <div
                     class="px-4 md:px-8 py-6 md:py-8 pb-8 md:pb-16 flex flex-col md:flex-row items-start md:items-center justify-between border-b-[0.5px] border-neutral-100 bg-neutral-0 gap-4">
-                    <div>
+                    <div class="flex-1 min-w-0">
                         <h1 class="text-h-4 md:text-h-3 font-bold text-neutral-900">Developer Dashboard</h1>
                         <p class="mt-1 text-b-2 md:text-b-1 text-neutral-600">Welcome back! Here's what's happening with your
                             projects
                         </p>
                     </div>
 
-                    <div>
+                    <div class="w-full md:w-auto">
                         <a href="{{ route('search.developers.show', auth()->user()->id) }}" target="_blank"
-                            class="inline-flex items-center justify-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-xl border border-primary-500 bg-primary-500 text-neutral-0
+                            class="inline-flex items-center justify-center gap-2 px-3 md:px-4 py-2 md:py-3 rounded-lg border border-primary-500 bg-primary-500 text-neutral-0
                                 hover:bg-neutral-0 hover:text-primary-500 hover:scale-[1.02] active:scale-[0.98]
                                 [box-shadow:inset_0_2px_4px_0_rgba(0,0,0,0.06),0_4px_12px_rgba(16,138,0,0.25)]
-                                transition-all duration-200 group whitespace-nowrap">
+                                transition-all duration-200 group whitespace-nowrap w-full md:w-auto">
 
                             <svg class="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 20 20">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.66667"
@@ -36,7 +36,7 @@
                             </svg>
 
                             {{-- Label --}}
-                            <span class="text-b-3 md:text-b-1 font-light">View Public Profile</span>
+                            <span class="text-b-2 md:text-b-1 font-medium md:font-light">View Public Profile</span>
                         </a>
                     </div>
                 </div>
@@ -240,16 +240,16 @@
                         return labels[this.sortBy] || 'Sort By';
                     }
                 }" @click.away="sortOpen = false">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-centerjustify-between mb-4 gap-4">
                         <div>
                             <h2 class="text-h-5 font-bold text-neutral-900">My Active and Complete Projects</h2>
                             <p class="text-b-1 text-neutral-600">Track your ongoing work, deadlines, and completed projects</p>
                         </div>
                         
                         <!-- Sort By Dropdown -->
-                        <div class="relative">
+                        <div class="relative w-full sm:w-auto">
                             <button @click="sortOpen = !sortOpen"
-                                class="text-primary-500 text-b-1 font-medium hover:bg-primary-50 px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                                class="text-primary-500 text-b-1 font-medium hover:bg-primary-50 md:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition w-auto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
                                 </svg>
@@ -267,7 +267,7 @@
                                 x-transition:leave="transition ease-in duration-150"
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-10"
+                                class="absolute left-0 sm:right-0 sm:left-auto mt-2 w-full sm:w-56 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-10"
                                 style="display: none;">
                                 <button @click="sortBy = 'default'; sortOpen = false" 
                                     class="w-full text-left px-4 py-2 text-b-2 hover:bg-neutral-50 transition"
@@ -306,7 +306,7 @@
                     <div class="space-y-4">
                         <template x-for="agreement in sortedAgreements" :key="agreement.id">
                             <div class="bg-white rounded-2xl border border-neutral-200 p-6 hover:shadow-lg transition">
-                                <div class="flex items-start justify-between gap-6">
+                                <div class="flex flex-col lg:flex-row items-start justify-between gap-6">
 
                                     <!-- Left Content -->
                                     <div class="flex-1">
@@ -437,13 +437,13 @@
                                     </div>
 
                                     <!-- Right Content -->
-                                    <div class="flex flex-col items-end gap-3">
-                                        <div class="text-right">
+                                    <div class="flex flex-col items-start lg:items-end gap-3 w-full lg:w-auto">
+                                        <div class="text-left lg:text-right w-full">
                                             <p class="text-h-5 font-bold text-neutral-900 flex items-center gap-1">
                                                 Rp<span x-text="agreement.final_price.toLocaleString('id-ID')"></span>
                                             </p>
                                             <p class="text-b-3 text-neutral-600">Payment</p>
-                                            <p class="text-b-3 text-neutral-600 flex items-center justify-end gap-1 mt-3">
+                                            <p class="text-b-3 text-neutral-600 flex items-center gap-1 mt-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 256 256">
                                                     <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"></path>
                                                 </svg>
@@ -452,9 +452,9 @@
                                             <p class="text-b-4 text-neutral-500">Deadline</p>
                                         </div>
 
-                                        <div class="flex gap-2">
+                                        <div class="flex gap-2 w-full lg:w-auto">
                                             <a :href="`/user/${agreement.consumer.id}`"
-                                                class="px-8 py-2 border border-primary-500 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition flex items-center gap-2">
+                                                class="flex-1 lg:flex-none px-8 py-2 border border-primary-500 bg-primary-500 text-white text-b-3 font-medium rounded-lg hover:bg-white hover:text-primary-500 transition flex items-center justify-center gap-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 256 256">
                                                     <path d="M216,48H40A16,16,0,0,0,24,64V224a15.85,15.85,0,0,0,9.24,14.5A16.13,16.13,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78.69.69,0,0,0,.13-.11L82.5,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM40,224h0ZM216,192H82.5a16,16,0,0,0-10.3,3.75l-.12.11L40,224V64H216ZM88,112a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm0,32a8,8,0,0,1,8-8h64a8,8,0,1,1,0,16H96A8,8,0,0,1,88,144Z"></path>
                                                 </svg>

@@ -14,7 +14,7 @@
                 class="messenger-listView max-w-[32rem] bg-white border-r border-neutral-100 flex flex-col {{ !!$id ? 'conversation-active' : '' }}">
 
                 {{-- Header --}}
-                <div class="m-header px-6 py-6 border-b border-neutral-100">
+                <div class="m-header px-6 py-6 pt-16 md:pt-0 border-b border-neutral-100">
                     <h1 class="text-h-4 text-neutral-900 mb-2 messenger-headTitle">
                         {{ Auth::user()->role === 'admin' ? 'Complaints' : 'Messages' }}
                     </h1>
@@ -38,7 +38,7 @@
                 {{-- Contacts List --}}
                 <div class="overflow-y-auto flex-1 mt-16">
                     {{-- User Tab --}}
-                    <div class="show messenger-tab users-tab app-scroll" data-view="users">
+                    <div class="show messenger-tab users-tab app-scroll mt-12 md:mt-0" data-view="users">
                         {{-- Favorites Section --}}
                         <div class="favorites-section px-4" style="display: none;">
                             <p class="messenger-title px-6 py-2 text-b-3 text-neutral-500 font-semibold">
@@ -46,14 +46,11 @@
                             <div class="messenger-favorites app-scroll-hidden"></div>
                         </div>
 
-                        {{-- All Messages --}}
-                        <p class="messenger-title px-6 py-2 text-b-3 text-neutral-500 font-semibold"><span>All
-                                Messages</span></p>
                         <div class="listOfContacts" style="width: 100%;"></div>
                     </div>
 
                     {{-- Search Tab (hidden by default) --}}
-                    <div class="messenger-tab search-tab app-scroll" data-view="search" style="display: none;">
+                    <div class="messenger-tab search-tab app-scroll mt-12 md:mt-0" data-view="search" style="display: none;">
                         </p>
                         <div class="search-records">
                             <p class="message-hint center-el text-b-3 text-neutral-400 text-center py-8"><span>Type to

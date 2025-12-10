@@ -15,12 +15,12 @@
                 <h3 class="text-h-6 text-neutral-1000">Personal Information</h3>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Full Name -->
-                <div>
-                    <label for="name" class="block text-b-1 font-medium text-neutral-700 mb-2">Full Name</label>
+                <div class="w-full">
+                    <label for="name" class="block text-b-2 md:text-b-1 font-medium text-neutral-700 mb-2">Full Name</label>
                     <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
-                        class="w-full px-4 py-2.5 text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                        class="w-full px-4 py-2.5 text-b-2 md:text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                         required>
                     @error('name')
                         <p class="mt-1 text-b-3 text-red-500">{{ $message }}</p>
@@ -28,10 +28,10 @@
                 </div>
 
                 <!-- Email -->
-                <div>
-                    <label for="email" class="block text-b-1 font-medium text-neutral-700 mb-2">Email</label>
+                <div class="w-full">
+                    <label for="email" class="block text-b-2 md:text-b-1 font-medium text-neutral-700 mb-2">Email</label>
                     <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
-                        class="w-full px-4 py-2.5 text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                        class="w-full px-4 py-2.5 text-b-2 md:text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                         required>
                     @error('email')
                         <p class="mt-1 text-b-3 text-red-500">{{ $message }}</p>
@@ -57,21 +57,21 @@
                 </div>
 
                 <!-- Phone -->
-                <div>
-                    <label for="phone" class="block text-b-1 font-medium text-neutral-700 mb-2">Phone</label>
+                <div class="w-full">
+                    <label for="phone" class="block text-b-2 md:text-b-1 font-medium text-neutral-700 mb-2">Phone</label>
                     <input type="tel" id="phone" name="phone"
                         value="{{ old('phone', $user->phone ?? '+62 812 3456 7890') }}"
-                        class="w-full px-4 py-2.5 text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                        class="w-full px-4 py-2.5 text-b-2 md:text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
                     @error('phone')
                         <p class="mt-1 text-b-3 text-red-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Location -->
-                <div>
-                    <label for="location" class="block text-b-1 font-medium text-neutral-700 mb-2">Location</label>
+                <div class="w-full">
+                    <label for="location" class="block text-b-2 md:text-b-1 font-medium text-neutral-700 mb-2">Location</label>
                     <input type="text" id="location" name="location" value="{{ old('location', $user->location) }}"
-                        class="w-full px-4 py-2.5 text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                        class="w-full px-4 py-2.5 text-b-2 md:text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                         placeholder="Jakarta, Indonesia">
                     @error('location')
                         <p class="mt-1 text-b-3 text-red-500">{{ $message }}</p>
@@ -80,12 +80,12 @@
 
                 <!-- Job Title (full width) -->
                 @if (Auth::user()->role === 'developer')
-                    <div class="col-span-2">
-                        <label for="job_title" class="block text-b-1 font-medium text-neutral-700 mb-2">Job
+                    <div class="col-span-1 md:col-span-2 w-full">
+                        <label for="job_title" class="block text-b-2 md:text-b-1 font-medium text-neutral-700 mb-2">Job
                             Title</label>
                         <input type="text" id="job_title" name="job_title"
                             value="{{ old('job_title', Auth::user()->developerProfile->headline ?? '') }}"
-                            class="w-full px-4 py-2.5 text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                            class="w-full px-4 py-2.5 text-b-2 md:text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
                             placeholder="e.g. Senior Full-Stack Developer">
                         @error('job_title')
                             <p class="mt-1 text-b-3 text-red-500">{{ $message }}</p>
@@ -94,10 +94,10 @@
                 @endif
 
                 <!-- Bio (full width) -->
-                <div class="col-span-2">
-                    <label for="bio" class="block text-b-1 font-medium text-neutral-700 mb-2">Bio</label>
+                <div class="col-span-1 md:col-span-2 w-full">
+                    <label for="bio" class="block text-b-2 md:text-b-1 font-medium text-neutral-700 mb-2">Bio</label>
                     <textarea id="bio" name="bio" rows="4" maxlength="1500"
-                        class="w-full px-4 py-2.5 text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition resize-none"
+                        class="w-full px-4 py-2.5 text-b-2 md:text-b-1 text-neutral-700 bg-neutral-50 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition resize-none"
                         placeholder="Full-stack developer with 5+ years of experience building web and mobile applications. Specialized in React, Node.js, and cloud technologies...">{{ old('bio', $user->bio) }}</textarea>
                     <p class="mt-1 text-b-2 text-neutral-400"><span
                             id="bio-count">{{ strlen($user->bio ?? '') }}</span>/1500 characters</p>
@@ -122,7 +122,7 @@
                     <h3 class="text-h-6 text-neutral-1000">Professional Details</h3>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Rate Min -->
                     <div>
                         <label for="rate_min" class="block text-b-1 font-medium text-neutral-700 mb-2">Minimum Rate
@@ -157,7 +157,8 @@
 
                     <!-- Years of Experience -->
                     <div>
-                        <label for="experience_years" class="block text-b-1 font-medium text-neutral-700 mb-2">Years of
+                        <label for="experience_years" class="block text-b-1 font-medium text-neutral-700 mb-2">Years
+                            of
                             Experience</label>
                         <input type="number" id="experience_years" name="experience_years"
                             value="{{ old('experience_years', Auth::user()->developerProfile->experience_years ?? 5) }}"

@@ -1,6 +1,6 @@
 <div class="bg-white rounded-lg shadow-sm p-6">
     <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-4">
             <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
                 <svg class="w-6 h-6 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -10,11 +10,11 @@
             <h3 class="text-h-6 text-neutral-1000">My Portfolio</h3>
         </div>
         <button type="button" onclick="toggleAddPortfolioModal()"
-            class="px-6 py-2.5 bg-primary-500 text-white text-b-1 font-medium rounded-lg hover:bg-primary-600 transition flex items-center gap-2">
+            class="px-4 py-2.5 md:px-6 bg-primary-500 text-white text-b-1 font-medium rounded-lg hover:bg-primary-600 transition flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            Add Project
+            <span class="hidden md:inline">Add Project</span>
         </button>
     </div>
 
@@ -32,7 +32,7 @@
 
     <!-- Portfolio Grid -->
     @if ($user->portfolios && $user->portfolios->count() > 0)
-        <div class="grid grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @foreach ($user->portfolios as $portfolio)
                 <div
                     class="group relative bg-white border border-neutral-200 rounded-lg overflow-hidden hover:shadow-lg transition">
