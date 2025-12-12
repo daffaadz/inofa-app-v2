@@ -16,10 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.access' => \App\Http\Middleware\AdminAccessControl::class,
         ]);
         
-        // Terapkan middleware admin.access ke semua route yang ter-autentikasi
-        $middleware->web(append: [
-            \App\Http\Middleware\AdminAccessControl::class,
-        ]);
+        // TIDAK menerapkan admin.access secara global
+        // Middleware akan diterapkan secara spesifik di routes
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

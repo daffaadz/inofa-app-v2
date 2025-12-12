@@ -77,19 +77,19 @@ Route::middleware('auth')
     ->name('redirect-after-login');
 
 // Main dashbaord
-Route::middleware(['auth'])
+Route::middleware(['auth', 'admin.access'])
     ->get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 // Complaint routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin.access'])->group(function () {
     Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
     Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
     Route::get('/complaints/{id}', [ComplaintController::class, 'show'])->name('complaints.show');
 });
 
 // Profile Management
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'admin.access'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -138,7 +138,7 @@ Route::get('/auth/{driver}/callback', [SocialAuthController::class, 'callback'])
     ->name('social.callback');
 
 // Registration flow routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin.access'])->group(function () {
     Route::get('/select-role', [RegistrationFlowController::class, 'showRoleSelection'])->name('select-role');
     Route::post('/select-role', [RegistrationFlowController::class, 'storeRole'])->name('select-role.store');
 
@@ -150,7 +150,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Search for Developers (requires authentication)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin.access'])->group(function () {
     Route::get('/search/developers', [SearchDevelopers::class, 'index'])
         ->name('search.developers');
     Route::get('/search/developers/{id}', [SearchDevelopers::class, 'show'])
@@ -169,7 +169,7 @@ require __DIR__ . '/auth.php';
 use App\Http\Controllers\ProposalController;
 
 // Proposal Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'admin.access'])->group(function () {
     // Hanya developer yang bisa membuat proposal
     Route::middleware(['role:developer'])->group(function () {
         Route::get('/proposals/create', [ProposalController::class, 'create'])

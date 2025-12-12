@@ -2,7 +2,7 @@
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100" x-data="{ tab: '{{ request('tab','payments') }}' }">
 
-    <div class="p-4 md:p-8 max-w-[1600px] mx-auto pt-20 lg:pt-4">
+    <div class="max-w-6xl mx-auto pt-20 lg:pt-4">
         
         {{-- Page Header --}}
         <div class="bg-white shadow-sm rounded-2xl p-4 sm:p-6 md:p-8 mb-4 md:mb-6 border border-gray-100">
