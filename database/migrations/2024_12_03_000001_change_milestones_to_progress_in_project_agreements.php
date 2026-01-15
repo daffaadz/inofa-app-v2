@@ -26,7 +26,6 @@ return new class extends Migration
         // Update existing records to have progress = 0
         DB::table('project_agreements')
             ->whereNull('progress')
-            ->orWhere('progress', '')
             ->update(['progress' => 0]);
     }
 

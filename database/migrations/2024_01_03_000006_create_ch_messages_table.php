@@ -20,7 +20,6 @@ return new class extends Migration
             $table->boolean('seen')->default(false);
             $table->timestamps();
 
-            $table->foreign('project_agreement_id')->references('id')->on('project_agreements')->onDelete('cascade');
             $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
         });
     }
