@@ -87,7 +87,7 @@ class AgreementController extends Controller
             }
 
             // Send termination request message with button
-            $messageBody = "I would like to stop the project '{$agreement->project_title}'. Please confirm if you agree to terminate this project.";
+            $messageBody = "I would like to stop the project '" . e($agreement->project_title) . "'. Please confirm if you agree to terminate this project.";
             
             $message = ChMessage::create([
                 'from_id' => Auth::id(),

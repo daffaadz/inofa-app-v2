@@ -191,11 +191,6 @@ class ProjectController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Incomplete project data. Please complete all steps.',
-                'debug' => [
-                    'has_details' => !empty($details),
-                    'has_skills' => !empty($skills),
-                    'has_budget' => !empty($budget),
-                ],
             ], 422);
         }
 
@@ -247,6 +242,17 @@ class ProjectController extends Controller
     public function update(Request $request, $id)
     {
         $project = Project::where('consumer_id', Auth::id())->findOrFail($id);
+
+        $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'budget' => 'sometimes|required|numeric|min:0',
+            'deadline' => 'sometimes|required|date',
+            'requirements' => 'sometimes|nullable|array',
+            'skills' => 'sometimes|array',
+            'skills.*.skill_id' => 'required|integer|exists:skills,id',
+            'skills.*.required_level' => 'required|integer|min:1|max:4',
+        ]);
 
         $data = $request->only(['title', 'description', 'budget', 'deadline']);
 

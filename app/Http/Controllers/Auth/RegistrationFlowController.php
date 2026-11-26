@@ -22,6 +22,15 @@ class RegistrationFlowController extends Controller
         ]);
 
         $user = auth()->user();
+        // Kolom role punya default 'consumer', jadi akun dianggap sudah memilih bila sudah punya aktivitas.
+        abort_if(
+            $user->isAdmin()
+                || $user->developerProfile()->exists()
+                || $user->postedProjects()->exists()
+                || $user->agreementsAsConsumer()->exists()
+                || $user->agreementsAsDeveloper()->exists(),
+            403
+        );
         $user->update(['role' => $request->role]);
 
         return redirect()->route('personal-information');

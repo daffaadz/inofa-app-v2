@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Developer;
 
+use App\Http\Controllers\Controller;
 use App\Models\Portofolio;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,8 +36,8 @@ class PortfolioController extends Controller
 
         // Convert technologies string to JSON array
         if (isset($validated['technologies'])) {
-            $techArray = array_map('trim', explode(',', $validated['technologies']));
-            $validated['technologies'] = json_encode($techArray);
+            // Model meng-cast ke array, jadi jangan di-encode dua kali
+            $validated['technologies'] = array_map('trim', explode(',', $validated['technologies']));
         }
 
         // Set sort order
@@ -83,8 +84,8 @@ class PortfolioController extends Controller
 
         // Convert technologies string to JSON array
         if (isset($validated['technologies'])) {
-            $techArray = array_map('trim', explode(',', $validated['technologies']));
-            $validated['technologies'] = json_encode($techArray);
+            // Model meng-cast ke array, jadi jangan di-encode dua kali
+            $validated['technologies'] = array_map('trim', explode(',', $validated['technologies']));
         }
 
         $portfolio->update($validated);

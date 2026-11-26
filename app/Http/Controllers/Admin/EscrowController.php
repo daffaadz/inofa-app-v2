@@ -43,14 +43,15 @@ class EscrowController extends Controller
     {
         $payment = Payment::findOrFail($id);
         
+        if ($payment->status !== 'confirmed') {
+            return back()->with('error', 'Pembayaran belum dikonfirmasi atau sudah ditransfer.');
+        }
+
+        $request->validate(['proof' => 'nullable|mimes:jpg,jpeg,png,pdf|max:5120']);
+
         if ($request->hasFile('proof')) {
             $path = $request->file('proof')->store('escrow/proof','public');
             $payment->update(['admin_transfer_proof' => $path]);
-        }
-
-
-        if ($payment->status !== 'confirmed') {
-            return back()->with('error', 'Pembayaran belum dikonfirmasi atau sudah ditransfer.');
         }
 
         $payment->markAsTransferred();

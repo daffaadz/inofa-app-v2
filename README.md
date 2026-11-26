@@ -125,10 +125,10 @@ Setelah menjalankan seeder, akun admin default akan tersedia:
 | Field | Value |
 |-------|-------|
 | **Email** | `admin@inofa.com` |
-| **Password** | `inofasite` |
+| **Password** | nilai `ADMIN_PASSWORD` di `.env` saat seeding |
 | **Role** | Admin |
 
-> ⚠️ **Penting:** Segera ganti password default setelah login pertama kali di production!
+> ⚠️ **Penting:** Isi `ADMIN_PASSWORD` sebelum `migrate --seed`. Kalau kosong, password dibuat acak dan tidak bisa dipakai login.
 
 ---
 

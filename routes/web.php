@@ -52,6 +52,7 @@ use App\Http\Controllers\Customer\SearchController as SearchDevelopers;
 use App\Http\Controllers\Developer\SearchController as SearchProjects;
 use App\Http\Controllers\Developer\SkillController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\Developer\PortfolioController as DevPortfolio;
 use App\Http\Controllers\ComplaintController;
 
 Route::get('/', function () {
@@ -121,9 +122,9 @@ Route::middleware(['auth', 'admin.access'])->group(function () {
 
         // Portfolio routes
         Route::post('/profile/portfolios', [PortfolioController::class, 'store'])->name('portfolios.store');
-        Route::patch('/profile/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolios.update');
+        Route::patch('/profile/portfolios/{portfolio}', [DevPortfolio::class, 'update'])->name('portfolios.update');
         Route::delete('/profile/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolios.destroy');
-        Route::post('/profile/portfolios/{portfolio}/toggle-featured', [PortfolioController::class, 'toggleFeatured'])->name('portfolios.toggle-featured');
+        Route::post('/profile/portfolios/{portfolio}/toggle-featured', [DevPortfolio::class, 'toggleFeatured'])->name('portfolios.toggle-featured');
 
         // Payment details route
         Route::patch('/profile/payment-details', [ProfileController::class, 'updatePaymentDetails'])->name('profile.payment-details.update');
@@ -250,7 +251,7 @@ use App\Http\Controllers\Customer\ProposalsController;
 use App\Http\Controllers\Customer\ReviewController;
 
 Route::middleware(['auth', 'role:consumer'])->prefix('consumer')->as('consumer.')->group(function () {
-    Route::resource('project', CustProject::class);
+    Route::resource('project', CustProject::class)->except('edit');
 
     /* ---------- custom CREATE (view) ---------- */
     Route::get('project/create/skills',      [CustProject::class, 'createSkills'])->name('project.createSkills');

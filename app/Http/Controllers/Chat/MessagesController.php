@@ -30,6 +30,18 @@ class MessagesController extends Controller
      */
     public function pusherAuth(Request $request)
     {
+        $channel = (string) $request['channel_name'];
+
+        // Channel sinyal (typing/seen) tidak memuat isi pesan; Chatify hanya mengizinkan channel milik sendiri.
+        if (preg_match('/^private-chatify-signal\.\d+$/D', $channel)) {
+            return Chatify::getFacadeRoot()->pusher->socket_auth($channel, (string) $request['socket_id']);
+        }
+
+        abort_unless(
+            $channel === 'private-chatify.' . Auth::id() || $channel === 'presence-activeStatus',
+            403
+        );
+
         return Chatify::pusherAuth(
             $request->user(),
             Auth::user(),
@@ -164,7 +176,7 @@ class MessagesController extends Controller
         }
         return Response::json([
             'favorite' => $favorite,
-            'fetch' => $fetch ?? null,
+            'fetch' => $fetch?->only(['id', 'name']),
             'user_avatar' => $userAvatar ?? null,
         ]);
     }
@@ -225,6 +237,11 @@ class MessagesController extends Controller
                 $error->status = 1;
                 $error->message = "File size you are trying to upload is too large!";
             }
+        }
+
+        if (!$error->status && !User::whereKey($request['id'])->exists()) {
+            $error->status = 1;
+            $error->message = "Recipient not found!";
         }
 
         if (!$error->status) {
@@ -688,6 +705,13 @@ class MessagesController extends Controller
             }
 
             $projectId = $request->input('project_id');
+
+            if ($projectId && !Project::whereKey($projectId)->where('consumer_id', Auth::id())->exists()) {
+                return Response::json([
+                    'success' => false,
+                    'message' => 'Project not found'
+                ], 404);
+            }
             
             // Update conversation's project_id
             $conversation->update([
@@ -714,10 +738,10 @@ class MessagesController extends Controller
                 'message' => 'Conversation not found'
             ], 404);
         } catch (\Exception $e) {
+            report($e);
             return Response::json([
                 'success' => false,
                 'message' => 'Failed to update project topic',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -773,10 +797,10 @@ class MessagesController extends Controller
                 'message' => 'Conversation not found'
             ], 404);
         } catch (\Exception $e) {
+            report($e);
             return Response::json([
                 'success' => false,
                 'message' => 'Failed to update conversation title',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -878,10 +902,10 @@ class MessagesController extends Controller
                 'message' => 'Conversation not found'
             ], 404);
         } catch (\Exception $e) {
+            report($e);
             return Response::json([
                 'success' => false,
                 'message' => 'Failed to send agreement request',
-                'error' => $e->getMessage()
             ], 500);
         }
     }

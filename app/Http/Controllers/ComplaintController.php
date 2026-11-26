@@ -51,10 +51,10 @@ class ComplaintController extends Controller
             ], 422);
 
         } catch (\Exception $e) {
+            report($e);
             return Response::json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengirim pengaduan. Silakan coba lagi.',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -77,10 +77,10 @@ class ComplaintController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            report($e);
             return Response::json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengambil data pengaduan.',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -110,10 +110,10 @@ class ComplaintController extends Controller
             ], 404);
 
         } catch (\Exception $e) {
+            report($e);
             return Response::json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengambil data pengaduan.',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }

@@ -47,7 +47,7 @@ services:
             MYSQL_USER: ${DB_USERNAME:-inofa}
         command: --log-bin-trust-function-creators=1
         ports:
-            - "3307:3306"
+            - "127.0.0.1:3307:3306"
         volumes:
             - mysql-data:/var/lib/mysql
         networks:
@@ -59,7 +59,7 @@ services:
         container_name: inofa-redis
         restart: unless-stopped
         ports:
-            - "6380:6379"
+            - "127.0.0.1:6380:6379"
         volumes:
             - redis-data:/data
         networks:
@@ -74,7 +74,7 @@ services:
             MEILI_MASTER_KEY: ${MEILISEARCH_KEY:-masterKey}
             MEILI_NO_ANALYTICS: true
         ports:
-            - "7700:7700"
+            - "127.0.0.1:7700:7700"
         volumes:
             - meilisearch-data:/meili_data
         networks:

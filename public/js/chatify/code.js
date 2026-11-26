@@ -651,15 +651,17 @@ function cancelUpdatingAvatar() {
 
 // subscribe to the channel
 const channelName = "private-chatify";
+// Sinyal (typing, seen) memakai channel terpisah supaya channel pesan orang lain tidak perlu dibuka
+const signalChannelName = "private-chatify-signal";
 var channel = pusher.subscribe(`${channelName}.${auth_id}`);
 var clientSendChannel;
 var clientListenChannel;
 
 function initClientChannel() {
   if (getMessengerId()) {
-    clientSendChannel = pusher.subscribe(`${channelName}.${getMessengerId()}`);
-    clientListenChannel = pusher.subscribe(`${channelName}.${auth_id}`);
+    clientSendChannel = pusher.subscribe(`${signalChannelName}.${getMessengerId()}`);
   }
+  clientListenChannel = pusher.subscribe(`${signalChannelName}.${auth_id}`);
 }
 initClientChannel();
 

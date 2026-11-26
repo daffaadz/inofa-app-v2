@@ -17,6 +17,7 @@ class Payment extends Model
         'admin_confirmed_at',
         'admin_transferred',
         'admin_transferred_at',
+        'admin_transfer_proof',
     ];
 
     protected $casts = [

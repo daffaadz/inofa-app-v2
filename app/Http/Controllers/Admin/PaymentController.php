@@ -19,11 +19,11 @@ class PaymentController extends Controller
         try {
             $payment = Payment::findOrFail($id);
             
-            // Check if already approved
-            if ($payment->status === 'confirmed' || $payment->status === 'transferred') {
+            // Hanya pembayaran pending: yang failed harus lewat review dulu
+            if ($payment->status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Payment has already been approved.'
+                    'message' => 'Only pending payments can be approved.'
                 ], 400);
             }
 
@@ -56,9 +56,10 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to approve payment: ' . $e->getMessage()
+                'message' => 'Failed to approve payment.'
             ], 500);
         }
     }
@@ -76,10 +77,10 @@ class PaymentController extends Controller
                 ], 400);
             }
 
-            if ($payment->status === 'confirmed' || $payment->status === 'transferred') {
+            if ($payment->status !== 'pending') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cannot reject an approved payment.'
+                    'message' => 'Only pending payments can be rejected.'
                 ], 400);
             }
 
@@ -105,9 +106,10 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to reject payment: ' . $e->getMessage()
+                'message' => 'Failed to reject payment.'
             ], 500);
         }
     }
@@ -122,6 +124,14 @@ class PaymentController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment is already in pending status.'
+                ], 400);
+            }
+
+            // Dana yang sudah keluar tidak boleh kembali ke pending (bisa dibayar dua kali)
+            if (in_array($payment->status, ['transferred', 'refunded'], true)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A transferred or refunded payment cannot be reviewed again.'
                 ], 400);
             }
 
@@ -145,9 +155,10 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to review payment: ' . $e->getMessage()
+                'message' => 'Failed to review payment.'
             ], 500);
         }
     }
@@ -174,10 +185,7 @@ class PaymentController extends Controller
             }
 
             // Update payment status to transferred
-            $payment->update([
-                'status' => 'transferred',
-                'transferred_at' => now(),
-            ]);
+            $payment->markAsTransferred();
 
             // Dispatch event untuk broadcast dan notifikasi
             event(new PaymentStatusUpdated($payment));
@@ -188,14 +196,15 @@ class PaymentController extends Controller
                 'data' => [
                     'status' => 'transferred',
                     'payment_id' => $payment->id,
-                    'transferred_at' => $payment->transferred_at
+                    'transferred_at' => $payment->admin_transferred_at
                 ]
             ]);
 
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to transfer payment: ' . $e->getMessage()
+                'message' => 'Failed to transfer payment.'
             ], 500);
         }
     }

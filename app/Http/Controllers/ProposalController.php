@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 
@@ -53,7 +54,7 @@ class ProposalController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'to_id' => 'required|exists:users,id',
-            'project_id' => 'nullable|exists:projects,id',
+            'project_id' => ['nullable', Rule::exists('projects', 'id')->where('consumer_id', $request->to_id)],
             'project_title' => 'required|string|max:255',
             'client_name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -318,7 +319,6 @@ class ProposalController extends Controller
      */
     public function quickApply(Request $request, $projectId)
     {
-        DB::beginTransaction();
         try {
             // Verify user is a developer
             if (Auth::user()->role !== 'developer') {
@@ -334,7 +334,7 @@ class ProposalController extends Controller
             // Check if already contacted via message
             $existingMessage = ChMessage::where('from_id', Auth::id())
                 ->where('to_id', $project->consumer_id)
-                ->where('body', 'LIKE', "%I'm interested in discussing your project titled '{$project->title}'%")
+                ->where('body', 'LIKE', "%I'm interested in discussing your project titled '" . addcslashes(e($project->title), '%_\\') . "'%")
                 ->first();
             
             if ($existingMessage) {
@@ -344,9 +344,13 @@ class ProposalController extends Controller
                 ], 400);
             }
 
+            // Setelah pemeriksaan, supaya return lebih awal tidak meninggalkan transaksi terbuka
+            DB::beginTransaction();
+
             // Create automatic message
-            $developerName = Auth::user()->name;
-            $projectTitle = $project->title;
+            // Isi chat dirender tanpa escape, jadi nama dan judul di-escape di sini
+            $developerName = e(Auth::user()->name);
+            $projectTitle = e($project->title);
             $messageBody = "Hello, I'm {$developerName} and I'm interested in discussing your project titled '{$projectTitle}'. I would love to learn more about your requirements and how I can contribute to making this project successful. Looking forward to hearing from you!";
 
             // Create chat message
@@ -395,7 +399,7 @@ class ProposalController extends Controller
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send application: ' . $e->getMessage()
+                'message' => 'Failed to send application.'
             ], 500);
         }
     }
@@ -506,20 +510,27 @@ class ProposalController extends Controller
 
             $message = ChMessage::where('project_agreement_id', $agreementId)->first();
             if ($message) {
-                $metadata = json_decode($message->metadata, true);
+                // metadata sudah berupa array (accessor di model)
+                $metadata = $message->metadata ?? [];
                 $metadata['status'] = 'rejected';
-                $message->update(['metadata' => json_encode($metadata)]);
+                $message->metadata = $metadata;
 
                 // Update attachment juga
                 if ($message->attachment) {
                     $attachment = json_decode($message->attachment, true);
                     $attachment['status'] = 'rejected';
-                    $message->update(['attachment' => json_encode($attachment)]);
+                    $message->attachment = json_encode($attachment);
                 }
+
+                $message->save();
             }
 
             // Send notification to developer
-            $agreement->developer->notify(new \App\Notifications\ProposalStatusUpdated($agreement, Auth::user()));
+            try {
+                $agreement->developer->notify(new \App\Notifications\ProposalStatusUpdated($agreement, Auth::user()));
+            } catch (\Exception $e) {
+                Log::error('Notification failed', ['error' => $e->getMessage()]);
+            }
 
             \App\Models\UserNotification::create([
                 'user_id' => $agreement->developer_id,

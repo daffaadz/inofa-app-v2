@@ -7,6 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Sintaks trigger khusus MySQL; test memakai SQLite
+        if (! in_array(DB::getDriverName(), ['mysql', 'mariadb'], true)) {
+            return;
+        }
+
         // Trigger untuk update rating saat review ditambahkan
         DB::unprepared('
             CREATE TRIGGER trg_reviews_after_insert

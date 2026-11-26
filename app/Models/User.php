@@ -16,6 +16,12 @@ class User extends Authenticatable
 
     protected $hidden = ['password', 'remember_token'];
 
+    // Jangan kirim email dan data akun ke mesin pencari
+    public function toSearchableArray(): array
+    {
+        return $this->only(['id', 'name', 'bio', 'location', 'role']);
+    }
+
     protected $casts = [
         'email_verified_at' => 'datetime',
         'dark_mode' => 'boolean',

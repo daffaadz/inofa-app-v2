@@ -10,13 +10,19 @@ use Illuminate\Support\Str;
 
 class SocialAuthController extends Controller
 {
+    private const DRIVERS = ['google'];
+
     public function redirect($driver)
     {
+        abort_unless(in_array($driver, self::DRIVERS, true), 404);
+
         return Socialite::driver($driver)->redirect();
     }
 
     public function callback($driver)
     {
+        abort_unless(in_array($driver, self::DRIVERS, true), 404);
+
         $socialUser = Socialite::driver($driver)->stateless()->user();
 
         // 1. Cari user berdasarkan provider + provider_id
@@ -49,6 +55,11 @@ class SocialAuthController extends Controller
                     'avatar'      => $socialUser->getAvatar(),
                 ]);
             }
+        }
+
+        if ($user->status === 'suspended') {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Your account has been suspended. Please contact administrator for more information.']);
         }
 
         // 5. Login

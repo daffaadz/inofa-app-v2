@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,7 +23,8 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Admin InoFa',
                 'email' => 'admin@inofa.com',
-                'password' => Hash::make('inofasite'),
+                // Kosong = password acak; set ADMIN_PASSWORD sebelum seeding untuk bisa login
+                'password' => Hash::make(env('ADMIN_PASSWORD') ?: Str::random(32)),
                 'role' => 'admin',
                 'email_verified_at' => now(),
             ]
